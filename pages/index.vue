@@ -13,7 +13,5 @@
 <script setup lang="ts">
 useScrollAnimation()
 
-const { data: latestPosts } = await useAsyncData('newsletter-posts', () =>
-  queryCollection('blog').order('date', 'DESC').limit(2).all()
-)
+const latestPosts = await queryCollection('blog').order('date', 'DESC').limit(2).all()
 </script>
