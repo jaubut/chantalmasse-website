@@ -101,6 +101,7 @@
             <span class="font-body text-sm text-on-surface">📍 En personne (Shefford)</span>
           </label>
           <label
+            v-if="service.id === 'individual'"
             class="flex-1 flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200"
             :class="form.sessionType === 'video' ? 'bg-primary-fixed border-primary' : 'bg-surface-container-low border-outline-variant/30 hover:border-primary/40'"
           >
@@ -173,7 +174,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { BookingService } from './ServiceSelector.vue'
@@ -212,6 +213,12 @@ const form = reactive<FormData>({
 })
 
 const errors = reactive<Partial<Record<keyof FormData, string>>>({})
+
+watch(() => props.service.id, (id) => {
+  if (id !== 'individual' && form.sessionType === 'video') {
+    form.sessionType = 'in-person'
+  }
+})
 
 const formattedDate = computed(() =>
   format(props.date, "d MMMM yyyy", { locale: fr }),

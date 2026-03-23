@@ -31,6 +31,7 @@
         </span>
         <div class="flex flex-wrap gap-2">
           <span
+            v-if="service.id === 'individual'"
             class="inline-flex items-center gap-1.5 text-xs font-body px-2.5 py-1 rounded-full transition-colors"
             :class="isSelected(slot) ? 'bg-on-primary/10 text-on-primary' : 'bg-[#e0f5ed] text-[#1a6e4a]'"
           >
