@@ -23,35 +23,32 @@
       <!-- Right: blog cards -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" data-animate>
 
-        <div class="bg-tertiary-container rounded-2xl overflow-hidden group">
+        <NuxtLink
+          v-for="post in latestPosts"
+          :key="post.slug"
+          :to="`/blog/${post.slug}`"
+          class="bg-tertiary-container rounded-2xl overflow-hidden group"
+        >
           <div class="aspect-[4/3] overflow-hidden">
             <img
-              src="https://images.unsplash.com/photo-1516585427167-9f4af9627e6c?w=400&q=80"
-              alt="Les 5 langages du pardon"
+              :src="post.image"
+              :alt="post.title"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
             />
           </div>
           <div class="p-6">
-            <span class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture 4 min</span>
-            <h4 class="font-headline text-xl text-on-tertiary">Les 5 langages du pardon</h4>
+            <span class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture {{ post.readTime }} min</span>
+            <h4 class="font-headline text-xl text-on-tertiary">{{ post.title }}</h4>
           </div>
-        </div>
-
-        <div class="bg-tertiary-container rounded-2xl overflow-hidden group">
-          <div class="aspect-[4/3] overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=400&q=80"
-              alt="L'espace entre nous"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-            />
-          </div>
-          <div class="p-6">
-            <span class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture 6 min</span>
-            <h4 class="font-headline text-xl text-on-tertiary">L'espace entre nous</h4>
-          </div>
-        </div>
+        </NuxtLink>
 
       </div>
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+const { data: latestPosts } = await useAsyncData('newsletter-posts', () =>
+  queryCollection('blog').order('date', 'DESC').limit(2).all()
+)
+</script>

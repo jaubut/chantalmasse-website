@@ -16,7 +16,7 @@
       <div class="hidden md:flex items-center gap-10">
         <a href="#services" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Services</a>
         <a href="#approche" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Approche</a>
-        <a href="#" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Blog</a>
+        <NuxtLink to="/blog" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Blog</NuxtLink>
       </div>
 
       <!-- CTA -->
@@ -36,7 +36,7 @@
     <div v-if="menuOpen" class="md:hidden bg-surface-container-low px-8 py-6 flex flex-col gap-6 border-t border-outline-variant/30">
       <a href="#services" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Services</a>
       <a href="#approche" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Approche</a>
-      <a href="#" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Blog</a>
+      <NuxtLink to="/blog" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Blog</NuxtLink>
       <a href="#booking" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold text-center" @click="menuOpen = false">Contact</a>
     </div>
   </nav>
