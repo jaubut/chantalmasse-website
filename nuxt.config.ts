@@ -3,7 +3,31 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   nitro: {
-    preset: 'vercel-static',
+    // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
+    // Page routes are pre-rendered at build time via routeRules below.
+    preset: 'vercel',
+  },
+
+  routeRules: {
+    '/': { prerender: true },
+    '/blog': { prerender: true },
+    '/blog/**': { prerender: true },
+  },
+
+  runtimeConfig: {
+    // Server-only secrets
+    googleServiceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    googlePrivateKey: process.env.GOOGLE_PRIVATE_KEY,
+    googleCalendarId: process.env.GOOGLE_CALENDAR_ID,
+    resendApiKey: process.env.RESEND_API_KEY,
+    emailFrom: process.env.EMAIL_FROM,
+    emailTo: process.env.EMAIL_TO,
+    bookingMinNoticeHours: process.env.BOOKING_MIN_NOTICE_HOURS || '24',
+    // Exposed to client
+    public: {
+      bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
+      bookingAdvanceDays: process.env.BOOKING_ADVANCE_DAYS || '60',
+    },
   },
 
   modules: [

@@ -17,9 +17,12 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4" data-animate>
-          <a href="#booking" class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-center hover:bg-primary-container transition-colors">
+          <button
+            class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-center hover:bg-primary-container transition-colors"
+            @click="booking.open()"
+          >
             Prendre rendez-vous
-          </a>
+          </button>
           <a href="#services" class="border border-outline-variant/40 px-10 py-5 rounded-xl text-center hover:bg-surface-container transition-colors font-light" style="background-color: rgba(254,248,243,0.4); backdrop-filter: blur(4px);">
             En savoir plus
           </a>
@@ -42,3 +45,7 @@
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+const booking = useBooking()
+</script>

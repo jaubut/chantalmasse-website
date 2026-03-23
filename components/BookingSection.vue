@@ -34,9 +34,12 @@
               </li>
             </ul>
 
-            <a href="#booking" class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl hover:scale-105 transition-transform">
+            <button
+              class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl hover:scale-105 transition-transform"
+              @click="booking.open()"
+            >
               Réserver une séance
-            </a>
+            </button>
           </div>
 
           <!-- Right: schedule card -->
@@ -66,4 +69,6 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+
+const booking = useBooking()
 </script>

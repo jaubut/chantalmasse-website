@@ -5,5 +5,6 @@
       <NuxtPage />
     </main>
     <TheFooter />
+    <BookingModal />
   </div>
 </template>
