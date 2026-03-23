@@ -78,7 +78,6 @@ export default defineEventHandler(async (event) => {
       description: descriptionParts.join('\n'),
       startISO: isoStart,
       endISO: isoEnd,
-      clientEmail: client.email,
       sessionType,
       colorId: serviceConfig.colorId,
     })

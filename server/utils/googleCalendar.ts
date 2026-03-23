@@ -35,7 +35,6 @@ export async function createBookingEvent(params: {
   description: string
   startISO: string
   endISO: string
-  clientEmail: string
   sessionType: 'in-person' | 'video'
   colorId: string
 }) {
@@ -48,7 +47,6 @@ export async function createBookingEvent(params: {
     start: { dateTime: params.startISO, timeZone: 'America/Toronto' },
     end: { dateTime: params.endISO, timeZone: 'America/Toronto' },
     colorId: params.colorId,
-    attendees: [{ email: params.clientEmail }],
     reminders: {
       useDefault: false,
       overrides: [
