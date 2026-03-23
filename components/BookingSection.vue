@@ -4,7 +4,7 @@
       <div class="bg-surface-container-low rounded-[3rem] p-8 lg:p-24 relative overflow-hidden">
 
         <!-- Decorative icon -->
-        <span class="material-symbols-outlined absolute top-0 right-0 text-primary opacity-10 select-none pointer-events-none" style="font-size: 20rem; line-height: 1; transform: translate(20%, -10%);">eco</span>
+        <Icon icon="material-symbols:eco" class="absolute top-0 right-0 text-primary opacity-10 select-none pointer-events-none" style="width: 20rem; height: 20rem; line-height: 1; transform: translate(20%, -10%);" />
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
 
@@ -19,14 +19,14 @@
 
             <ul class="space-y-6 mb-12">
               <li class="flex items-start gap-4">
-                <span class="material-symbols-outlined text-primary mt-0.5">location_on</span>
+                <Icon icon="material-symbols:location-on" class="text-primary mt-0.5" />
                 <div>
                   <p class="font-semibold text-on-surface">Bureau Shefford</p>
                   <p class="text-on-surface-variant font-light">Région de la Haute-Yamaska</p>
                 </div>
               </li>
               <li class="flex items-start gap-4">
-                <span class="material-symbols-outlined text-primary mt-0.5">verified</span>
+                <Icon icon="material-symbols:verified" class="text-primary mt-0.5" />
                 <div>
                   <p class="font-semibold text-on-surface">Membre RITMA</p>
                   <p class="text-on-surface-variant font-light">Reçus pour fins d'assurances disponibles</p>
@@ -63,3 +63,7 @@
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { Icon } from '@iconify/vue'
+</script>

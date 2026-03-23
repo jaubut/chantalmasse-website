@@ -18,7 +18,7 @@
         <!-- Individual Therapy -->
         <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
           <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
-            <span class="material-symbols-outlined text-primary text-2xl">person</span>
+            <Icon icon="material-symbols:person" class="text-2xl text-primary" />
           </div>
           <h3 class="font-headline text-3xl text-primary mb-2">Thérapie Individuelle</h3>
           <p class="font-headline italic text-on-surface-variant mb-6">60 minutes pour soi</p>
@@ -27,11 +27,11 @@
           </p>
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-surface-variant font-light">
-              <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+              <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />
               Approche centrée sur le cœur
             </li>
             <li class="flex items-center gap-3 text-on-surface-variant font-light">
-              <span class="material-symbols-outlined text-primary text-lg">check_circle</span>
+              <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />
               Reçus d'assurance RITMA
             </li>
           </ul>
@@ -43,7 +43,7 @@
         <!-- Couple Coaching -->
         <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
           <div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-8">
-            <span class="material-symbols-outlined text-secondary text-2xl">favorite</span>
+            <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
           </div>
           <h3 class="font-headline text-3xl text-on-primary mb-2">Coaching de Couple</h3>
           <p class="font-headline italic text-on-primary-container mb-6">90 minutes de dialogue</p>
@@ -52,11 +52,11 @@
           </p>
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-primary-container font-light">
-              <span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+              <Icon icon="material-symbols:check-circle" class="text-lg text-on-primary" />
               Dialogue intentionnel Imago
             </li>
             <li class="flex items-center gap-3 text-on-primary-container font-light">
-              <span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+              <Icon icon="material-symbols:check-circle" class="text-lg text-on-primary" />
               Outils de communication concrets
             </li>
           </ul>
@@ -69,3 +69,7 @@
     </div>
   </section>
 </template>
+
+<script setup lang="ts">
+import { Icon } from '@iconify/vue'
+</script>

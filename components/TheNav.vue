@@ -28,7 +28,7 @@
 
       <!-- Hamburger -->
       <button class="md:hidden p-2" @click="menuOpen = !menuOpen" aria-label="Menu">
-        <span class="material-symbols-outlined text-primary">{{ menuOpen ? 'close' : 'menu' }}</span>
+        <Icon :icon="menuOpen ? 'material-symbols:close' : 'material-symbols:menu'" class="text-2xl text-primary" />
       </button>
     </div>
 
@@ -43,6 +43,8 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 const menuOpen = ref(false)
 const scrolled = ref(false)
 
