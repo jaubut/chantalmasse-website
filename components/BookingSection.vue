@@ -47,15 +47,19 @@
             <h4 class="font-headline text-2xl italic text-primary mb-8">Horaires habituels</h4>
             <div class="space-y-0">
               <div class="flex justify-between py-4 border-b border-outline-variant/20">
-                <span class="text-on-surface font-medium">Lundi — Jeudi</span>
-                <span class="text-on-surface-variant font-light">09:00 — 18:00</span>
+                <span class="text-on-surface font-medium">Lundi</span>
+                <span class="text-on-surface-variant font-light">10:30 — 18:30</span>
               </div>
               <div class="flex justify-between py-4 border-b border-outline-variant/20">
-                <span class="text-on-surface font-medium">Vendredi</span>
-                <span class="text-on-surface-variant font-light">09:00 — 14:00</span>
+                <span class="text-on-surface font-medium">Mardi</span>
+                <span class="text-on-surface-variant font-light">09:00 — 18:30</span>
+              </div>
+              <div class="flex justify-between py-4 border-b border-outline-variant/20">
+                <span class="text-on-surface font-medium">Mercredi — Jeudi</span>
+                <span class="text-on-surface-variant font-light">09:00 — 17:00</span>
               </div>
               <div class="flex justify-between py-4">
-                <span class="text-outline font-medium">Samedi — Dimanche</span>
+                <span class="text-outline font-medium">Vendredi — Dimanche</span>
                 <span class="text-outline font-light">Fermé</span>
               </div>
             </div>

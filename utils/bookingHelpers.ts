@@ -18,12 +18,11 @@ export const BOOKING_TIMEZONE = 'America/Toronto'
 
 // Working hours by weekday (0=Sun, 1=Mon, ..., 6=Sat)
 export const WORKING_HOURS: Record<number, { start: string; end: string }> = {
-  1: { start: '09:00', end: '18:00' }, // Monday
-  2: { start: '09:00', end: '18:00' }, // Tuesday
-  3: { start: '09:00', end: '18:00' }, // Wednesday
-  4: { start: '09:00', end: '18:00' }, // Thursday
-  5: { start: '09:00', end: '14:00' }, // Friday
-  // 0 (Sunday) and 6 (Saturday): closed
+  1: { start: '10:30', end: '18:30' }, // Monday
+  2: { start: '09:00', end: '18:30' }, // Tuesday
+  3: { start: '09:00', end: '17:00' }, // Wednesday
+  4: { start: '09:00', end: '17:00' }, // Thursday
+  // 0 (Sunday), 5 (Friday), and 6 (Saturday): closed
 }
 
 export const BUFFER_MINUTES = 15
