@@ -24,7 +24,7 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" data-animate>
 
         <NuxtLink
-          v-for="post in latestPosts"
+          v-for="post in posts"
           :key="post.slug"
           :to="`/blog/${post.slug}`"
           class="bg-tertiary-container rounded-2xl overflow-hidden group"
@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-const { data: latestPosts } = await useAsyncData('newsletter-posts', () =>
-  queryCollection('blog').order('date', 'DESC').limit(2).all()
-)
+defineProps<{
+  posts: { slug: string; title: string; image: string; readTime: number }[]
+}>()
 </script>
