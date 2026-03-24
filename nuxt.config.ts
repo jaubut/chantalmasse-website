@@ -23,6 +23,13 @@ export default defineNuxtConfig({
     emailFrom: process.env.EMAIL_FROM,
     emailTo: process.env.EMAIL_TO,
     bookingMinNoticeHours: process.env.BOOKING_MIN_NOTICE_HOURS || '24',
+    // Admin dashboard
+    adminPassword: process.env.ADMIN_PASSWORD,
+    metaAccessToken: process.env.META_ACCESS_TOKEN,
+    metaIgUserId: process.env.META_IG_USER_ID,
+    metaFbPageId: process.env.META_FB_PAGE_ID,
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+    briefEmail: process.env.BRIEF_EMAIL,
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',

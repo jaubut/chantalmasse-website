@@ -111,3 +111,60 @@ npm run dev
 ```
 
 The booking modal will open when clicking any "Prendre rendez-vous" or "Réserver une séance" button. API routes are available at `http://localhost:3000/api/booking/`.
+
+---
+
+## Configuration Meta Graph API
+
+### Step 1 — Create a Meta App
+
+1. Go to https://developers.facebook.com
+2. Click **My Apps → Create App**
+3. Type: **Business** → give it a name → **Create App**
+4. Add products: **Instagram Graph API** + **Pages API**
+
+### Step 2 — Generate a Long-Lived Access Token
+
+1. Open the **Graph API Explorer** in the developer portal
+2. Select your App and your Facebook Page
+3. Request permissions:
+   - `instagram_basic`
+   - `instagram_manage_insights`
+   - `pages_read_engagement`
+   - `pages_show_list`
+4. Click **Generate Access Token**
+5. Exchange for a long-lived token (valid 60 days):
+   ```
+   GET /oauth/access_token
+     ?grant_type=fb_exchange_token
+     &client_id={APP_ID}
+     &client_secret={APP_SECRET}
+     &fb_exchange_token={SHORT_LIVED_TOKEN}
+   ```
+
+### Step 3 — Get Your Instagram User ID
+
+```
+GET /me/accounts → find your page
+GET /{page-id}?fields=instagram_business_account
+```
+The `instagram_business_account.id` is your `META_IG_USER_ID`.
+
+### Step 4 — Add to `.env`
+
+```bash
+META_ACCESS_TOKEN=your_long_lived_page_access_token
+META_IG_USER_ID=your_instagram_business_account_id
+META_FB_PAGE_ID=your_facebook_page_id
+```
+
+> **Note:** Long-lived tokens expire after 60 days. For production, implement a token refresh endpoint before expiry via the `fb_exchange_token` flow.
+
+### Admin Dashboard
+
+Once configured, access the admin dashboard at `/admin`:
+- Default password: set `ADMIN_PASSWORD` in `.env`
+- Tab 1: Real-time Meta insights (last 7 days)
+- Tab 2: AI-generated weekly content brief via Claude API
+- Tab 3: System architecture overview
+- Tab 4: Editable Claude system prompt
