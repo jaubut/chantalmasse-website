@@ -80,18 +80,26 @@
     <Transition name="modal">
       <div
         v-if="showCoupleModal"
-        class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 z-[100] overflow-y-auto p-4 flex items-start justify-center"
         @click.self="showCoupleModal = false"
       >
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showCoupleModal = false" />
+        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showCoupleModal = false" />
 
         <!-- Card -->
-        <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden">
+        <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden my-8">
+
+          <!-- Close button -->
+          <button
+            class="absolute top-4 right-4 w-9 h-9 rounded-full bg-on-surface/10 flex items-center justify-center hover:bg-on-surface/20 transition-colors z-10"
+            @click="showCoupleModal = false"
+          >
+            <Icon icon="material-symbols:close" class="text-on-primary text-lg" />
+          </button>
 
           <!-- Top accent -->
-          <div class="bg-primary px-10 pt-10 pb-8">
-            <div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center mb-6">
+          <div class="bg-primary px-8 pt-8 pb-7">
+            <div class="w-12 h-12 bg-secondary-fixed rounded-xl flex items-center justify-center mb-5">
               <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
             </div>
             <h2 class="font-headline text-3xl italic text-on-primary leading-tight">
@@ -101,7 +109,7 @@
           </div>
 
           <!-- Body -->
-          <div class="px-10 py-8 space-y-5">
+          <div class="px-8 py-7 space-y-5">
             <p class="text-on-surface-variant font-light leading-relaxed">
               Chaque individu au sein du couple porte en lui un vécu relationnel plus ou moins souffrant. Déceptions, besoins non comblés, insatisfactions et aspirations. De ce vécu relationnel souffrant, prend source les conflits au sein du couple. N'étant pas conscient de ce qui se passe en nous ou/et comment le communiquer à notre conjoint, la majorité des conflits proviennent d'une mauvaise communication.
             </p>
@@ -114,13 +122,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="px-10 pb-10 flex items-center justify-between gap-4">
-            <button
-              class="text-on-surface-variant font-body text-sm hover:text-on-surface transition-colors"
-              @click="showCoupleModal = false"
-            >
-              Fermer
-            </button>
+          <div class="px-8 pb-8 flex items-center justify-end">
             <button
               class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
               @click="showCoupleModal = false; booking.open()"
@@ -138,18 +140,26 @@
     <Transition name="modal">
       <div
         v-if="showIndividualModal"
-        class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+        class="fixed inset-0 z-[100] overflow-y-auto p-4 flex items-start justify-center"
         @click.self="showIndividualModal = false"
       >
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showIndividualModal = false" />
+        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showIndividualModal = false" />
 
         <!-- Card -->
-        <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden">
+        <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden my-8">
+
+          <!-- Close button -->
+          <button
+            class="absolute top-4 right-4 w-9 h-9 rounded-full bg-on-surface/10 flex items-center justify-center hover:bg-on-surface/20 transition-colors z-10"
+            @click="showIndividualModal = false"
+          >
+            <Icon icon="material-symbols:close" class="text-primary text-lg" />
+          </button>
 
           <!-- Top accent -->
-          <div class="bg-primary-fixed px-10 pt-10 pb-8">
-            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-6">
+          <div class="bg-primary-fixed px-8 pt-8 pb-7">
+            <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-5">
               <Icon icon="material-symbols:person" class="text-2xl text-on-primary" />
             </div>
             <h2 class="font-headline text-3xl italic text-primary leading-tight">
@@ -159,7 +169,7 @@
           </div>
 
           <!-- Body -->
-          <div class="px-10 py-8 space-y-5">
+          <div class="px-8 py-7 space-y-5">
             <p class="text-on-surface-variant font-light leading-relaxed">
               Une démarche thérapeutique permet la prise de conscience de ce qui se passe en vous et de ce qui entretient les insatisfactions de votre vie et ainsi cheminer vers un mieux-être. Plus on prend conscience de ce qui nous fait peur, nous dérange ou nous fait mal, plus on a la possibilité de faire des choix conscients, en fonction de nos besoins, et de reprendre confiance en nous à l'égard de vivre votre vie.
             </p>
@@ -169,13 +179,7 @@
           </div>
 
           <!-- Footer -->
-          <div class="px-10 pb-10 flex items-center justify-between gap-4">
-            <button
-              class="text-on-surface-variant font-body text-sm hover:text-on-surface transition-colors"
-              @click="showIndividualModal = false"
-            >
-              Fermer
-            </button>
+          <div class="px-8 pb-8 flex items-center justify-end">
             <button
               class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
               @click="showIndividualModal = false; booking.open()"
