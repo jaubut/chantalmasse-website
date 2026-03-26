@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
 
   // 2. Build prompt
   const systemPrompt = body.customPrompt || SYSTEM_PROMPT
-  const userMessage = buildWeeklyPrompt(insights)
+  const userMessage = stripLoneSurrogates(buildWeeklyPrompt(insights))
 
   // 3. Call Claude API
   if (!config.anthropicApiKey) {
@@ -40,6 +40,9 @@ export default defineEventHandler(async (event) => {
   const generatedAt = new Date().toISOString()
 
   // 4. Send email if requested
+  let emailSent = false
+  let emailError: string | null = null
+
   if (body.action === 'email') {
     const resend = new Resend(config.resendApiKey)
     const targetEmail = config.briefEmail || config.emailTo
@@ -47,16 +50,29 @@ export default defineEventHandler(async (event) => {
     const monday = getMondayDate()
     const subject = `📋 Brief Marketing — Semaine du ${monday}`
 
-    await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: config.emailFrom || 'hello@chantalmasse.com',
       to: targetEmail,
       subject,
       html: buildBriefEmailHtml(briefText, monday),
     })
+
+    if (error) {
+      emailError = error.message
+    } else {
+      emailSent = true
+      console.log('[brief] Email sent:', data?.id, '→', targetEmail)
+    }
   }
 
-  return { brief: briefText, generatedAt }
+  return { brief: briefText, generatedAt, emailSent, emailError }
 })
+
+// Lone surrogates (U+D800–U+DFFF without their pair) are invalid in JSON/UTF-8
+// and get rejected by the Anthropic API. Strip them from scraped text.
+function stripLoneSurrogates(str: string): string {
+  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
+}
 
 function getMondayDate(): string {
   const now = new Date()

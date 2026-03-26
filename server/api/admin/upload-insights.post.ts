@@ -20,6 +20,15 @@ export default defineEventHandler(async (event) => {
     ))
     .filter(Boolean)
 
+  // Debug: include per-file details in response
+  const debugInfo = parsed.map(p => ({
+    label: p?.label,
+    type: p?.type,
+    headers: p?._headers,
+    firstRow: p?._firstRow,
+    data: p?.data,
+  }))
+
   const csvMetrics = mergeMetrics(parsed)
 
   // If there's a cached scrape result, preserve IG scrape data and only update FB metrics
@@ -29,8 +38,9 @@ export default defineEventHandler(async (event) => {
   if (existing?.source === 'scrape') {
     insights = {
       ...existing,
-      facebook:    csvMetrics.facebook,
-      filesLoaded: csvMetrics.filesLoaded,
+      csvInstagram: csvMetrics.instagram,
+      facebook:     csvMetrics.facebook,
+      filesLoaded:  csvMetrics.filesLoaded,
     }
     // Update followers.facebook if we got FB follow data
     if (csvMetrics.facebook?.newFollowers) {
@@ -45,7 +55,7 @@ export default defineEventHandler(async (event) => {
 
   setCachedInsights(insights)
 
-  return { success: true, insights }
+  return { success: true, insights, debug: debugInfo }
 })
 
 // ─── Detection ────────────────────────────────────────────────────────────────
@@ -56,65 +66,68 @@ function detectFileType(csv: string, filename: string): {
   label: string
   emoji: string
 } {
-  const text = csv.toLowerCase().slice(0, 800)
-  const name = filename.toLowerCase()
+  const text = normalize(csv.slice(0, 800))
+  const name = normalize(filename)
+
+  const isFB = text.includes('facebook') || text.includes('page') || name.includes('facebook') || name.includes('fb')
+  const isIG = text.includes('instagram') || name.includes('instagram') || name.includes('ig')
 
   // ── FACEBOOK ──────────────────────────────────────────────────────────────
   // Facebook Viewers (check before Views)
-  if ((text.includes('viewer') || name.includes('viewer')) && !name.includes('instagram'))
+  if ((text.includes('viewer') || text.includes('personne') || name.includes('viewer')) && isFB && !isIG)
     return { type: 'fb_viewers', platform: 'facebook', label: 'Viewers Facebook', emoji: '👁' }
 
   // Facebook Views
-  if ((name.includes('view') || text.includes('video view') || text.includes('vue') || text.includes('page view')) &&
-      !name.includes('instagram') &&
-      (text.includes('facebook') || text.includes('page') || name.includes('facebook') || name.includes('fb')))
+  if (isFB && !isIG &&
+      (name.includes('view') || name.includes('vue') || text.includes('video view') || text.includes('vue') || text.includes('page view') || text.includes('impression')))
     return { type: 'fb_views', platform: 'facebook', label: 'Vues Facebook', emoji: '👁' }
 
-  // Facebook Content Interactions
-  if ((name.includes('interaction') || text.includes('reaction') || text.includes('content interaction')) &&
-      (text.includes('facebook') || name.includes('facebook') || name.includes('fb')))
+  // Facebook Interactions (reaction/j'aime/like/comment/partage/share)
+  if (isFB && !isIG &&
+      (name.includes('interaction') || text.includes('reaction') || text.includes('j\'aime') || text.includes('jaime') || text.includes('content interaction') || text.includes('publication')))
     return { type: 'fb_interactions', platform: 'facebook', label: 'Interactions Facebook', emoji: '💬' }
 
   // Facebook Link Clicks
-  if ((name.includes('link') || text.includes('link click') || text.includes('clic')) &&
-      (text.includes('facebook') || name.includes('facebook') || name.includes('fb')))
+  if (isFB && !isIG &&
+      (name.includes('link') || name.includes('clic') || text.includes('link click') || text.includes('clic sur') || text.includes('lien')))
     return { type: 'fb_link_clicks', platform: 'facebook', label: 'Clics Facebook', emoji: '🔗' }
 
   // Facebook Visits
-  if ((name.includes('visit') || text.includes('page visit') || text.includes('visite')) &&
-      (text.includes('facebook') || name.includes('facebook') || name.includes('fb')))
+  if (isFB && !isIG &&
+      (name.includes('visit') || text.includes('page visit') || text.includes('visite')))
     return { type: 'fb_visits', platform: 'facebook', label: 'Visites Facebook', emoji: '🏠' }
 
   // Facebook Follows
-  if ((name.includes('follow') || text.includes('new follower') || text.includes('page like') || text.includes('fan')) &&
-      (text.includes('facebook') || name.includes('facebook') || name.includes('fb')))
+  if (isFB && !isIG &&
+      (name.includes('follow') || name.includes('abonn') || text.includes('new follower') || text.includes('page like') || text.includes('fan') || text.includes('abonn')))
     return { type: 'fb_follows', platform: 'facebook', label: 'Abonnés Facebook', emoji: '👥' }
 
   // ── INSTAGRAM ─────────────────────────────────────────────────────────────
   // Instagram Views
-  if (name.includes('view') ||
-      (text.includes('view') && text.includes('instagram') && !text.includes('viewer')))
+  if (name.includes('view') || name.includes('vue') ||
+      (text.includes('view') && !text.includes('viewer')) ||
+      text.includes('impression'))
     return { type: 'ig_views', platform: 'instagram', label: 'Vues Instagram', emoji: '👁' }
 
   // Instagram Reach
-  if (name.includes('reach') || text.includes('reach') || text.includes('portée') || text.includes('account reached'))
+  if (name.includes('reach') || name.includes('portee') || text.includes('reach') || text.includes('portee') || text.includes('account reached') || text.includes('compte touche'))
     return { type: 'ig_reach', platform: 'instagram', label: 'Portée Instagram', emoji: '📊' }
 
-  // Instagram Content Interactions
-  if (name.includes('interaction') || text.includes('like') || text.includes('content interaction') ||
+  // Instagram Interactions
+  if (name.includes('interaction') || text.includes('like') || text.includes('jaime') || text.includes('content interaction') ||
       text.includes('save') || text.includes('enregistrement'))
     return { type: 'ig_interactions', platform: 'instagram', label: 'Interactions Instagram', emoji: '💬' }
 
   // Instagram Link Clicks
-  if (name.includes('link') || text.includes('link click') || text.includes('clic sur le lien'))
+  if (name.includes('link') || name.includes('clic') || text.includes('link click') || text.includes('clic sur le lien') || text.includes('lien'))
     return { type: 'ig_link_clicks', platform: 'instagram', label: 'Clics Instagram', emoji: '🔗' }
 
   // Instagram Visits
-  if (name.includes('visit') || text.includes('profile visit') || text.includes('visite') || text.includes('account visit'))
+  if (name.includes('visit') || text.includes('profile visit') || text.includes('visite') || text.includes('account visit') || text.includes('compte visite'))
     return { type: 'ig_visits', platform: 'instagram', label: 'Visites Instagram', emoji: '🏠' }
 
   // Instagram Follows
-  if (name.includes('follow') || text.includes('follower') || text.includes('abonné') || text.includes('new follow'))
+  if (name.includes('follow') || name.includes('abonn') || text.includes('follower') || text.includes('abonn') || text.includes('new follow'))
     return { type: 'ig_follows', platform: 'instagram', label: 'Abonnés Instagram', emoji: '👥' }
 
   return { type: 'unknown', platform: 'instagram', label: 'Non reconnu', emoji: '❓' }
@@ -127,10 +140,12 @@ function extractValue(
   headers: string[],
   keywords: string[]
 ): number {
+  const normKeywords = keywords.map(normalize)
+
   // FORMAT C — row where first column matches keyword
   for (const row of rows) {
-    const firstVal = Object.values(row)[0]?.toLowerCase() || ''
-    if (keywords.some(kw => firstVal.includes(kw))) {
+    const firstVal = normalize(Object.values(row)[0] || '')
+    if (normKeywords.some(kw => firstVal.includes(kw))) {
       const nums = Object.values(row)
         .map(v => parseInt(v.replace(/[^0-9]/g, '')))
         .filter(n => !isNaN(n) && n >= 0)
@@ -142,7 +157,7 @@ function extractValue(
   const valueCol = headers.find(h =>
     h.includes('value') || h.includes('valeur') ||
     h.includes('count') || h.includes('total') ||
-    keywords.some(kw => h.includes(kw))
+    normKeywords.some(kw => h.includes(kw))
   )
   if (valueCol) {
     return rows.reduce((sum, row) => {
@@ -170,24 +185,51 @@ function extractValue(
 
 // ─── Per-file parser ──────────────────────────────────────────────────────────
 
+// Normalize accented French characters for keyword matching
+function normalize(s: string): string {
+  return s.toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/['']/g, "'")
+}
+
 function parseMetricFile(csv: string, filename: string) {
   const text = csv.replace(/^\uFEFF/, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n')
-  const lines = text.split('\n').filter(l => l.trim())
-  if (lines.length < 2) return null
+  const allLines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  if (allLines.length < 2) return null
+
+  // Auto-detect separator: count occurrences in first few lines
+  const sample = allLines.slice(0, 3).join('\n')
+  const commas     = (sample.match(/,/g) || []).length
+  const semicolons = (sample.match(/;/g) || []).length
+  const tabs       = (sample.match(/\t/g) || []).length
+  const sep = tabs > commas && tabs > semicolons ? '\t'
+    : semicolons > commas ? ';'
+    : ','
 
   const parseRow = (line: string): string[] => {
     const result: string[] = []
     let cur = '', inQ = false
     for (const c of line) {
       if (c === '"') { inQ = !inQ; continue }
-      if (c === ',' && !inQ) { result.push(cur.trim()); cur = ''; continue }
+      if (c === sep && !inQ) { result.push(cur.trim()); cur = ''; continue }
       cur += c
     }
     result.push(cur.trim())
     return result
   }
 
-  const headers = parseRow(lines[0] ?? '').map(h => h.toLowerCase().trim())
+  // Skip title/metadata rows: find the first line that has multiple columns (likely the header row)
+  let headerIdx = 0
+  for (let i = 0; i < Math.min(allLines.length - 1, 5); i++) {
+    const cols = parseRow(allLines[i] ?? '')
+    if (cols.length >= 2) { headerIdx = i; break }
+  }
+
+  const lines = allLines.slice(headerIdx)
+  if (lines.length < 2) return null
+
+  const headers = parseRow(lines[0] ?? '').map(h => normalize(h))
   const rows = lines.slice(1).map(l => {
     const vals = parseRow(l)
     return Object.fromEntries(headers.map((h, i) => [h, vals[i] || '']))
@@ -246,7 +288,7 @@ function parseMetricFile(csv: string, filename: string) {
     }
   }
 
-  return { ...detected, data }
+  return { ...detected, data, _headers: headers, _firstRow: rows[0] ?? {} }
 }
 
 // ─── Merge ────────────────────────────────────────────────────────────────────
