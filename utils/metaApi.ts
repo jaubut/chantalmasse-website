@@ -25,6 +25,31 @@ export interface MetaInsights {
   totalReach: number
   totalEngagement: number
   isMockData?: boolean
+  // CSV upload fields
+  source?: string
+  filesLoaded?: string
+  engagementRate?: string
+  instagram?: {
+    views: number
+    reach: number
+    likes: number
+    comments: number
+    saves: number
+    shares: number
+    linkClicks: number
+    profileVisits: number
+    newFollowers: number
+  }
+  facebook?: {
+    views: number
+    uniqueViewers: number
+    likes: number
+    comments: number
+    shares: number
+    linkClicks: number
+    pageVisits: number
+    newFollowers: number
+  }
 }
 
 const DAYS_FR = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']

@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     metaFbPageId: process.env.META_FB_PAGE_ID,
     anthropicApiKey: process.env.ANTHROPIC_API_KEY,
     briefEmail: process.env.BRIEF_EMAIL,
+    apifyApiToken: process.env.APIFY_API_TOKEN,
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',

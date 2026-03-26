@@ -5,13 +5,32 @@ definePageMeta({ layout: 'admin', middleware: 'admin' })
 
 // ─── State ───────────────────────────────────────────────────────────────────
 const activeTab = ref<'dashboard' | 'brief' | 'architecture' | 'prompt'>('dashboard')
-const { logout, fetchInsights, generateBrief } = useAdmin()
+const { logout, fetchInsights, uploadInsights, scrapeInstagram, generateBrief } = useAdmin()
 
 // Tab 1 – Insights
 const insights = ref<any>(null)
 const insightsLoading = ref(false)
 const insightsError = ref(false)
 const showMetaSetupModal = ref(false)
+
+// Tab 1 – Instagram Scraper
+const igUsername = ref('')
+const scrapeLoading = ref(false)
+const scrapeError = ref('')
+const scrapeElapsed = ref(0)
+let scrapeTimer: ReturnType<typeof setInterval> | null = null
+
+const scrapeStep = computed(() => {
+  if (scrapeElapsed.value < 3)  return '⏳ Connexion au scraper…'
+  if (scrapeElapsed.value < 10) return '🔍 Lecture du profil…'
+  if (scrapeElapsed.value < 30) return '📊 Analyse des publications…'
+  return '✨ Traitement des données…'
+})
+
+// Tab 1 – Facebook CSV Upload
+const csvFiles = ref<File[]>([])
+const uploadLoading = ref(false)
+const uploadError = ref('')
 
 // Tab 2 – Brief
 const briefState = ref<'empty' | 'loading' | 'generated'>('empty')
@@ -39,10 +58,33 @@ const currentMondayLabel = computed(() => {
 
 // ─── Lifecycle ───────────────────────────────────────────────────────────────
 onMounted(() => {
-  loadInsights()
   loadBriefHistory()
   loadSavedPrompt()
+  if (import.meta.client) {
+    const saved = localStorage.getItem('cm_ig_username')
+    if (saved) igUsername.value = saved
+  }
 })
+
+// ─── Instagram Scraper ───────────────────────────────────────────────────────
+async function handleScrape() {
+  const username = igUsername.value.trim().replace(/^@/, '')
+  if (!username) { scrapeError.value = 'Veuillez entrer un nom d\'utilisateur Instagram.'; return }
+  scrapeLoading.value = true
+  scrapeError.value = ''
+  scrapeElapsed.value = 0
+  scrapeTimer = setInterval(() => { scrapeElapsed.value++ }, 1000)
+  try {
+    const res = await scrapeInstagram(username) as any
+    insights.value = res.insights
+    if (import.meta.client) localStorage.setItem('cm_ig_username', igUsername.value)
+  } catch (e: any) {
+    scrapeError.value = e?.data?.message || 'Erreur lors du scraping. Réessayez.'
+  } finally {
+    scrapeLoading.value = false
+    if (scrapeTimer) { clearInterval(scrapeTimer); scrapeTimer = null }
+  }
+}
 
 // ─── Insights ────────────────────────────────────────────────────────────────
 async function loadInsights() {
@@ -54,6 +96,42 @@ async function loadInsights() {
     insightsError.value = true
   } finally {
     insightsLoading.value = false
+  }
+}
+
+function onFilesSelected(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (!input.files) return
+  const added = Array.from(input.files)
+  const existing = csvFiles.value.map(f => f.name)
+  for (const f of added) {
+    if (!existing.includes(f.name)) csvFiles.value.push(f)
+  }
+  input.value = ''
+}
+
+function removeFile(index: number) {
+  csvFiles.value.splice(index, 1)
+}
+
+async function handleUpload() {
+  if (csvFiles.value.length === 0) {
+    uploadError.value = 'Veuillez sélectionner au moins un fichier CSV.'
+    return
+  }
+  uploadLoading.value = true
+  uploadError.value = ''
+  try {
+    const form = new FormData()
+    for (const file of csvFiles.value) {
+      form.append('file', file, file.name)
+    }
+    const res = await uploadInsights(form) as any
+    insights.value = res.insights
+  } catch (e: any) {
+    uploadError.value = e?.data?.message || 'Erreur lors du traitement des fichiers.'
+  } finally {
+    uploadLoading.value = false
   }
 }
 
@@ -271,160 +349,430 @@ function formatDate(iso: string): string {
            ══════════════════════════════════════════════════════ -->
       <div v-show="activeTab === 'dashboard'">
 
-        <!-- Loading -->
-        <div v-if="insightsLoading" class="space-y-4 animate-pulse">
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div v-for="i in 4" :key="i" class="bg-surface rounded-2xl p-6 border border-outline-variant/20 h-28" />
+        <!-- Scrape loading -->
+        <div v-if="scrapeLoading" class="bg-surface rounded-2xl border border-outline-variant/20 overflow-hidden">
+          <div class="h-1.5 bg-gradient-to-r from-[#E1306C] to-[#7B5EA7] animate-pulse" />
+          <div class="p-10 text-center">
+            <div class="text-4xl mb-4">📸</div>
+            <p class="text-on-surface font-semibold text-lg mb-2">{{ scrapeStep }}</p>
+            <p class="text-outline text-sm mb-6">{{ scrapeElapsed }} seconde{{ scrapeElapsed !== 1 ? 's' : '' }}…</p>
+            <div class="space-y-2 max-w-sm mx-auto">
+              <div class="h-2.5 bg-surface-container-high rounded-full animate-pulse" />
+              <div class="h-2.5 bg-surface-container-high rounded-full animate-pulse w-4/5 mx-auto" />
+              <div class="h-2.5 bg-surface-container-high rounded-full animate-pulse w-3/5 mx-auto" />
+            </div>
           </div>
         </div>
 
-        <!-- Mock data setup banner -->
-        <div
-          v-if="insights?.isMockData && !insightsLoading"
-          class="bg-primary-fixed rounded-2xl p-6 mb-6 text-center"
-        >
-          <p class="text-primary font-semibold mb-3">
-            🔌 Connectez votre compte Meta pour voir vos statistiques réelles.
-          </p>
-          <button
-            @click="showMetaSetupModal = true"
-            class="bg-primary text-on-primary px-5 py-2 text-sm font-semibold transition hover:opacity-90 rounded-xl"
-          >
-            Comment configurer →
-          </button>
-          <p class="text-primary/60 text-xs mt-2">Données fictives affichées pour démonstration</p>
-        </div>
-
-        <div v-if="insights && !insightsLoading">
-          <!-- KPI Row -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 editorial-shadow">
-              <div class="text-2xl mb-2">📅</div>
-              <div class="text-xs text-outline mb-1">Meilleur jour</div>
-              <div class="text-xl font-semibold text-[#E07A5F]">{{ insights.bestDay }}</div>
-            </div>
-            <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 editorial-shadow">
-              <div class="text-2xl mb-2">🎬</div>
-              <div class="text-xs text-outline mb-1">Meilleur format</div>
-              <div class="text-xl font-semibold text-[#7B5EA7]">{{ insights.bestFormat }}</div>
-            </div>
-            <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 editorial-shadow">
-              <div class="text-2xl mb-2">📸</div>
-              <div class="text-xs text-outline mb-1">Abonnés Instagram</div>
-              <div class="text-xl font-semibold text-[#3D9970]">{{ insights.followers.instagram.toLocaleString('fr-CA') }}</div>
-              <div class="text-xs text-[#3D9970] mt-0.5">{{ insights.followers.igGrowth }}</div>
-            </div>
-            <div class="bg-surface rounded-2xl p-5 border border-outline-variant/20 editorial-shadow">
-              <div class="text-2xl mb-2">👥</div>
-              <div class="text-xs text-outline mb-1">Abonnés Facebook</div>
-              <div class="text-xl font-semibold text-[#C9A84C]">{{ insights.followers.facebook.toLocaleString('fr-CA') }}</div>
+        <!-- FB CSV loading -->
+        <div v-else-if="uploadLoading" class="bg-surface rounded-2xl border border-outline-variant/20 overflow-hidden">
+          <div class="h-1.5 bg-gradient-to-r from-[#1877F2] to-primary animate-pulse" />
+          <div class="p-8 text-center">
+            <div class="text-3xl mb-4">📊</div>
+            <p class="text-on-surface font-semibold mb-4">Analyse des fichiers Facebook CSV…</p>
+            <div class="space-y-2 max-w-sm mx-auto">
+              <div class="h-3 bg-surface-container-high rounded animate-pulse" />
+              <div class="h-3 bg-surface-container-high rounded animate-pulse w-4/5 mx-auto" />
+              <div class="h-3 bg-surface-container-high rounded animate-pulse w-3/5 mx-auto" />
             </div>
           </div>
+        </div>
 
-          <!-- Last week's posts -->
-          <div class="mb-8">
-            <h2 class="font-headline italic text-xl text-primary mb-4">
-              Publications de la semaine
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                v-for="post in insights.posts"
-                :key="post.id"
-                class="flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden editorial-shadow"
+        <!-- State A: Input zone -->
+        <div v-else-if="!insights" class="space-y-6">
+
+          <!-- Instagram scraper -->
+          <div class="bg-surface rounded-2xl border border-outline-variant/20 p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#E1306C] inline-block"></span>
+              <h2 class="font-semibold text-primary text-sm">Analyser un profil Instagram</h2>
+            </div>
+            <div class="flex gap-3">
+              <div class="flex-1 flex items-center bg-background border border-outline-variant/30 rounded-xl px-4 focus-within:border-[#E1306C] transition">
+                <span class="text-outline text-sm font-medium mr-1">@</span>
+                <input
+                  v-model="igUsername"
+                  type="text"
+                  placeholder="chantalmasse"
+                  class="flex-1 bg-transparent py-3 text-sm text-on-surface outline-none placeholder:text-outline/50"
+                  @keyup.enter="handleScrape"
+                />
+              </div>
+              <button
+                @click="handleScrape"
+                class="bg-[#E1306C] text-white px-6 py-3 rounded-xl font-semibold text-sm hover:opacity-90 transition whitespace-nowrap"
               >
-                <!-- Colored top band (like blog image) -->
+                Analyser →
+              </button>
+            </div>
+            <div v-if="scrapeError" class="mt-3 text-[#E07A5F] text-sm bg-[#E07A5F]/10 rounded-xl px-4 py-2">
+              {{ scrapeError }}
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="flex items-center gap-3 text-outline text-xs">
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+            <span class="font-medium uppercase tracking-wider">Facebook (optionnel)</span>
+            <div class="flex-1 h-px bg-outline-variant/20"></div>
+          </div>
+
+          <!-- Facebook CSV zone -->
+          <div class="space-y-4">
+            <p class="text-sm text-outline text-center">
+              📁 Importez vos CSV Facebook pour enrichir l'analyse
+              <span class="text-outline/60">(vues, interactions, clics, visites, abonnés)</span>
+            </p>
+
+            <div class="bg-surface rounded-2xl border-2 border-dashed border-[#1877F2]/30 p-5">
+              <div v-if="csvFiles.length > 0" class="mb-3 space-y-1.5">
                 <div
-                  class="h-20 flex items-center justify-center"
-                  :style="{ backgroundColor: pillarColor(pillarMetaMap[post.pillar] || '') + '1A' }"
+                  v-for="(file, i) in csvFiles"
+                  :key="file.name"
+                  class="flex items-center justify-between bg-background rounded-xl px-3 py-2 text-sm border border-outline-variant/20"
                 >
+                  <span class="text-[#3D9970] font-semibold truncate">✓ {{ file.name }}</span>
+                  <button @click="removeFile(i)" class="text-outline hover:text-[#E07A5F] ml-2 shrink-0 text-xs">✕</button>
+                </div>
+              </div>
+              <label class="block cursor-pointer">
+                <input type="file" accept=".csv" multiple class="sr-only" @change="onFilesSelected" />
+                <div class="bg-background rounded-xl p-3 text-sm text-center transition hover:bg-surface-container-low border border-outline-variant/20">
+                  <span class="text-outline">{{ csvFiles.length > 0 ? '+ Ajouter des fichiers…' : 'Choisir des fichiers CSV Facebook…' }}</span>
+                </div>
+              </label>
+            </div>
+
+            <div v-if="uploadError" class="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-3 text-[#E07A5F] text-sm">
+              {{ uploadError }}
+            </div>
+
+            <div v-if="csvFiles.length > 0" class="flex justify-center">
+              <button
+                @click="handleUpload"
+                class="bg-[#1877F2] text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition"
+              >
+                Importer les données Facebook →
+              </button>
+            </div>
+
+            <!-- Export instructions -->
+            <div class="bg-primary-fixed rounded-2xl p-4 text-xs space-y-3">
+              <p class="font-semibold text-primary text-sm">📥 Comment exporter depuis Facebook Business Suite</p>
+              <ol class="list-decimal list-inside space-y-0.5 text-primary/80">
+                <li>Business Suite → votre Page → Statistiques → Exporter les données</li>
+                <li>Exportez : <span class="font-medium">Vues · Viewers · Interactions · Clics · Visites · Abonnés</span></li>
+                <li>Importez les 6 fichiers ici</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+
+        <!-- State B: Data loaded -->
+        <div v-else class="space-y-8">
+
+          <!-- ── Scrape view ── -->
+          <template v-if="insights.source === 'scrape'">
+
+            <!-- Profile header -->
+            <div class="bg-surface rounded-2xl border border-outline-variant/20 p-5">
+              <div class="flex items-center justify-between gap-4 flex-wrap">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-2xl bg-[#E1306C]/10 flex items-center justify-center text-2xl shrink-0 overflow-hidden">
+                    <img
+                      v-if="insights.profile?.profilePic"
+                      :src="insights.profile.profilePic"
+                      referrerpolicy="no-referrer"
+                      class="w-full h-full object-cover"
+                      @error="($event.target as HTMLImageElement).style.display = 'none'"
+                    />
+                    <span v-else>📸</span>
+                  </div>
+                  <div>
+                    <div class="font-semibold text-on-surface">{{ insights.profile?.fullName || '@' + insights.profile?.username }}</div>
+                    <div class="text-sm text-outline">@{{ insights.profile?.username }}</div>
+                    <div class="text-xs text-outline mt-0.5">
+                      {{ insights.profile?.followers?.toLocaleString('fr-CA') }} abonnés
+                      · {{ insights.profile?.postsCount }} publications
+                    </div>
+                  </div>
+                </div>
+                <button
+                  @click="handleScrape"
+                  :disabled="scrapeLoading"
+                  class="flex items-center gap-2 text-sm text-primary/70 hover:text-primary font-semibold transition disabled:opacity-40"
+                >
+                  🔄 Actualiser
+                </button>
+              </div>
+            </div>
+
+            <!-- Analytics KPIs -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="bg-surface rounded-2xl p-4 border border-outline-variant/20 editorial-shadow">
+                <div class="text-lg mb-1">📅</div>
+                <div class="text-xs text-outline mb-0.5">Meilleur jour</div>
+                <div class="text-base font-semibold text-[#E07A5F]">{{ insights.analytics?.bestDay }}</div>
+              </div>
+              <div class="bg-surface rounded-2xl p-4 border border-outline-variant/20 editorial-shadow">
+                <div class="text-lg mb-1">🕐</div>
+                <div class="text-xs text-outline mb-0.5">Meilleure heure</div>
+                <div class="text-base font-semibold text-[#7B5EA7]">{{ insights.analytics?.bestHour }}</div>
+              </div>
+              <div class="bg-surface rounded-2xl p-4 border border-outline-variant/20 editorial-shadow">
+                <div class="text-lg mb-1">🎬</div>
+                <div class="text-xs text-outline mb-0.5">Meilleur format</div>
+                <div class="text-base font-semibold text-[#3D9970]">{{ insights.analytics?.bestFormat }}</div>
+              </div>
+              <div class="bg-surface rounded-2xl p-4 border border-outline-variant/20 editorial-shadow">
+                <div class="text-lg mb-1">💫</div>
+                <div class="text-xs text-outline mb-0.5">Engagement moy.</div>
+                <div class="text-base font-semibold text-[#C9A84C]">{{ insights.analytics?.avgEngagement?.toLocaleString('fr-CA') }} <span class="text-xs font-normal text-outline">/ pub</span></div>
+              </div>
+            </div>
+
+            <!-- Post grid -->
+            <div>
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="font-headline italic text-xl text-primary">
+                  {{ insights.posts?.length }} dernières publications
+                </h2>
+                <span class="text-xs text-outline bg-surface-container-high px-3 py-1 rounded-full">
+                  {{ insights.week }}
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a
+                  v-for="post in insights.posts"
+                  :key="post.id"
+                  :href="post.url"
+                  target="_blank"
+                  rel="noopener"
+                  class="flex gap-4 bg-surface border border-[#f0ebe4] rounded-2xl p-4 hover:shadow-md transition-all cursor-pointer no-underline group"
+                >
+                  <!-- Thumbnail -->
+                  <div class="relative w-16 h-16 rounded-xl overflow-hidden shrink-0 bg-surface-container-high flex items-center justify-center">
+                    <img
+                      v-if="post.thumbnailUrl"
+                      :src="post.thumbnailUrl"
+                      referrerpolicy="no-referrer"
+                      class="w-full h-full object-cover"
+                      @error="($event.target as HTMLImageElement).style.display = 'none'"
+                    />
+                    <span v-else class="text-2xl" :style="{ color: post.pillarMeta?.color }">
+                      {{ post.pillarMeta?.emoji }}
+                    </span>
+                    <!-- Type overlay -->
+                    <div v-if="post.isReel" class="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <span class="text-white text-xs font-bold">▶</span>
+                    </div>
+                    <div v-else-if="post.isCarousel" class="absolute top-1 right-1 bg-black/40 rounded text-white text-xs px-1">⊞</div>
+                  </div>
+
+                  <!-- Content -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2 mb-1">
+                      <div>
+                        <span class="text-xs font-semibold" :style="{ color: post.pillarMeta?.color }">{{ post.type }}</span>
+                        <span class="text-xs text-outline mx-1">·</span>
+                        <span class="text-xs text-outline">{{ post.day }} {{ post.date }}</span>
+                      </div>
+                      <span class="text-outline/40 group-hover:text-outline transition text-xs shrink-0">↗</span>
+                    </div>
+
+                    <!-- Pillar badge -->
+                    <span
+                      class="inline-block text-xs px-2 py-0.5 rounded-full font-medium mb-2"
+                      :style="{ backgroundColor: post.pillarMeta?.color + '1A', color: post.pillarMeta?.color }"
+                    >
+                      {{ post.pillarMeta?.emoji }} {{ post.pillarMeta?.label }}
+                    </span>
+
+                    <!-- Stats -->
+                    <div class="flex items-center gap-3 text-xs text-outline mb-1.5">
+                      <span v-if="post.isReel">👁 {{ post.views?.toLocaleString('fr-CA') }} vues</span>
+                      <span v-else>❤️ {{ post.likes?.toLocaleString('fr-CA') }}</span>
+                      <span>💬 {{ post.comments }}</span>
+                      <span class="text-[#3D9970] font-medium">{{ post.engagementRate }}</span>
+                    </div>
+
+                    <!-- Caption -->
+                    <p class="text-xs text-outline/70 font-body italic leading-snug truncate">
+                      {{ post.caption?.slice(0, 90) }}…
+                    </p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            <!-- Facebook enrichment -->
+            <div>
+              <div class="flex items-center gap-3 text-outline text-xs mb-4">
+                <div class="flex-1 h-px bg-outline-variant/20"></div>
+                <span class="font-medium uppercase tracking-wider">Facebook (optionnel)</span>
+                <div class="flex-1 h-px bg-outline-variant/20"></div>
+              </div>
+
+              <!-- Show FB KPIs if present -->
+              <div v-if="insights.facebook" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div class="bg-surface rounded-xl p-3 border-l-4 border-[#1877F2] border border-outline-variant/20 text-center">
+                  <div class="text-xs text-outline mb-0.5">Vues</div>
+                  <div class="font-semibold text-sm">{{ (insights.facebook.views || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-xl p-3 border-l-4 border-[#1877F2] border border-outline-variant/20 text-center">
+                  <div class="text-xs text-outline mb-0.5">Interactions</div>
+                  <div class="font-semibold text-sm">{{ ((insights.facebook.likes || 0) + (insights.facebook.comments || 0) + (insights.facebook.shares || 0)).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-xl p-3 border-l-4 border-[#1877F2] border border-outline-variant/20 text-center">
+                  <div class="text-xs text-outline mb-0.5">Clics</div>
+                  <div class="font-semibold text-sm">{{ (insights.facebook.linkClicks || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-xl p-3 border-l-4 border-[#1877F2] border border-outline-variant/20 text-center">
+                  <div class="text-xs text-outline mb-0.5">Abonnés</div>
+                  <div class="font-semibold text-sm">{{ (insights.facebook.newFollowers || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+              </div>
+
+              <div class="bg-surface rounded-2xl border-2 border-dashed border-[#1877F2]/30 p-5">
+                <p class="text-sm text-outline text-center mb-3">
+                  {{ insights.facebook ? '🔄 Mettre à jour les données Facebook' : '📁 Ajouter des données Facebook pour enrichir le brief' }}
+                </p>
+                <div v-if="csvFiles.length > 0" class="mb-3 space-y-1.5">
                   <div
-                    class="w-12 h-12 flex items-center justify-center text-2xl text-white rounded-2xl"
-                    :style="{ backgroundColor: pillarColor(pillarMetaMap[post.pillar] || '') }"
+                    v-for="(file, i) in csvFiles"
+                    :key="file.name"
+                    class="flex items-center justify-between bg-background rounded-xl px-3 py-2 text-sm border border-outline-variant/20"
                   >
-                    {{ post.pillar === 'myth' ? '⚡' : post.pillar === 'challenge' ? '📅' : post.pillar === 'qa' ? '💬' : '✨' }}
+                    <span class="text-[#3D9970] font-semibold truncate">✓ {{ file.name }}</span>
+                    <button @click="removeFile(i)" class="text-outline hover:text-[#E07A5F] ml-2 shrink-0 text-xs">✕</button>
                   </div>
                 </div>
-
-                <!-- Content -->
-                <div class="flex flex-col flex-1 p-5 gap-3">
-                  <!-- Pillar + platform -->
-                  <div class="flex items-center justify-between">
-                    <span
-                      class="text-xs uppercase tracking-widest font-semibold px-3 py-1 rounded-full text-white"
-                      :style="{ backgroundColor: pillarColor(pillarMetaMap[post.pillar] || '') }"
-                    >
-                      {{ pillarMetaMap[post.pillar] || post.pillar }}
-                    </span>
-                    <span
-                      class="text-xs font-semibold text-white px-2 py-1 rounded-full"
-                      :style="{ backgroundColor: platformBadgeColors[post.platform] || '#727975' }"
-                    >
-                      {{ post.platform }}
-                    </span>
+                <label class="block cursor-pointer">
+                  <input type="file" accept=".csv" multiple class="sr-only" @change="onFilesSelected" />
+                  <div class="bg-background rounded-xl p-3 text-sm text-center transition hover:bg-surface-container-low border border-outline-variant/20">
+                    <span class="text-outline">{{ csvFiles.length > 0 ? '+ Ajouter des fichiers…' : 'Choisir des fichiers CSV Facebook…' }}</span>
                   </div>
-
-                  <!-- Type + day -->
-                  <h3 class="font-headline italic text-primary text-lg leading-snug">
-                    {{ post.type }} · {{ post.day }}
-                  </h3>
-
-                  <!-- Stats grid -->
-                  <div class="grid grid-cols-2 gap-2 flex-1">
-                    <div class="bg-background rounded-xl p-3">
-                      <div class="text-xs text-outline mb-0.5">Portée</div>
-                      <div class="font-semibold text-on-surface text-sm">{{ post.reach.toLocaleString('fr-CA') }}</div>
-                    </div>
-                    <div class="bg-background rounded-xl p-3">
-                      <div class="text-xs text-outline mb-0.5">Engagement</div>
-                      <div class="font-semibold text-on-surface text-sm">{{ post.engagement }}</div>
-                    </div>
-                    <div class="bg-background rounded-xl p-3">
-                      <div class="text-xs text-outline mb-0.5">Sauvegardes</div>
-                      <div class="font-semibold text-on-surface text-sm">{{ post.saves }}</div>
-                    </div>
-                    <div class="bg-background rounded-xl p-3">
-                      <div class="text-xs text-outline mb-0.5">Taux</div>
-                      <div class="font-semibold text-on-surface text-sm">{{ post.engagementRate }}</div>
-                    </div>
-                  </div>
-
-                  <!-- Footer -->
-                  <div class="flex items-center justify-between pt-3 border-t border-outline-variant/30">
-                    <span class="text-xs text-on-surface-variant font-light">{{ post.day }}</span>
-                    <span class="text-primary text-sm font-semibold">{{ post.engagementRate }}</span>
-                  </div>
+                </label>
+                <div v-if="uploadError" class="mt-2 text-[#E07A5F] text-sm bg-[#E07A5F]/10 rounded-xl px-4 py-2">{{ uploadError }}</div>
+                <div v-if="csvFiles.length > 0" class="mt-3 flex justify-center">
+                  <button @click="handleUpload" class="bg-[#1877F2] text-white px-6 py-2 rounded-xl font-semibold text-sm hover:opacity-90 transition">
+                    Importer →
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Content Pillars -->
-          <div>
-            <h2 class="font-headline italic text-xl text-primary mb-4">
-              Piliers de contenu
-            </h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div
-                v-for="pillar in PILLARS"
-                :key="pillar.name"
-                class="rounded-2xl p-5 border"
-                :style="{
-                  backgroundColor: pillar.color + '1A',
-                  borderColor: pillar.color + '4D',
-                }"
+            <!-- Reset -->
+            <div class="flex justify-end">
+              <button
+                @click="insights = null; csvFiles = []; scrapeError = ''; uploadError = ''"
+                class="text-xs text-primary/50 hover:text-primary font-semibold transition"
               >
-                <div class="text-2xl mb-2">{{ pillar.icon }}</div>
-                <div class="font-semibold text-on-surface mb-0.5">{{ pillar.name }}</div>
-                <div
-                  class="text-xs font-semibold mb-2 inline-block px-2 py-0.5 rounded-full"
-                  :style="{ backgroundColor: pillar.color + '33', color: pillar.color }"
-                >
-                  {{ pillar.format }}
+                ↑ Réanalyser
+              </button>
+            </div>
+          </template>
+
+          <!-- ── CSV view (aggregate metrics) ── -->
+          <template v-else>
+            <div class="flex items-center justify-between">
+              <div class="text-xs text-outline">Données CSV · {{ insights.week }}</div>
+              <button
+                @click="insights = null; csvFiles = []; uploadError = ''"
+                class="text-xs text-primary/60 hover:text-primary font-semibold transition"
+              >
+                ↑ Re-importer
+              </button>
+            </div>
+
+            <!-- KPI — Instagram -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#E1306C] inline-block"></span>
+                <span class="font-semibold text-sm text-primary">Instagram</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">👁</div><div class="text-xs text-outline mb-0.5">Vues</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.instagram?.views || 0).toLocaleString('fr-CA') }}</div>
                 </div>
-                <p class="text-sm text-on-surface-variant">{{ pillar.tip }}</p>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">📊</div><div class="text-xs text-outline mb-0.5">Portée</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.instagram?.reach || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">💬</div><div class="text-xs text-outline mb-0.5">Interactions</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ ((insights.instagram?.likes || 0) + (insights.instagram?.comments || 0) + (insights.instagram?.saves || 0) + (insights.instagram?.shares || 0)).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">🔗</div><div class="text-xs text-outline mb-0.5">Clics</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.instagram?.linkClicks || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">🏠</div><div class="text-xs text-outline mb-0.5">Visites</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.instagram?.profileVisits || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#E1306C] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">👥</div><div class="text-xs text-outline mb-0.5">Nouveaux abonnés</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.instagram?.newFollowers || 0).toLocaleString('fr-CA') }}</div>
+                </div>
               </div>
             </div>
-          </div>
+
+            <!-- KPI — Facebook -->
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#1877F2] inline-block"></span>
+                <span class="font-semibold text-sm text-primary">Facebook</span>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">👁</div><div class="text-xs text-outline mb-0.5">Vues</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.facebook?.views || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">👁</div><div class="text-xs text-outline mb-0.5">Viewers uniques</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.facebook?.uniqueViewers || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">💬</div><div class="text-xs text-outline mb-0.5">Interactions</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ ((insights.facebook?.likes || 0) + (insights.facebook?.comments || 0) + (insights.facebook?.shares || 0)).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">🔗</div><div class="text-xs text-outline mb-0.5">Clics</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.facebook?.linkClicks || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">🏠</div><div class="text-xs text-outline mb-0.5">Visites</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.facebook?.pageVisits || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+                <div class="bg-surface rounded-2xl p-4 border-l-4 border-[#1877F2] border border-outline-variant/20 editorial-shadow">
+                  <div class="text-lg mb-1">👥</div><div class="text-xs text-outline mb-0.5">Nouveaux abonnés</div>
+                  <div class="text-lg font-semibold text-on-surface">{{ (insights.facebook?.newFollowers || 0).toLocaleString('fr-CA') }}</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Content Pillars -->
+            <div>
+              <h2 class="font-headline italic text-xl text-primary mb-4">Piliers de contenu</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div
+                  v-for="pillar in PILLARS"
+                  :key="pillar.name"
+                  class="rounded-2xl p-5 border"
+                  :style="{ backgroundColor: pillar.color + '1A', borderColor: pillar.color + '4D' }"
+                >
+                  <div class="text-2xl mb-2">{{ pillar.icon }}</div>
+                  <div class="font-semibold text-on-surface mb-0.5">{{ pillar.name }}</div>
+                  <div class="text-xs font-semibold mb-2 inline-block px-2 py-0.5 rounded-full" :style="{ backgroundColor: pillar.color + '33', color: pillar.color }">{{ pillar.format }}</div>
+                  <p class="text-sm text-on-surface-variant">{{ pillar.tip }}</p>
+                </div>
+              </div>
+            </div>
+          </template>
+
         </div>
       </div>
 
