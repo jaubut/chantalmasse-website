@@ -83,7 +83,7 @@
         <div class="max-w-3xl mx-auto text-center">
           <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-4">Prochaine étape</p>
           <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight">
-            Prête à aller plus loin ?
+            Prêt à aller plus loin ?
           </h2>
           <p class="text-primary-fixed-dim font-light text-lg mb-10 max-w-xl mx-auto">
             Un espace confidentiel, sans jugement, pour explorer ce qui vous habite. Consultations en personne à Shefford ou en vidéoconférence.

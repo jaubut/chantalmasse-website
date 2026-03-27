@@ -6,36 +6,25 @@
         <h2 class="font-headline text-5xl text-primary italic" data-animate>Témoignages</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
-        <div class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow" data-animate>
+        <div
+          v-for="(t, i) in testimonials"
+          :key="t.name"
+          class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow"
+          :class="i === 1 || i === 2 ? 'lg:translate-y-8' : ''"
+          data-animate
+        >
           <div class="flex gap-1 mb-6">
-            <Icon v-for="i in 5" :key="i" icon="material-symbols:star" class="text-secondary" />
+            <Icon v-for="s in 5" :key="s" icon="material-symbols:star" class="text-secondary" />
           </div>
           <p class="text-on-surface-variant font-light leading-relaxed mb-8 italic">
-            "Chantal a cette capacité rare d'écouter au-delà des mots. Après quelques séances, nous avons redécouvert ce qui nous avait réunis au départ."
+            "{{ t.quote }}"
           </p>
-          <p class="font-semibold text-primary">Sophie &amp; Marc</p>
-        </div>
-
-        <div class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow lg:translate-y-8" data-animate>
-          <div class="flex gap-1 mb-6">
-            <Icon v-for="i in 5" :key="i" icon="material-symbols:star" class="text-secondary" />
+          <div>
+            <p class="font-semibold text-primary">{{ t.name }}</p>
+            <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
           </div>
-          <p class="text-on-surface-variant font-light leading-relaxed mb-8 italic">
-            "Une approche douce et efficace. J'ai retrouvé une paix intérieure que je croyais perdue. Je recommande chaleureusement."
-          </p>
-          <p class="font-semibold text-primary">Pierre L.</p>
-        </div>
-
-        <div class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow" data-animate>
-          <div class="flex gap-1 mb-6">
-            <Icon v-for="i in 5" :key="i" icon="material-symbols:star" class="text-secondary" />
-          </div>
-          <p class="text-on-surface-variant font-light leading-relaxed mb-8 italic">
-            "Le dialogue Imago a transformé notre façon de communiquer. Nous avons enfin les outils pour nous comprendre vraiment."
-          </p>
-          <p class="font-semibold text-primary">Julie R.</p>
         </div>
 
       </div>
@@ -45,4 +34,27 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+
+const testimonials = [
+  {
+    quote: "Les moments partagés avec Chantal ont été simplement bénissant. Elle m'a doucement guider dans mes réflexions et m'a aidé à travailler sur moi-même. J'ai pu, grâce à nos rencontres, apprendre enfin, à mieux me connaître, à m'aimer et enfin mettre mes limites. Douce, empathique, à l'écoute Chantal sait nous accompagné dans un respect des plus complet.",
+    name: 'Alexandra',
+    context: 'En thérapie individuelle',
+  },
+  {
+    quote: "Nous avons beaucoup apprécié les séances de coaching de couple avec Chantal, car elle sait très bien établir une ambiance propice aux échanges. La communication se fait sans jugement et dans le respect. Son approche permet également de créer des ponts qui favorisent l'ouverture, la compréhension et l'acceptation. Nous recommandons sans réserve Chantal à tous ceux qui veulent réellement améliorer leur relation de couple.",
+    name: 'Véronique & Dany',
+    context: 'En thérapie de couple',
+  },
+  {
+    quote: "Suite à certains problèmes dans ma vie, j'ai contacté Chantal pour m'aider à y voir plus clair. Tout de suite j'ai vu une différence. Je réussissais de plus en plus à analyser la situation par moi-même grâce aux outils qu'elle m'apportait. J'ai appris à prendre soin de moi, à accepter mes limites et à mieux accepter mes rechutes. Investir du temps et de l'énergie dans sa vie n'est pas toujours facile mais ça en vaut la peine. Avec Chantal, c'est simple et facile de parler. Elle va à notre rythme tout en nous amenant plus loin dans notre vie. Je vous la recommande à 100%.",
+    name: 'Myriam',
+    context: 'En thérapie individuelle',
+  },
+  {
+    quote: "Chantal nous a aidé à avoir un but de couple tout en ayant des trucs pour les atteindre. Elle nous a appris à communiquer de façon efficace tout en restant dans le respect de l'autre et a se concentrer sur le NOUS…couple. Être focus sur le positif et ce que l'on aime de l'autre tout en restant fixé sur le nous. Elle nous guide dans nos moments plus difficile.",
+    name: 'Suzy et Jocelyn',
+    context: 'En coaching de couple',
+  },
+]
 </script>

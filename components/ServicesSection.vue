@@ -28,7 +28,7 @@
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-surface-variant font-light">
               <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />
-              Approche centrée sur le cœur
+              Approche centrée sur la personne
             </li>
             <li class="flex items-center gap-3 text-on-surface-variant font-light">
               <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />

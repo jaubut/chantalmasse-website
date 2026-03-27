@@ -11,7 +11,7 @@
           <!-- Left -->
           <div data-animate>
             <h2 class="font-headline text-5xl italic text-primary mb-6">
-              Prêt à entamer ce voyage?
+              Prêt à entamer cette démarche?
             </h2>
             <p class="text-on-surface-variant font-light text-lg mb-10">
               Consultations disponibles en personne à Shefford ou en vidéoconférence.

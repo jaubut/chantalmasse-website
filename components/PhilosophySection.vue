@@ -14,7 +14,7 @@
         <!-- Floating quote -->
         <div class="absolute top-1/2 -right-4 lg:-right-8 -translate-y-1/2 bg-surface p-8 lg:p-10 rounded-3xl editorial-shadow max-w-[260px] lg:max-w-[280px] z-10">
           <p class="font-headline text-xl lg:text-2xl italic text-primary leading-snug">
-            "L'amour n'est pas un sentiment, c'est une pratique consciente."
+            "Pour retrouvez la connexion avec vous-même et l'autre."
           </p>
         </div>
       </div>

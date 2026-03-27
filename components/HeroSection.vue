@@ -5,11 +5,34 @@
       <!-- Left column -->
       <div class="order-2 lg:order-1 flex flex-col gap-8">
         <span class="inline-flex w-fit items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2" data-animate>
-          Accompagnement Thérapeutique
+          <span
+            ref="trackEl"
+            class="relative inline-flex items-center overflow-hidden"
+            :style="{ width: containerWidth ? containerWidth + 'px' : undefined, transition: 'width 600ms cubic-bezier(0.4, 0, 0.2, 1)' }"
+          >
+            <!-- Ghost refs: one per label, invisible, used to measure widths -->
+            <span
+              v-for="label in labels"
+              :key="label"
+              ref="ghostEls"
+              class="invisible absolute whitespace-nowrap pointer-events-none"
+              aria-hidden="true"
+            >{{ label }}</span>
+            <!-- Sliding labels -->
+            <span
+              v-for="(label, i) in labels"
+              :key="'vis-' + label"
+              class="whitespace-nowrap transition-all duration-500 ease-in-out"
+              :class="i === activeLabel ? 'relative' : 'absolute'"
+              :style="{
+                opacity: i === activeLabel ? 1 : 0,
+                transform: i === activeLabel ? 'translateY(0)' : i < activeLabel ? 'translateY(-100%)' : 'translateY(100%)',
+              }"
+            >{{ label }}</span>
+          </span>
         </span>
-
         <h1 class="font-headline text-6xl lg:text-8xl text-primary leading-[1.05] tracking-tight" data-animate>
-          Retrouvez la <span class="italic">connexion</span> — avec vous-même et avec l'autre.
+          Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
         </h1>
 
         <p class="text-on-surface-variant text-xl max-w-lg font-light" data-animate>
@@ -34,7 +57,7 @@
         <div class="absolute -bottom-10 -left-10 w-64 h-64 rounded-full blur-3xl -z-10" style="background-color: rgba(219,225,255,0.3);"></div>
         <div class="aspect-[4/5] rounded-[2rem] overflow-hidden lg:translate-x-12 translate-y-4">
           <img
-            src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80"
+            src="/images/chantal-hero.jpg"
             alt="Chantal Massé, thérapeute"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"
@@ -48,4 +71,22 @@
 
 <script setup lang="ts">
 const booking = useBooking()
+
+const labels = ['Thérapeute en relations d\'aide', 'Coach de couple']
+const activeLabel = ref(0)
+const ghostEls = ref<HTMLElement[]>([])
+const containerWidth = ref<number | null>(null)
+
+function updateWidth() {
+  const el = ghostEls.value[activeLabel.value]
+  if (el) containerWidth.value = el.offsetWidth
+}
+
+onMounted(() => {
+  updateWidth()
+  setInterval(() => {
+    activeLabel.value = (activeLabel.value + 1) % labels.length
+    updateWidth()
+  }, 3000)
+})
 </script>

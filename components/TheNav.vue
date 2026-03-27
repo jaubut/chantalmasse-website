@@ -16,6 +16,7 @@
       <div class="hidden md:flex items-center gap-10">
         <a href="#services" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Services</a>
         <a href="#approche" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Approche</a>
+        <a href="#apropos" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">À propos</a>
         <NuxtLink to="/blog" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Blog</NuxtLink>
       </div>
 

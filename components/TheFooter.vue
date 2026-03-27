@@ -5,9 +5,8 @@
       <a href="/" class="font-headline italic text-2xl text-primary">Chantal Massé</a>
 
       <nav class="flex items-center gap-8">
-        <a href="#" class="text-sm uppercase tracking-wide text-on-surface-variant hover:text-primary transition-colors">Mentions Légales</a>
-        <a href="#" class="text-sm uppercase tracking-wide text-on-surface-variant hover:text-primary transition-colors">Confidentialité</a>
-        <a href="#" class="text-sm uppercase tracking-wide text-on-surface-variant hover:text-primary transition-colors">FR/EN</a>
+        <NuxtLink to="/mentions-legales" class="text-sm uppercase tracking-wide text-on-surface-variant hover:text-primary transition-colors">Mentions Légales</NuxtLink>
+        <NuxtLink to="/confidentialite" class="text-sm uppercase tracking-wide text-on-surface-variant hover:text-primary transition-colors">Confidentialité</NuxtLink>
       </nav>
 
       <p class="text-sm uppercase tracking-wide" style="color: rgba(23,48,40,0.5);">
