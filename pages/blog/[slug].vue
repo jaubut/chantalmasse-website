@@ -80,20 +80,51 @@
 
       <!-- CTA -->
       <div class="px-8 lg:px-20 py-20 bg-primary">
-        <div class="max-w-3xl mx-auto text-center">
-          <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-4">Prochaine étape</p>
-          <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight">
-            Prêt à aller plus loin ?
-          </h2>
-          <p class="text-primary-fixed-dim font-light text-lg mb-10 max-w-xl mx-auto">
-            Un espace confidentiel, sans jugement, pour explorer ce qui vous habite. Consultations en personne à Shefford ou en vidéoconférence.
-          </p>
-          <button
-            class="inline-block bg-primary-fixed text-primary px-10 py-4 rounded-xl font-semibold hover:scale-105 transition-transform"
-            @click="booking.open()"
-          >
-            Prendre rendez-vous
-          </button>
+        <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+          <!-- Booking -->
+          <div>
+            <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-4">Prochaine étape</p>
+            <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight">
+              Prêt à aller plus loin ?
+            </h2>
+            <p class="text-primary-fixed-dim font-light text-lg mb-10">
+              Un espace confidentiel, sans jugement, pour explorer ce qui vous habite. Consultations en personne à Shefford ou en vidéoconférence.
+            </p>
+            <button
+              class="inline-block bg-primary-fixed text-primary px-10 py-4 rounded-xl font-semibold hover:scale-105 transition-transform"
+              @click="booking.open()"
+            >
+              Prendre rendez-vous
+            </button>
+          </div>
+
+          <!-- Newsletter -->
+          <div class="bg-white/10 rounded-[2rem] p-10">
+            <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-3">Infolettre</p>
+            <h3 class="font-headline text-3xl italic text-white mb-3 leading-snug">Pensées & Réflexions</h3>
+            <p class="text-primary-fixed-dim font-light mb-8">
+              Recevez mensuellement des pistes de réflexion et des ressources pour nourrir vos relations.
+            </p>
+            <form class="flex flex-col gap-4" @submit.prevent="subscribe">
+              <input
+                v-model="email"
+                type="email"
+                placeholder="votre@courriel.com"
+                :disabled="loading || success"
+                class="bg-white/15 text-white rounded-xl px-5 py-4 outline-none placeholder-white/40 focus:ring-2 focus:ring-primary-fixed/50 disabled:opacity-50"
+              />
+              <button
+                type="submit"
+                :disabled="loading || success"
+                class="bg-primary-fixed text-primary px-8 py-4 rounded-xl font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:scale-100"
+              >
+                {{ success ? 'Confirmez votre courriel ✓' : loading ? '...' : "S'abonner" }}
+              </button>
+            </form>
+            <p v-if="error" class="mt-3 text-sm text-red-300">{{ error }}</p>
+          </div>
+
         </div>
       </div>
 
@@ -161,6 +192,25 @@ useSeoMeta({
 })
 
 const booking = useBooking()
+
+const email = ref('')
+const loading = ref(false)
+const success = ref(false)
+const error = ref('')
+
+async function subscribe() {
+  error.value = ''
+  loading.value = true
+  try {
+    await $fetch('/api/newsletter/subscribe', { method: 'POST', body: { email: email.value } })
+    success.value = true
+    email.value = ''
+  } catch (e: any) {
+    error.value = e?.data?.statusMessage ?? 'Une erreur est survenue. Réessayez.'
+  } finally {
+    loading.value = false
+  }
+}
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-CA', {
