@@ -45,7 +45,55 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
+    '@nuxtjs/seo',
+    '@nuxt/image',
   ],
+
+  // ─── Site identity (used by sitemap, robots, schema.org) ───────────────────
+  site: {
+    url: 'https://chantalmasse.com',
+    name: 'Chantal Massé — Thérapeute en relation d\'aide',
+    description: 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.',
+    defaultLocale: 'fr',
+  },
+
+  // ─── Robots ────────────────────────────────────────────────────────────────
+  robots: {
+    // Block admin from indexing; /api is not crawled by bots anyway
+    disallow: ['/admin'],
+  },
+
+  // ─── Sitemap ───────────────────────────────────────────────────────────────
+  // crawlLinks: true in nitro means all prerendered routes are auto-discovered
+  sitemap: {},
+
+  // ─── OG Image ──────────────────────────────────────────────────────────────
+  // Blog posts already set ogImage via useSeoMeta (Wixstatic images).
+  // Disable the Satori renderer to keep the build simple.
+  ogImage: { enabled: false },
+
+  // ─── Schema.org ────────────────────────────────────────────────────────────
+  schemaOrg: {
+    identity: {
+      type: 'Person',
+      name: 'Chantal Massé',
+      description: 'Thérapeute en relation d\'aide et coach de couple, Shefford (Québec)',
+      url: 'https://chantalmasse.com',
+      sameAs: [],
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Shefford',
+        addressRegion: 'QC',
+        addressCountry: 'CA',
+      },
+    },
+  },
+
+  // ─── Image ─────────────────────────────────────────────────────────────────
+  image: {
+    // Allow Wixstatic (blog post images) and the site's own domain
+    domains: ['static.wixstatic.com', 'chantalmasse.com'],
+  },
 
   googleFonts: {
     families: {
