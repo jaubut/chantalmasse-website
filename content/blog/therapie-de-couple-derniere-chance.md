@@ -13,14 +13,20 @@ La vie de couple est souvent comparée à un voyage. Un chemin parsemé de joies
 
 La bonne nouvelle, c'est que la thérapie de couple n'est pas seulement une « planche de salut » utilisée en désespoir de cause. Elle peut être un espace transformateur pour apprendre à mieux communiquer, se reconnecter et bâtir une relation plus consciente et épanouissante.
 
+> La thérapie de couple n'est pas une dernière chance. C'est une nouvelle chance — l'occasion de créer de nouvelles bases pour un futur commun plus solide.
+
 ## 1. Pourquoi les couples arrivent à envisager la séparation ?
 
 La séparation ne survient jamais du jour au lendemain. Elle est souvent le résultat d'une accumulation de tensions non résolues :
 
 - **La communication rompue :** Les partenaires ne parviennent plus à exprimer leurs besoins ou leurs émotions sans se blesser mutuellement.
+
 - **La perte de complicité :** Les moments de qualité se raréfient, laissant place à la routine et au sentiment de distance.
+
 - **Les conflits récurrents :** Des disputes répétitives sur les mêmes sujets qui finissent par épuiser le lien affectif.
+
 - **Les blessures affectives :** Infidélité, mensonges, manque de soutien émotionnel.
+
 - **Les différences de valeurs ou de projets de vie.**
 
 ## 2. La thérapie de couple : un espace neutre pour comprendre et reconstruire
@@ -36,8 +42,11 @@ La thérapie est d'autant plus efficace qu'elle est commencée tôt. Imaginez un
 ## 4. Les bienfaits concrets d'une thérapie de couple
 
 - **Une meilleure communication :** Apprendre à écouter réellement et à parler avec respect.
+
 - **Un climat plus serein :** Les disputes diminuent, car le couple trouve des outils pour désamorcer les conflits.
+
 - **Un regain d'intimité et de complicité :** Les partenaires redécouvrent le plaisir de partager et d'être ensemble.
+
 - **Un cheminement personnel :** Chaque individu gagne en maturité émotionnelle.
 
 ## 5. Quand consulter un thérapeute de couple ?
@@ -50,6 +59,8 @@ La thérapie est d'autant plus efficace qu'elle est commencée tôt. Imaginez un
 ## 6. Et si malgré tout la séparation reste la meilleure option ?
 
 Il faut être honnête : la thérapie ne « sauve » pas toutes les relations. Parfois, le processus permet aux partenaires de réaliser que leurs chemins doivent se séparer. Toutefois, même dans ce cas, elle n'est jamais vaine : elle permet de se séparer dans le respect, offre des outils pour mieux vivre les futures relations, et apporte une compréhension apaisée de ce qui n'a pas fonctionné.
+
+---
 
 ## Conclusion : La thérapie, une nouvelle chance à saisir
 

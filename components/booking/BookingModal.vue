@@ -91,6 +91,7 @@
                 :service="selectedService!"
                 :slots="slotsForSelectedDate"
                 :selected-slot="selectedSlot"
+                :is-loading="isLoadingSlots"
                 @select="onSlotSelected"
                 @back="currentStep = 'calendar'"
               />
@@ -156,6 +157,7 @@ const selectedDate = ref<Date | null>(null)
 const selectedSlot = ref<TimeSlot | null>(null)
 const slotsForSelectedDate = ref<TimeSlot[]>([])
 
+const isLoadingSlots = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref<string | null>(null)
 const globalError = ref<string | null>(null)
@@ -217,6 +219,8 @@ function onDateSelected(date: Date) {
 
 async function fetchSlotsForDate(date: Date) {
   if (!selectedService.value) return
+  isLoadingSlots.value = true
+  slotsForSelectedDate.value = []
   const month = format(date, 'yyyy-MM')
   try {
     const data = await $fetch<{ slotsByDate: Record<string, TimeSlot[]> }>(
@@ -228,6 +232,8 @@ async function fetchSlotsForDate(date: Date) {
   } catch {
     slotsForSelectedDate.value = []
     globalError.value = 'Impossible de charger les disponibilités. Veuillez réessayer.'
+  } finally {
+    isLoadingSlots.value = false
   }
 }
 

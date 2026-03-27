@@ -15,6 +15,8 @@ C'est ce qu'on appelle le **« mode réaction »**. Un état de pilotage automat
 
 Pourtant, une autre voie existe. Celle de **l'amour conscient**. Ce n'est pas une relation sans conflits, mais une relation où l'on choisit, ensemble, de ne plus subir nos automatismes pour devenir les architectes de notre bonheur.
 
+> L'amour conscient, ce n'est pas une relation sans conflits — c'est une relation où l'on choisit de ne plus subir ses automatismes.
+
 ## 1. Comprendre le mode réaction : quand le pilote automatique dirige votre couple
 
 Le mode réaction est une réponse de survie émotionnelle. Lorsque nous nous sentons critiqués, ignorés ou incompris, notre cerveau active des mécanismes de défense instantanés. On ne répond plus à son partenaire, on réagit à une menace perçue.
@@ -22,8 +24,11 @@ Le mode réaction est une réponse de survie émotionnelle. Lorsque nous nous se
 ### Les visages de la réaction automatique
 
 - **Le reproche préventif :** Attaquer l'autre avant qu'il n'ait le temps de nous pointer du doigt.
+
 - **Le retrait (la fuite) :** Se murer dans le silence ou quitter la pièce pour éviter l'inconfort émotionnel.
+
 - **La justification constante :** Chercher à avoir raison plutôt qu'à comprendre le ressenti de l'autre.
+
 - **Le pilotage automatique :** Reproduire les schémas relationnels observés durant notre enfance, sans jamais les remettre en question.
 
 Vivre en mode réaction, c'est comme conduire une voiture dont les freins sont bloqués : on avance avec effort, on s'épuise, et on finit par s'abîmer contre les mêmes obstacles. Pour sortir de ce cycle, il est nécessaire de faire un premier pas vers la conscience.
@@ -48,12 +53,15 @@ La communication est souvent le premier domaine où le passage au mode conscient
 ### Exemple concret de transformation
 
 - **Mode réaction :** « Tu te fous de moi, tu es encore en retard, tu ne respectes jamais mon temps ! »
+
 - **Mode conscient :** « Je me sens insécure et peu prioritaire quand l'heure convenue est dépassée sans nouvelles. J'ai besoin de clarté pour m'organiser. »
 
 **Pistes pour une communication saine :**
 
 - **Ralentir :** Avant de répondre, prenez trois grandes respirations. Demandez-vous : « Est-ce que ce que je vais dire va construire ou détruire ? ».
+
 - **Nommer l'émotion :** « Je sens que je suis en train de me fermer, j'ai besoin de 5 minutes avant de continuer. »
+
 - **L'écoute active :** Reformuler ce que l'autre a dit pour s'assurer qu'on a bien compris son intention, et non notre interprétation.
 
 ## 4. Gérer les conflits et prendre des décisions : la force de la co-création
@@ -69,8 +77,11 @@ Même avec la meilleure volonté du monde, il est parfois difficile de sortir se
 ### Ce qu'apporte une séance de thérapie de couple :
 
 - **Mettre des mots sur ce qu'on ne peut exprimer :** Identifier les émotions complexes derrière les disputes répétitives.
+
 - **Un espace sécurisant :** Pour s'assurer que chacun est entendu dans ses besoins profonds.
+
 - **Des outils concrets :** Repartir avec des stratégies de communication et de gestion émotionnelle adaptées à votre réalité.
+
 - **Un temps d'arrêt de 90 minutes :** Une pause nécessaire dans le tourbillon du quotidien pour se retrouver vraiment.
 
 Le changement ne demande pas la perfection, il demande de la direction. Passer de la réaction à la création est un cheminement qui se fait un pas à la fois, avec douceur et persévérance.

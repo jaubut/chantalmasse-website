@@ -13,6 +13,8 @@ La vie à deux, ce n'est pas toujours simple. Même avec beaucoup d'amour, de bo
 
 Consulter un thérapeute de couple, ce n'est pas forcément une démarche de dernier recours. C'est même, dans bien des cas, une façon de prévenir plutôt que de guérir.
 
+> Consulter un thérapeute de couple, ce n'est pas un aveu d'échec. C'est un signe de maturité — c'est choisir d'investir dans votre relation.
+
 ## 1. Vous ne vous parlez plus... ou alors pour vous disputer
 
 La communication, c'est la base. Quand elle disparaît ou devient blessante, le lien commence à se fragiliser. Vous évitez certains sujets pour ne pas déclencher de conflit ? Vos échanges tournent rapidement au clash ? Vous ne vous sentez plus écouté(e), ni compris(e) ? Les silences ont remplacé les vraies conversations ?

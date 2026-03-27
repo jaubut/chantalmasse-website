@@ -11,6 +11,8 @@ originalUrl: "https://www.chantalmasse.com/post/l-automne-et-la-rentrée-une-sai
 
 La rentrée et l'automne marquent une période de transition. Alors que l'automne laisse place aux journées plus courtes et au rythme soutenu de la vie professionnelle, scolaire et familiale, beaucoup ressentent une certaine fatigue émotionnelle, du stress ou un sentiment d'être débordé. Pourtant, cette saison peut devenir une formidable occasion de renouveau personnel.
 
+> Plutôt que de subir l'automne, vous pouvez le transformer en tremplin de croissance personnelle.
+
 ## 1. L'automne : une invitation au ralentissement et à l'introspection
 
 Contrairement à l'énergie expansée de l'été, l'automne incite à ralentir. La nature elle-même nous le rappelle : les arbres perdent leurs feuilles pour se préparer à un cycle nouveau.
@@ -42,6 +44,8 @@ En thérapie individuelle, vous serez guidé pour explorer vos désirs profonds 
 ## 7. Prévenir l'impact émotionnel de l'hiver
 
 Pour beaucoup, l'automne est aussi le prélude aux mois d'hiver. Se préparer à cette période est une façon de prendre soin de soi à l'avance : anticiper et mieux gérer les coups de fatigue émotionnelle, développer des stratégies pour garder un état d'esprit positif, renforcer sa résilience.
+
+---
 
 ## Conclusion : transformer la rentrée et l'automne en tremplin de croissance personnelle
 

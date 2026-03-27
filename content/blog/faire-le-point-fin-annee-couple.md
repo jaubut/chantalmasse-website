@@ -11,6 +11,8 @@ originalUrl: "https://www.chantalmasse.com/post/faire-le-point-en-fin-d-année-p
 
 La fin d'année, c'est souvent un moment de bilan personnel… mais aussi relationnel. Les fêtes approchent, le quotidien ralentit un peu, et avec lui, émerge parfois un **besoin de recul sur ce que l'on vit dans son couple**. Que vous traversiez une période difficile ou que vous ressentiez simplement un certain éloignement, **la fin d'année peut être un moment idéal pour entamer une démarche thérapeutique à deux.**
 
+> La fin d'année peut être un moment idéal pour entamer une démarche thérapeutique à deux.
+
 ## 1. Une période propice à la réflexion
 
 Entre les moments en famille, les vacances et les résolutions à venir, **la fin d'année invite naturellement à faire le point** : Où en sommes-nous dans notre couple ? Est-ce que nos besoins sont entendus ? Est-ce que notre relation nous nourrit encore ?
@@ -41,6 +43,8 @@ La thérapie de couple n'est pas un tribunal où l'on cherche un coupable, mais 
 ## 5. Préparer l'avenir avec plus de clarté
 
 Consulter en fin d'année peut aussi aider à y voir plus clair : **voulons-nous continuer ensemble ? Qu'avons-nous besoin de changer ?** Ce n'est pas toujours une réponse facile, mais elle peut être mieux accueillie et construite dans un processus thérapeutique.
+
+---
 
 ## Conclusion : Un choix conscient pour cultiver sa relation
 

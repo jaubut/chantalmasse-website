@@ -17,6 +17,8 @@ En tant que thérapeute en relation d'aide, je rencontre souvent des hommes et d
 
 Dans cet article, nous allons explorer pourquoi nous cherchons à tout régenter et comment la **thérapie individuelle** peut vous aider à retrouver la sérénité du lâcher-prise.
 
+> Derrière le besoin de contrôle se cache souvent une quête de sécurité.
+
 ## Pourquoi le besoin de contrôle devient-il envahissant ?
 
 Le besoin de contrôle n'est pas un défaut de fabrication ; c'est un mécanisme de défense. Pour comprendre pourquoi il prend tant de place, il faut regarder ce qu'il tente de protéger.
@@ -58,7 +60,9 @@ On pense souvent, à tort, que « lâcher prise » signifie « ne plus rien fair
 Lors de nos rencontres d'environ une heure, je vous offre un espace sécuritaire, sans jugement, où vous pouvez enfin déposer votre armure.
 
 - **Mettre des mots sur les émotions :** Nous identifions ensemble l'émotion qui déclenche le besoin de contrôle (est-ce de la peur ? de la culpabilité ? un besoin de reconnaissance ?).
+
 - **Comprendre le « pourquoi » :** Nous explorons l'origine de ce mécanisme pour mieux le désamorcer.
+
 - **Pratiquer l'auto-observation :** Apprendre à reconnaître le moment où la tension monte avant que le comportement de contrôle ne prenne le dessus.
 
 ### Un chemin vers l'équilibre
@@ -70,10 +74,16 @@ La thérapie n'est pas une solution magique, c'est un processus de **développem
 S'engager dans une démarche thérapeutique permet de transformer votre quotidien de manière durable. Voici ce que vous pouvez gagner :
 
 - **Une meilleure compréhension de soi :** Vous comprenez enfin vos réactions et vous ne les subissez plus.
+
 - **Une communication plus saine :** En relâchant la pression sur les autres, vos relations deviennent plus fluides et harmonieuses.
+
 - **Une réduction significative du stress :** Vous apprenez à distinguer ce qui dépend de vous de ce qui ne dépend pas de vous.
+
 - **Des décisions alignées :** Au lieu de décider par peur, vous apprenez à décider en fonction de vos valeurs profondes.
+
 - **Une plus grande estime de soi :** Vous réalisez que votre valeur ne dépend pas de la perfection de votre environnement.
+
+---
 
 ## FAQ : Questions fréquentes sur la thérapie individuelle
 
@@ -84,6 +94,8 @@ S'engager dans une démarche thérapeutique permet de transformer votre quotidie
 **Combien de temps dure une thérapie ?** La durée varie selon chaque personne. Certaines voient un changement après quelques séances (4 à 6), tandis que d'autres préfèrent un suivi à plus long terme pour approfondir leur développement personnel. Chaque séance dure environ 1 heure.
 
 **Est-ce normal d'avoir peur de consulter ?** Absolument. Parler de soi à une inconnue demande du courage. C'est pourquoi mon approche est basée sur l'empathie, la douceur et le respect de votre rythme. Vous restez maître de ce que vous souhaitez partager.
+
+---
 
 ## Conclusion : Faire le premier pas vers la sérénité
 

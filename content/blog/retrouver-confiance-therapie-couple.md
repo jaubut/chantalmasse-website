@@ -11,6 +11,8 @@ originalUrl: "https://www.chantalmasse.com/post/retrouver-la-confiance-grâce-à
 
 Dans une relation amoureuse, la confiance est souvent ce qui fait tenir le couple dans la durée. Pourtant, même les relations les plus stables peuvent connaître des phases de tension, de doute ou d'éloignement. Quand la confiance vacille, les échanges deviennent plus compliqués, la communication se tend, et le sentiment de sécurité affective s'érode.
 
+> Quand la confiance vacille, la communication se tend — et le sentiment de sécurité affective s'érode peu à peu.
+
 ## Comprendre la thérapie de couple
 
 La thérapie de couple, c'est un espace d'écoute guidé par un(e) professionnel(le) neutre, où chacun peut s'exprimer librement. Elle invite les partenaires à parler de ce qu'ils ressentent, à formuler leurs besoins, et à identifier les habitudes ou mécanismes qui freinent leur complicité.
@@ -29,9 +31,13 @@ La confiance repose sur des éléments essentiels : la sincérité, la constance
 ## Ce que la thérapie de couple peut réellement changer
 
 1. **Un espace pour parler librement** — Le cadre thérapeutique garantit une écoute sans jugement. Chacun peut s'y exprimer sans être interrompu.
+
 2. **Une communication plus claire et sincère** — Les tensions viennent souvent d'une mauvaise manière de se dire les choses.
+
 3. **Revenir sur l'histoire commune** — Revisiter les moments douloureux permet de comprendre comment la confiance a été affectée.
+
 4. **Valoriser les efforts concrets** — La thérapie encourage à poser des gestes significatifs : améliorer sa présence, respecter ses engagements.
+
 5. **Rétablir un sentiment de sécurité affective** — Quand la communication devient plus fluide et l'écoute plus bienveillante, chacun se sent plus compris et reconnu.
 
 ## Quand envisager une thérapie pour renforcer la confiance ?

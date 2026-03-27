@@ -15,6 +15,8 @@ Cette sensation de devenir des « colocataires efficaces » plutôt que des amou
 
 Si vous ressentez cette distance, sachez que vous n'êtes pas seuls. Ce n'est pas forcément le signe que l'amour a disparu, mais plutôt que le lien a besoin d'être nourri.
 
+> La connexion émotionnelle est souvent la première victime du tourbillon quotidien — et la première chose à nourrir intentionnellement.
+
 ## Qu'est-ce que la connexion émotionnelle dans un couple ?
 
 La **connexion émotionnelle** est le sentiment de sécurité, de compréhension et de proximité qui permet à deux partenaires de se sentir liés l'un à l'autre. C'est la certitude que l'autre est un « port d'attache » sécurisant où l'on peut être soi-même sans jugement.
@@ -85,6 +87,8 @@ Il arrive que le fossé semble trop large pour être franchi seul. Consulter un 
 
 La thérapie permet de réparer la connexion émotionnelle en profondeur, pour que vous deveniez une équipe solide, alignée avec vos valeurs communes.
 
+---
+
 ## FAQ – Vos questions sur la connexion de couple
 
 ### Qu'est-ce que la connexion émotionnelle dans un couple ?
@@ -106,6 +110,8 @@ Oui, dans la majorité des cas, à condition que les deux partenaires aient la v
 ### La thérapie de couple fonctionne-t-elle vraiment ?
 
 La thérapie de couple est très efficace pour briser les impasses de communication. Elle offre un cadre professionnel pour comprendre les racines de la distance et reconstruire des bases saines et durables.
+
+---
 
 ## Conclusion : Un pas vers le mieux-être
 

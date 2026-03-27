@@ -13,8 +13,17 @@
       </div>
     </div>
 
+    <!-- Loading skeletons -->
+    <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div
+        v-for="n in 6"
+        :key="n"
+        class="h-20 rounded-xl bg-surface-container animate-pulse"
+      />
+    </div>
+
     <!-- Slots grid -->
-    <div v-if="slots.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div v-else-if="slots.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
       <button
         v-for="slot in slots"
         :key="slot.isoStart"
@@ -77,6 +86,7 @@ const props = defineProps<{
   service: BookingService
   slots: TimeSlot[]
   selectedSlot: TimeSlot | null
+  isLoading: boolean
 }>()
 
 defineEmits<{

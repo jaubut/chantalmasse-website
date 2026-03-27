@@ -11,6 +11,8 @@ originalUrl: "https://www.chantalmasse.com/post/comment-retrouver-un-équilibre-
 
 Tu as peut-être l'impression de courir sans arrêt, de jongler entre mille obligations, sans jamais vraiment te sentir aligné·e ni apaisé·e. Ce sentiment de déséquilibre est de plus en plus courant. Il ne s'agit pas seulement d'un agenda trop chargé, mais souvent d'un mal-être plus profond : un éloignement de soi, de ses besoins, de ses limites.
 
+> L'équilibre de vie, ce n'est pas atteindre une perfection — c'est se sentir en cohérence avec soi-même.
+
 ## Qu'est-ce que l'équilibre de vie, exactement ?
 
 L'équilibre de vie, ce n'est pas atteindre une perfection entre toutes les sphères (travail, famille, santé, relations), mais plutôt :
@@ -31,10 +33,16 @@ La vie moderne nous pousse à faire toujours plus, à répondre à des exigences
 Un accompagnement thérapeutique ne te donne pas une recette magique, mais t'aide à te reconnecter à ce qui compte pour **toi**. Concrètement, tu pourras :
 
 1. **Prendre du recul sur ta réalité** — En parlant librement, tu clarifies ce qui te pèse.
+
 2. **Identifier tes besoins profonds** — Tu redécouvres ce qui te nourrit et ce que tu veux vraiment dans ta vie.
+
 3. **Revoir tes priorités** — La thérapie t'aide à faire le tri entre ce qui t'appartient et ce que tu fais uniquement pour répondre aux attentes des autres.
+
 4. **Apprendre à dire non et poser tes limites** — Tu développes des outils pour protéger ton espace personnel, sans culpabilité.
+
 5. **Revenir à toi avec douceur** — Peu à peu, tu retrouves une sensation de calme, d'ancrage, de cohérence intérieure.
+
+---
 
 ## Conclusion
 

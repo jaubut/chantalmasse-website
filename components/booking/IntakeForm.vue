@@ -22,6 +22,14 @@
       </div>
     </div>
 
+    <!-- Pre-filled notice -->
+    <div v-if="prefilled" class="flex items-center justify-between bg-primary-fixed/60 rounded-xl px-4 py-3 mb-2 font-body text-sm">
+      <span class="text-on-surface">👋 Vos informations ont été pré-remplies.</span>
+      <button type="button" class="text-on-surface-variant underline text-xs hover:text-on-surface transition-colors" @click="clearSaved">
+        Effacer
+      </button>
+    </div>
+
     <!-- Form -->
     <form class="space-y-5" @submit.prevent="handleSubmit">
       <!-- Name row -->
@@ -174,11 +182,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { BookingService } from './ServiceSelector.vue'
 import type { TimeSlot } from '~/utils/bookingHelpers'
+
+const STORAGE_KEY = 'booking_client_info'
 
 const props = defineProps<{
   service: BookingService
@@ -213,6 +223,29 @@ const form = reactive<FormData>({
 })
 
 const errors = reactive<Partial<Record<keyof FormData, string>>>({})
+const prefilled = ref(false)
+
+onMounted(() => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    if (saved) {
+      const { firstName, lastName, email, phone } = JSON.parse(saved)
+      if (firstName) { form.firstName = firstName; prefilled.value = true }
+      if (lastName) form.lastName = lastName
+      if (email) form.email = email
+      if (phone) form.phone = phone
+    }
+  } catch {}
+})
+
+function clearSaved() {
+  localStorage.removeItem(STORAGE_KEY)
+  form.firstName = ''
+  form.lastName = ''
+  form.email = ''
+  form.phone = ''
+  prefilled.value = false
+}
 
 watch(() => props.service.id, (id) => {
   if (id !== 'individual' && form.sessionType === 'video') {
@@ -242,6 +275,14 @@ function validate(): boolean {
 
 function handleSubmit() {
   if (!validate()) return
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      email: form.email,
+      phone: form.phone,
+    }))
+  } catch {}
   emit('submit', { ...form })
 }
 </script>

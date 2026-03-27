@@ -17,6 +17,8 @@ En tant que **thérapeute en relation d'aide**, j'accompagne régulièrement des
 
 C'est un **signal précieux** que quelque chose, en nous, a besoin d'attention, de compréhension, de réajustement.
 
+> L'anxiété n'est pas une faiblesse. C'est un signal précieux que quelque chose, en nous, a besoin d'attention.
+
 Voici **3 étapes simples et accessibles** que je recommande souvent à mes clients.
 
 ## 1. 🧘 Respirer profondément

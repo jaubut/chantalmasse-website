@@ -6,6 +6,9 @@ export default defineNuxtConfig({
     // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
     // Page routes are pre-rendered at build time via routeRules below.
     preset: 'vercel',
+    prerender: {
+      crawlLinks: true,
+    },
   },
 
   routeRules: {

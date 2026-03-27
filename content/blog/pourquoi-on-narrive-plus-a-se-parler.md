@@ -13,6 +13,8 @@ Au début, on se parlait avec curiosité. Puis, tranquillement, les échanges so
 
 Si tu te reconnais là-dedans, rassure-toi : tu n'es pas seul(e). Et surtout, ce n'est pas parce que l'amour n'est plus là. Bien souvent, c'est la communication qui s'est installée en **mode pilote automatique**, sans que le couple s'en rende compte.
 
+> Ce n'est pas parce que l'amour n'est plus là. Bien souvent, c'est la communication qui s'est installée en mode pilote automatique.
+
 ## Comprendre les cycles de communication défensive
 
 Quand la communication devient blessante, ce n'est rarement à cause d'un seul événement. Il s'agit plutôt d'un **cycle relationnel** qui se répète, souvent inconsciemment.
@@ -93,6 +95,7 @@ S'arrêter n'est pas fuir. Prendre 20 minutes pour se calmer, puis revenir avec 
 **4. Clarifier l'intention**
 
 Avant de répondre, se demander :
+
 - « Qu'est-ce que l'autre essaie vraiment de me dire ? »
 - « De quoi a-t-il/elle besoin en ce moment ? »
 

@@ -13,6 +13,8 @@ Le mois de décembre est souvent synonyme de joie, de réunions familiales et de
 
 De plus en plus de personnes choisissent d'entamer une **démarche de thérapie individuelle en décembre** afin de mieux comprendre leurs émotions et traverser cette période avec plus de douceur.
 
+> Décembre agit comme un déclencheur émotionnel — il met en lumière ce que l'on porte en silence le reste de l'année.
+
 ## Pourquoi décembre est une période sensible pour la santé émotionnelle ?
 
 Le temps des Fêtes agit comme un déclencheur émotionnel. Il met parfois en lumière :

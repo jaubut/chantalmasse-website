@@ -15,6 +15,8 @@ Souvent, ce ne sont pas les sujets qui posent problème, mais **la manière dont
 
 Voici **3 phrases à éviter en période de conflit**, et surtout, **des alternatives pour préserver le lien tout en exprimant ce que vous ressentez.**
 
+> Ce ne sont pas les sujets qui posent problème, mais la manière dont ils sont abordés.
+
 ## ❌ 1. « Tu fais toujours ça ! »
 
 Généraliser un comportement (« toujours », « jamais ») empêche le dialogue. Cela place l'autre sur la défensive et crée de la frustration au lieu de la compréhension.

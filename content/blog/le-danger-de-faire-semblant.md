@@ -13,6 +13,8 @@ Dans un monde où l'apparence, la performance et le contrôle dominent souvent l
 
 Ce réflexe, pourtant si répandu, est loin d'être bénin. Dans les relations de couple, amicales ou familiales, **le fait de cacher ce que l'on ressent réellement est l'une des causes les plus fréquentes de malentendus, d'épuisement émotionnel et de ruptures non désirées**.
 
+> Ce qui n'est pas exprimé ne disparaît pas. Il s'accumule, jusqu'au jour où il s'exprime autrement.
+
 ## Pourquoi fait-on semblant que tout va bien ?
 
 Personne ne choisit consciemment de s'éteindre ou de taire ce qu'il ressent. Derrière cette façade se cachent souvent des mécanismes de protection bien enracinés.

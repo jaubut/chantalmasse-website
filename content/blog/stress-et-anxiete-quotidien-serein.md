@@ -13,6 +13,8 @@ Dans le rythme effréné de la vie moderne, stress et anxiété se sont invités
 
 Mais non, ce n'est pas un signe de faiblesse. Le stress et l'anxiété sont des messages. Ils nous parlent. Ils nous disent que quelque chose, quelque part, a besoin d'attention.
 
+> Le stress et l'anxiété sont des messages. Ils nous disent que quelque chose, quelque part, a besoin d'attention.
+
 ## Mieux comprendre ce qui se passe en soi
 
 **Le stress : une réaction normale du corps** — C'est notre système d'alerte interne. Devant une situation difficile ou exigeante, le stress nous pousse à réagir, à nous adapter. Mais quand il s'installe trop longtemps, il fatigue notre corps et notre esprit.

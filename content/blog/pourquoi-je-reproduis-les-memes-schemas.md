@@ -13,6 +13,8 @@ Avez-vous déjà eu cette impression déroutante de revivre encore et encore la 
 
 Si vous vous reconnaissez, j'aimerais vous rassurer d'emblée : vous n'êtes ni faible, ni inconscient, ni incapable de changer. La répétition des schémas est profondément humaine. Elle s'explique par des mécanismes internes puissants, souvent invisibles… mais transformables.
 
+> La répétition des schémas est profondément humaine. Elle s'explique par des mécanismes internes puissants, souvent invisibles… mais transformables.
+
 ## Comprendre ce qu'on appelle un « schéma répétitif »
 
 Un schéma répétitif, c'est une **dynamique intérieure** qui nous amène à revivre des situations similaires, même lorsque celles-ci nous font souffrir. Il peut se manifester dans différentes sphères de la vie :

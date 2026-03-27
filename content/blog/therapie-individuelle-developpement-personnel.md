@@ -13,6 +13,8 @@ Le développement personnel est souvent associé à des lectures inspirantes, de
 
 Contrairement à certaines approches qui misent sur des solutions rapides, la thérapie invite à un travail intérieur authentique, où l'on apprend à mieux se connaître, à se libérer de ses blocages et à devenir pleinement acteur·rice de sa vie.
 
+> La thérapie individuelle est bien plus qu'un soin de l'âme : c'est une démarche active de croissance personnelle.
+
 ## Qu'est-ce que le développement personnel au juste ?
 
 Ce n'est pas juste « aller bien ». C'est aussi :
@@ -45,6 +47,8 @@ Bref, c'est un processus d'évolution vers une version plus alignée de soi.
 - Une plus grande paix intérieure
 
 Et surtout : une capacité nouvelle à s'accueillir tel·le que l'on est, tout en avançant.
+
+---
 
 ## Conclusion
 
