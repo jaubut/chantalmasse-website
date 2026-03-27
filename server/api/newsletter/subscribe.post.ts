@@ -11,9 +11,11 @@ export default defineEventHandler(async (event) => {
     apiKey: process.env.BREVO_API_KEY!,
   })
 
-  await client.contacts.createContact({
+  await client.contacts.createDoiContact({
     email,
-    updateEnabled: true,
+    includeListIds: [Number(process.env.BREVO_LIST_ID)],
+    templateId: Number(process.env.BREVO_DOI_TEMPLATE_ID),
+    redirectionUrl: `${process.env.NUXT_PUBLIC_SITE_URL}/inscription-confirmee`,
     ...(phone ? { attributes: { SMS: phone } } : {}),
   })
 
