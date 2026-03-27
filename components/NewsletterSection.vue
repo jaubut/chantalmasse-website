@@ -8,16 +8,23 @@
         <p class="text-on-tertiary-container font-light text-lg mb-10 max-w-md">
           Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.
         </p>
-        <form class="flex flex-col sm:flex-row gap-4" @submit.prevent>
+        <form class="flex flex-col sm:flex-row gap-4" @submit.prevent="subscribe">
           <input
+            v-model="email"
             type="email"
             placeholder="votre@courriel.com"
-            class="flex-1 bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50"
+            :disabled="loading || success"
+            class="flex-1 bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50"
           />
-          <button type="submit" class="bg-secondary-fixed text-on-secondary-container px-8 py-4 rounded-xl font-semibold hover:scale-105 transition-transform whitespace-nowrap">
-            S'abonner
+          <button
+            type="submit"
+            :disabled="loading || success"
+            class="bg-secondary-fixed text-on-secondary-container px-8 py-4 rounded-xl font-semibold hover:scale-105 transition-transform whitespace-nowrap disabled:opacity-50 disabled:scale-100"
+          >
+            {{ success ? 'Inscrit ✓' : loading ? '...' : "S'abonner" }}
           </button>
         </form>
+        <p v-if="error" class="mt-3 text-sm text-red-400">{{ error }}</p>
       </div>
 
       <!-- Right: blog cards -->
@@ -51,4 +58,23 @@
 defineProps<{
   posts: { slug: string; title: string; image: string; readTime: number }[]
 }>()
+
+const email = ref('')
+const loading = ref(false)
+const success = ref(false)
+const error = ref('')
+
+async function subscribe() {
+  error.value = ''
+  loading.value = true
+  try {
+    await $fetch('/api/newsletter/subscribe', { method: 'POST', body: { email: email.value } })
+    success.value = true
+    email.value = ''
+  } catch (e: any) {
+    error.value = e?.data?.statusMessage ?? 'Une erreur est survenue. Réessayez.'
+  } finally {
+    loading.value = false
+  }
+}
 </script>

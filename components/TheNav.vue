@@ -21,7 +21,7 @@
 
       <!-- CTA -->
       <div class="hidden md:block">
-        <a href="#booking" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-container transition-colors">
+        <a href="mailto:chantal.gmasse@gmail.com" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-container transition-colors">
           Contact
         </a>
       </div>
