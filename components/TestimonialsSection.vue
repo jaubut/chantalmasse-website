@@ -15,11 +15,9 @@
           :class="i === 1 || i === 2 ? 'lg:translate-y-8' : ''"
           data-animate
         >
-          <div class="flex gap-1 mb-6">
-            <Icon v-for="s in 5" :key="s" icon="material-symbols:star" class="text-secondary" />
-          </div>
-          <p class="text-on-surface-variant font-light leading-relaxed mb-8 italic">
-            "{{ t.quote }}"
+          <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-6">"</p>
+          <p class="text-on-surface text-lg leading-relaxed mb-8">
+            {{ t.quote }}
           </p>
           <div>
             <p class="font-semibold text-primary">{{ t.name }}</p>
@@ -33,7 +31,6 @@
 </template>
 
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
 
 const testimonials = [
   {
