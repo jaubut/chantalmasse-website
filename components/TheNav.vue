@@ -20,9 +20,15 @@
         <NuxtLink to="/blog" class="font-headline italic font-light text-on-surface hover:text-secondary transition-colors">Blog</NuxtLink>
       </div>
 
-      <!-- CTA -->
-      <div class="hidden md:block">
-        <a href="mailto:chantal.gmasse@gmail.com" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-container transition-colors">
+      <!-- Socials + CTA -->
+      <div class="hidden md:flex items-center gap-3">
+        <a href="https://www.facebook.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Facebook" class="flex items-center justify-center w-9 h-9 rounded-lg">
+          <Icon icon="mdi:facebook" class="text-lg" style="color: rgba(23,48,40,0.3);" />
+        </a>
+        <a href="https://www.instagram.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Instagram" class="flex items-center justify-center w-9 h-9 rounded-lg">
+          <Icon icon="mdi:instagram" class="text-lg" style="color: rgba(23,48,40,0.3);" />
+        </a>
+        <a href="mailto:chantal.gmasse@gmail.com" class="ml-2 bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-container transition-colors">
           Contact
         </a>
       </div>
@@ -39,6 +45,14 @@
       <a href="#approche" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Approche</a>
       <NuxtLink to="/blog" class="font-headline italic text-lg text-on-surface" @click="menuOpen = false">Blog</NuxtLink>
       <a href="#booking" class="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold text-center" @click="menuOpen = false">Contact</a>
+      <div class="flex items-center gap-3">
+        <a href="https://www.facebook.com/chantalmassetherapeutecoach" target="_blank" rel="noopener" aria-label="Facebook" class="flex items-center justify-center w-9 h-9 rounded-lg" style="background-color: rgba(23,48,40,0.1);">
+          <Icon icon="mdi:facebook" class="text-lg text-primary" />
+        </a>
+        <a href="https://www.instagram.com/chantalmasse_therapeute" target="_blank" rel="noopener" aria-label="Instagram" class="flex items-center justify-center w-9 h-9 rounded-lg" style="background-color: rgba(23,48,40,0.1);">
+          <Icon icon="mdi:instagram" class="text-lg text-primary" />
+        </a>
+      </div>
     </div>
   </nav>
 </template>

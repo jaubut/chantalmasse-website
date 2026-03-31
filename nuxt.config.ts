@@ -26,14 +26,6 @@ export default defineNuxtConfig({
     emailFrom: process.env.EMAIL_FROM,
     emailTo: process.env.EMAIL_TO,
     bookingMinNoticeHours: process.env.BOOKING_MIN_NOTICE_HOURS || '24',
-    // Admin dashboard
-    adminPassword: process.env.ADMIN_PASSWORD,
-    metaAccessToken: process.env.META_ACCESS_TOKEN,
-    metaIgUserId: process.env.META_IG_USER_ID,
-    metaFbPageId: process.env.META_FB_PAGE_ID,
-    anthropicApiKey: process.env.ANTHROPIC_API_KEY,
-    briefEmail: process.env.BRIEF_EMAIL,
-    apifyApiToken: process.env.APIFY_API_TOKEN,
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
@@ -55,12 +47,6 @@ export default defineNuxtConfig({
     name: 'Chantal Massé — Thérapeute en relation d\'aide',
     description: 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.',
     defaultLocale: 'fr',
-  },
-
-  // ─── Robots ────────────────────────────────────────────────────────────────
-  robots: {
-    // Block admin from indexing; /api is not crawled by bots anyway
-    disallow: ['/admin'],
   },
 
   // ─── Sitemap ───────────────────────────────────────────────────────────────

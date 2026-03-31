@@ -1,46 +1,40 @@
-import { setCachedInsights } from '~/utils/metaApi'
+import Anthropic from '@anthropic-ai/sdk'
+import { Resend } from 'resend'
+import { SYSTEM_PROMPT, buildWeeklyPrompt } from '../../utils/agentPrompt'
 
-export default defineEventHandler(async (event) => {
-  const session = getCookie(event, 'admin_session')
-  if (session !== 'authenticated') {
-    throw createError({ statusCode: 401, message: 'Non autorisé' })
-  }
+export interface BriefClientConfig {
+  igUsername: string
+  fbUsername?: string
+  briefEmail: string
+  apifyToken?: string
+  anthropicKey?: string
+  resendKey?: string
+  emailFrom?: string
+}
 
-  const { username, fbUsername } = await readBody(event)
-  if (!username) {
-    throw createError({ statusCode: 400, message: 'Username requis' })
-  }
-  const fbUser = (fbUsername || username) as string
+// ── Instagram / Facebook scraping via Apify ───────────────────────────────────
 
-  const config = useRuntimeConfig()
-  if (!config.apifyApiToken) {
-    throw createError({
-      statusCode: 503,
-      message: 'Configurez votre token Apify dans le fichier .env (APIFY_API_TOKEN) pour activer l\'analyse automatique.',
-    })
-  }
+export async function scrapeInstagram(config: BriefClientConfig): Promise<any> {
+  const token = config.apifyToken || process.env.APIFY_API_TOKEN
+  if (!token) throw new Error('APIFY_API_TOKEN is not configured')
 
-  const token = config.apifyApiToken as string
+  const fbUser = config.fbUsername || config.igUsername
 
-  // ── Run both scrapers in parallel ─────────────────────────────────────────
   const [igRunRes, fbRunRes] = await Promise.all([
     startApifyRun(token, 'apify~instagram-profile-scraper', {
-      usernames: [username],
+      usernames: [config.igUsername],
       resultsLimit: 12,
       scrapeType: 'posts',
     }),
     startApifyRun(token, 'apify~facebook-posts-scraper', {
       startUrls: [{ url: `https://www.facebook.com/${fbUser}` }],
       maxPosts: 12,
-    }).catch(() => null), // Facebook is best-effort
+    }).catch(() => null),
   ])
 
   const igRunId = igRunRes?.data?.id
-  if (!igRunId) {
-    throw createError({ statusCode: 502, message: 'Impossible de démarrer le scraper Instagram' })
-  }
+  if (!igRunId) throw new Error('Failed to start Instagram scraper')
 
-  // ── Poll both to completion ───────────────────────────────────────────────
   const [igStatus, fbStatus] = await Promise.all([
     pollRun(token, 'apify~instagram-profile-scraper', igRunId, 15),
     fbRunRes?.data?.id
@@ -49,13 +43,9 @@ export default defineEventHandler(async (event) => {
   ])
 
   if (igStatus !== 'SUCCEEDED') {
-    throw createError({
-      statusCode: 504,
-      message: 'L\'analyse Instagram a pris trop de temps. Réessayez dans quelques minutes.',
-    })
+    throw new Error('Instagram scrape timed out — retry in a few minutes')
   }
 
-  // ── Fetch results ─────────────────────────────────────────────────────────
   const [igItems, fbItems] = await Promise.all([
     fetchDataset(token, igRunRes.data.defaultDatasetId),
     fbRunRes?.data?.defaultDatasetId && fbStatus === 'SUCCEEDED'
@@ -63,40 +53,114 @@ export default defineEventHandler(async (event) => {
       : Promise.resolve([]),
   ])
 
-  // ── Parse Instagram ───────────────────────────────────────────────────────
   const igProfile = igItems.find((i: any) => i.followersCount !== undefined)
-  if (!igProfile) {
-    throw createError({ statusCode: 404, message: `Le compte @${username} est introuvable ou est privé.` })
-  }
+  if (!igProfile) throw new Error(`Account @${config.igUsername} not found or is private`)
 
   const igPosts: any[] = Array.isArray(igProfile.latestPosts) ? igProfile.latestPosts : []
   if (igPosts.length === 0) {
-    throw createError({
-      statusCode: 422,
-      message: `Profil @${username} trouvé mais aucune publication récupérée. Réessayez dans quelques minutes.`,
-    })
+    throw new Error(`Profile @${config.igUsername} found but no posts retrieved`)
   }
 
-  // ── Parse Facebook ────────────────────────────────────────────────────────
-  // facebook-posts-scraper returns posts directly as dataset items
   const fbPosts: any[] = Array.isArray(fbItems) ? fbItems : []
-  const fbPage = fbPosts[0] ?? null  // used only for page-level meta (pageName, likes)
+  const fbPage = fbPosts[0] ?? null
 
-  // ── Build insights ────────────────────────────────────────────────────────
-  const scrapeInsights = buildInsightsFromScrape(igProfile, igPosts, fbPage, fbPosts)
-  setCachedInsights(scrapeInsights as any)
+  return buildInsightsFromScrape(igProfile, igPosts, fbPage, fbPosts)
+}
 
-  return { success: true, insights: scrapeInsights }
-})
+// ── Claude brief generation ───────────────────────────────────────────────────
 
-// ── Apify helpers ─────────────────────────────────────────────────────────────
+export async function generateBrief(insights: any, customPrompt?: string): Promise<string> {
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (!apiKey) throw new Error('ANTHROPIC_API_KEY is not configured')
 
-async function startApifyRun(token: string, actor: string, input: object) {
-  return $fetch<any>(`https://api.apify.com/v2/acts/${actor}/runs`, {
+  const client = new Anthropic({ apiKey })
+  const userMessage = stripLoneSurrogates(buildWeeklyPrompt(insights))
+
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-6',
+    max_tokens: 1500,
+    system: customPrompt || SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: userMessage }],
+  })
+
+  const firstBlock = message.content[0]
+  return firstBlock?.type === 'text' ? firstBlock.text : ''
+}
+
+// ── Resend email delivery ─────────────────────────────────────────────────────
+
+export async function sendBriefEmail(briefText: string, config: BriefClientConfig): Promise<void> {
+  const apiKey = config.resendKey || process.env.RESEND_API_KEY
+  if (!apiKey) throw new Error('RESEND_API_KEY is not configured')
+
+  const resend = new Resend(apiKey)
+  const from = config.emailFrom || process.env.EMAIL_FROM || 'hello@tech-lab.studio'
+  const monday = getMondayDate()
+
+  const { error } = await resend.emails.send({
+    from,
+    to: config.briefEmail,
+    subject: `📋 Brief Marketing — Semaine du ${monday}`,
+    html: buildBriefEmailHtml(briefText, monday),
+  })
+
+  if (error) throw new Error(`Resend error: ${error.message}`)
+  console.log(`[brief] Email sent → ${config.briefEmail}`)
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function stripLoneSurrogates(str: string): string {
+  return str.replace(/[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g, '')
+}
+
+function getMondayDate(): string {
+  const now = new Date()
+  const day = now.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  const monday = new Date(now)
+  monday.setDate(now.getDate() + diff)
+  return monday.toLocaleDateString('fr-CA', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
+function buildBriefEmailHtml(brief: string, weekDate: string): string {
+  const escaped = brief
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background:#faf7f3;font-family:Manrope,sans-serif;">
+  <div style="max-width:600px;margin:0 auto;padding:40px 20px;">
+    <div style="background:#173028;border-radius:16px;padding:32px;margin-bottom:24px;text-align:center;">
+      <h1 style="color:#fff;font-size:24px;margin:0 0 8px;font-style:italic;">Chantal Massé</h1>
+      <p style="color:#cce9dd;margin:0;font-size:14px;">Brief Marketing IA</p>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:32px;border:1px solid #f0ebe4;">
+      <h2 style="color:#173028;font-size:18px;margin:0 0 8px;">Semaine du ${weekDate}</h2>
+      <p style="color:#727975;font-size:13px;margin:0 0 24px;">Généré automatiquement par l'agent IA</p>
+      <div style="color:#1d1b19;font-size:15px;line-height:1.7;">${escaped}</div>
+    </div>
+    <p style="text-align:center;color:#a0a0a0;font-size:12px;margin-top:24px;">
+      Chantal Massé — Thérapeute en relation d'aide · Shefford, Québec
+    </p>
+  </div>
+</body>
+</html>`
+}
+
+// ── Apify HTTP helpers ────────────────────────────────────────────────────────
+
+async function startApifyRun(token: string, actor: string, input: object): Promise<any> {
+  const res = await fetch(`https://api.apify.com/v2/acts/${actor}/runs`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
     body: JSON.stringify(input),
   })
+  return res.json()
 }
 
 async function pollRun(token: string, actor: string, runId: string, maxAttempts: number): Promise<string> {
@@ -104,25 +168,25 @@ async function pollRun(token: string, actor: string, runId: string, maxAttempts:
   let status = 'RUNNING'
   while (status === 'RUNNING' && attempts < maxAttempts) {
     await new Promise(r => setTimeout(r, 3000))
-    const res = await $fetch<any>(
-      `https://api.apify.com/v2/acts/${actor}/runs/${runId}`,
-      { headers: { 'Authorization': `Bearer ${token}` } }
-    )
-    status = res.data?.status ?? 'FAILED'
+    const res = await fetch(`https://api.apify.com/v2/acts/${actor}/runs/${runId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    const data = await res.json()
+    status = data?.data?.status ?? 'FAILED'
     attempts++
   }
   return status
 }
 
 async function fetchDataset(token: string, datasetId: string): Promise<any[]> {
-  const res = await $fetch<any>(
-    `https://api.apify.com/v2/datasets/${datasetId}/items?clean=true`,
-    { headers: { 'Authorization': `Bearer ${token}` } }
-  )
-  return Array.isArray(res) ? res : []
+  const res = await fetch(`https://api.apify.com/v2/datasets/${datasetId}/items?clean=true`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  const data = await res.json()
+  return Array.isArray(data) ? data : []
 }
 
-// ── Builders ──────────────────────────────────────────────────────────────────
+// ── Insights builder (extracted from scrape-instagram.post.ts) ────────────────
 
 function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any, fbRawPosts: any[]) {
   const days   = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
@@ -169,25 +233,18 @@ function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any
   }
 
   function parseFbPost(p: any) {
-    // apify/facebook-posts-scraper schema:
-    // postId, url, time (ISO), text, likes, shares (int), topReactionsCount
-    // media[].thumbnail, media[].large_share_image.uri
-    // user.name, user.profilePic
     const raw  = p.time || ''
     const date = raw ? new Date(raw) : new Date()
     const likes    = p.likes ?? 0
-    const comments = p.comments ?? 0  // not always present
+    const comments = p.comments ?? 0
     const shares   = typeof p.shares === 'number' ? p.shares : 0
     const engagement = likes + comments + shares
     const pillar     = detectPillar(p.text || '')
-    const thumbnailUrl = p.media?.[0]?.thumbnail
-      || p.media?.[0]?.large_share_image?.uri
-      || ''
+    const thumbnailUrl = p.media?.[0]?.thumbnail || p.media?.[0]?.large_share_image?.uri || ''
     return {
       id: p.postId || p.url || String(Math.random()),
       shortCode: null, url: p.url || '',
-      thumbnailUrl,
-      type: 'Publication',
+      thumbnailUrl, type: 'Publication',
       platform: 'Facebook', pillar, pillarMeta: pillarMeta[pillar],
       likes, comments, shares, views: 0, engagement, saves: 0, reach: engagement,
       engagementRate: '—',
@@ -196,7 +253,6 @@ function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any
       isoDate: raw || new Date().toISOString(),
       caption: (p.text || '').slice(0, 200),
       hashtags: [], isReel: false, isCarousel: false,
-      // page info embedded per post — used for profile header
       _pageName: p.user?.name || p.pageName || '',
       _pageProfilePic: p.user?.profilePic || '',
     }
@@ -209,7 +265,6 @@ function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any
     (a, b) => new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime()
   )
 
-  // Analytics across all posts
   const dayEng:  Record<string, number[]> = {}
   const fmtEng:  Record<string, number[]> = {}
   const hourEng: Record<number, number[]> = {}
@@ -243,7 +298,7 @@ function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any
       bio:        igProfile?.biography      || '',
       profilePic: igProfile?.profilePicUrl  || '',
       fbFollowers: 0,
-      fbPageName:  fbPageName,
+      fbPageName,
     },
     analytics: {
       bestDay, bestFormat, bestHour,
@@ -256,7 +311,6 @@ function buildInsightsFromScrape(igProfile: any, igRawPosts: any[], _fbPage: any
       igPosts: igPosts.length,
       fbPosts: fbPosts.length,
     },
-    // Backward compat for brief generation
     followers: {
       instagram: igProfile?.followersCount || 0,
       igGrowth:  '',
