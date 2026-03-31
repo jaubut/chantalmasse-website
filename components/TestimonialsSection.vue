@@ -26,6 +26,18 @@
         </div>
 
       </div>
+
+      <div class="text-center mt-16" data-animate>
+        <a
+          href="https://search.google.com/local/writereview?placeid=ChIJf0hxfazRyUwRzgp46r7fzIQ"
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors text-sm font-body"
+        >
+          <span class="text-base">★</span>
+          Voir nos avis Google
+        </a>
+      </div>
     </div>
   </section>
 </template>

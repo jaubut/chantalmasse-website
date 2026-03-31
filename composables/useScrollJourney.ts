@@ -12,6 +12,18 @@ const GRADIENTS: Record<EmotionalState, GradientStop> = {
   relief:    { from: '#2a3a2d', to: '#fef8f3' },
 }
 
+// Continuous color ramp — evenly spaced stops across the full 0→1 scroll progress
+// This prevents hard jumps between states and creates one smooth gradient transition
+const COLOR_RAMP = [
+  { at: 0.00, color: '#1a0a0a' },  // crisis start
+  { at: 0.15, color: '#2d1520' },  // crisis end / awareness start
+  { at: 0.35, color: '#3a2a1a' },  // awareness end / process start
+  { at: 0.55, color: '#2a3a2d' },  // process mid
+  { at: 0.75, color: '#4a6a5d' },  // process end — bridge to relief
+  { at: 0.90, color: '#c5d9cf' },  // relief transition
+  { at: 1.00, color: '#fef8f3' },  // relief end — matches site surface
+]
+
 const STATES: EmotionalState[] = ['crisis', 'awareness', 'process', 'relief']
 
 function lerpColor(a: string, b: string, t: number): string {
@@ -26,6 +38,20 @@ function lerpColor(a: string, b: string, t: number): string {
   const g = Math.round(ca[1] + (cb[1] - ca[1]) * t)
   const b_ = Math.round(ca[2] + (cb[2] - ca[2]) * t)
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b_.toString(16).padStart(2, '0')}`
+}
+
+/** Interpolate along the full color ramp at a given progress (0→1) */
+function sampleRamp(p: number): string {
+  const clamped = Math.max(0, Math.min(1, p))
+  for (let i = 0; i < COLOR_RAMP.length - 1; i++) {
+    const curr = COLOR_RAMP[i]
+    const next = COLOR_RAMP[i + 1]
+    if (clamped >= curr.at && clamped <= next.at) {
+      const t = (clamped - curr.at) / (next.at - curr.at)
+      return lerpColor(curr.color, next.color, t)
+    }
+  }
+  return COLOR_RAMP[COLOR_RAMP.length - 1].color
 }
 
 export function useScrollJourney() {
@@ -46,10 +72,10 @@ export function useScrollJourney() {
   })
 
   const gradientColors = computed(() => {
-    const gradient = GRADIENTS[currentState.value]
-    const fromColor = lerpColor(gradient.from, gradient.to, stateProgress.value)
-    const toColor = gradient.to
-    return { from: fromColor, to: toColor }
+    // Sample two points on the ramp — slightly offset for a radial spread
+    const from = sampleRamp(progress.value)
+    const to = sampleRamp(Math.min(1, progress.value + 0.08))
+    return { from, to }
   })
 
   const currentGradient = computed(() => {

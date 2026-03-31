@@ -117,6 +117,92 @@ export function clientConfirmationEmail(params: {
   return { subject, html }
 }
 
+export function reviewRequestEmail(params: {
+  firstName: string
+  service: string
+  date: string
+  reviewUrl: string
+}): { subject: string; html: string } {
+  const subject = 'Votre avis compte — Chantal Massé'
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+
+        <!-- Header -->
+        <tr>
+          <td style="background:#173028;padding:40px;text-align:center;">
+            <div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Chantal Massé</div>
+            <div style="font-size:14px;color:#cce9dd;margin-top:6px;">Thérapeute en relation d'aide</div>
+          </td>
+        </tr>
+
+        <!-- Body -->
+        <tr>
+          <td style="padding:48px 40px 24px;">
+            <p style="font-size:16px;color:#1d1b19;line-height:1.7;margin:0 0 16px;">
+              Bonjour ${params.firstName},
+            </p>
+            <p style="font-size:16px;color:#1d1b19;line-height:1.7;margin:0 0 16px;">
+              J'espère que notre rencontre du ${params.date} t'a fait du bien.
+            </p>
+            <p style="font-size:16px;color:#1d1b19;line-height:1.7;margin:0 0 16px;">
+              Si tu sens que notre travail ensemble t'a aidé, un court avis sur Google permet à d'autres personnes qui vivent des moments difficiles de trouver du soutien. C'est complètement optionnel — et tu peux rester anonyme si tu le souhaites.
+            </p>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:0 40px 32px;text-align:center;">
+            <a href="${params.reviewUrl}" style="
+              display:inline-block;
+              background:#173028;
+              color:#ffffff;
+              padding:16px 32px;
+              border-radius:8px;
+              font-family:sans-serif;
+              font-weight:600;
+              font-size:16px;
+              text-decoration:none;
+            ">Laisser un avis Google →</a>
+          </td>
+        </tr>
+
+        <!-- Reassurance -->
+        <tr>
+          <td style="padding:0 40px 40px;">
+            <div style="background:#f2ede8;border-radius:12px;padding:20px;text-align:center;font-size:14px;color:#727975;line-height:1.6;">
+              Cela prend moins de 2 minutes. Ton avis aide d'autres personnes à faire le premier pas.
+            </div>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="background:#fef8f3;padding:24px 40px;text-align:center;border-top:1px solid #e6e2dd;">
+            <p style="font-size:13px;color:#727975;margin:0;">
+              Merci pour ta confiance
+              <br>
+              <a href="https://chantalmasse.com" style="color:#173028;text-decoration:none;">chantalmasse.com</a>
+              &nbsp;·&nbsp; Membre RITMA &nbsp;·&nbsp; Shefford, QC
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`
+
+  return { subject, html }
+}
+
 export function therapistNotificationEmail(params: {
   clientName: string
   clientEmail: string
