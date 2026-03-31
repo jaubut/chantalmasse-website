@@ -15,13 +15,14 @@ const GRADIENTS: Record<EmotionalState, GradientStop> = {
 // Continuous color ramp — evenly spaced stops across the full 0→1 scroll progress
 // This prevents hard jumps between states and creates one smooth gradient transition
 const COLOR_RAMP = [
-  { at: 0.00, color: '#1a0a0a' },  // crisis start
-  { at: 0.15, color: '#2d1520' },  // crisis end / awareness start
-  { at: 0.35, color: '#3a2a1a' },  // awareness end / process start
-  { at: 0.55, color: '#2a3a2d' },  // process mid
-  { at: 0.75, color: '#4a6a5d' },  // process end — bridge to relief
-  { at: 0.90, color: '#c5d9cf' },  // relief transition
-  { at: 1.00, color: '#fef8f3' },  // relief end — matches site surface
+  { at: 0.00, color: '#30273a' },  // tertiary — closed, heavy, inward
+  { at: 0.12, color: '#3a2a3d' },  // deepening into warm purple
+  { at: 0.30, color: '#3d2d30' },  // shifting from purple into earthy brown
+  { at: 0.48, color: '#3a3528' },  // amber warmth emerging
+  { at: 0.62, color: '#2f4035' },  // green growth begins
+  { at: 0.78, color: '#5a7a6a' },  // sage — the soul opening
+  { at: 0.90, color: '#c5d5cc' },  // soft light, almost there
+  { at: 1.00, color: '#f2ede8' },  // warm cream — peace, matches site
 ]
 
 const STATES: EmotionalState[] = ['crisis', 'awareness', 'process', 'relief']
@@ -83,9 +84,10 @@ export function useScrollJourney() {
     return `radial-gradient(ellipse at 50% 40%, ${to}, ${from})`
   })
 
-  const objectScale = computed(() => 0.6 + progress.value * 0.6)
-  const objectOpacity = computed(() => 0.3 + progress.value * 0.7)
-  const objectBlur = computed(() => 40 - progress.value * 32)
+  // Soul opening: starts small and tight, grows large and clear
+  const objectScale = computed(() => 0.4 + progress.value * 1.2)   // 0.4 → 1.6
+  const objectOpacity = computed(() => 0.2 + progress.value * 0.8)  // 0.2 → 1.0
+  const objectBlur = computed(() => 50 - progress.value * 44)       // 50px → 6px
 
   let scrollCleanup: (() => void) | null = null
 

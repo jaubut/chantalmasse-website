@@ -21,6 +21,9 @@
       />
     </div>
 
+    <!-- Cursor soul — follows mouse, grows with scroll progress -->
+    <CursorSoul :progress="progress" />
+
     <!-- Hero -->
     <section class="min-h-screen flex flex-col justify-end px-8 lg:px-20 pb-24 pt-32">
       <div class="max-w-screen-xl mx-auto w-full">
@@ -79,12 +82,14 @@
 
 <script setup lang="ts">
 import JourneyBentoSection from '~/components/journey/JourneyBentoSection.vue'
+import CursorSoul from '~/components/journey/CursorSoul.vue'
 import { journeyHero, journeySections, journeyCTA } from '~/utils/journey-data'
 import type { EmotionalState } from '~/composables/useScrollJourney'
 
 const booking = useBooking()
 
 const {
+  progress,
   containerRef,
   currentGradient,
   objectScale,
@@ -94,10 +99,10 @@ const {
 } = useScrollJourney()
 
 const BLOB_COLORS: Record<EmotionalState, [string, string]> = {
-  crisis:    ['#4a1525', '#2d0a15'],
-  awareness: ['#5a3a2a', '#3a2015'],
-  process:   ['#2a5a3d', '#1a3a25'],
-  relief:    ['#b1cdc2', '#cce9dd'],
+  crisis:    ['#4a3555', '#30273a'],
+  awareness: ['#5a4040', '#3d2d30'],
+  process:   ['#3a6a50', '#2f4035'],
+  relief:    ['#b1cdc2', '#d5e0d8'],
 }
 
 const blobColors = computed(() => BLOB_COLORS[currentState.value])
