@@ -117,7 +117,7 @@ const formations = [
     institution: null,
   },
   {
-    title: 'Les neurosciences appliquées au couple',
+    title: 'Atelier sur les neurosciences appliquées au couple',
     institution: null,
   },
   {

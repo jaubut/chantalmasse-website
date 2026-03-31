@@ -39,6 +39,15 @@ export default {
         'on-surface-variant': '#424845',
         'outline': '#727975',
         'outline-variant': '#c2c8c4',
+        // Emotional journey gradient stops
+        'journey-crisis-from': '#1a0a0a',
+        'journey-crisis-to': '#2d1520',
+        'journey-awareness-from': '#2d1520',
+        'journey-awareness-to': '#3a2a1a',
+        'journey-process-from': '#3a2a1a',
+        'journey-process-to': '#2a3a2d',
+        'journey-relief-from': '#2a3a2d',
+        'journey-relief-to': '#fef8f3',
       },
       fontFamily: {
         headline: ['Newsreader', 'serif'],

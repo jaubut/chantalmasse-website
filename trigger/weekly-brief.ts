@@ -35,6 +35,7 @@ export const weeklyBrief = schedules.task({
 
     if (!config.igUsername) throw new Error('CHANTAL_IG_USERNAME env var is not set')
     if (!config.briefEmail) throw new Error('BRIEF_EMAIL env var is not set')
+    if (!config.fbUsername) logger.warn('CHANTAL_FB_USERNAME not set — falling back to IG username for Facebook scrape')
 
     // Step 1 — Scrape Instagram + Facebook
     logger.info('Scraping Instagram', { username: config.igUsername })

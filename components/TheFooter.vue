@@ -10,7 +10,7 @@
       </nav>
 
       <p class="text-sm uppercase tracking-wide" style="color: rgba(23,48,40,0.5);">
-        © 2025 Chantal Massé. Tous droits réservés.
+        © 2026 Chantal Massé. Tous droits réservés.
       </p>
 
     </div>
