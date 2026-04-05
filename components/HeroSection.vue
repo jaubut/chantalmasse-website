@@ -31,9 +31,12 @@
             >{{ label }}</span>
           </span>
         </span>
-        <h1 class="font-headline text-6xl lg:text-8xl text-primary leading-[1.05] tracking-tight" data-animate>
-          Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
+        <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] tracking-tight" data-animate>
+          Thérapeute en relation d'aide à <span class="italic">Shefford</span>
         </h1>
+        <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] tracking-tight" data-animate>
+          Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
+        </h2>
 
         <p class="text-on-surface-variant text-xl max-w-lg font-light" data-animate>
           Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.

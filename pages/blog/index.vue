@@ -143,6 +143,17 @@ function formatDate(dateStr: string): string {
 
 useSeoMeta({
   title: 'Blogue — Chantal Massé',
+  ogTitle: 'Blogue — Chantal Massé',
   description: 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.',
+  ogDescription: 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.',
+  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://chantalmasse.com/blog' },
+  ],
 })
 </script>

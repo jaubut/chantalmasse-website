@@ -42,6 +42,15 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Confidentialité — Chantal Massé',
+  ogTitle: 'Confidentialité — Chantal Massé',
   description: 'Politique de confidentialité du site de Chantal Massé, thérapeute.',
+  ogDescription: 'Politique de confidentialité du site de Chantal Massé, thérapeute.',
+  ogType: 'website',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://chantalmasse.com/confidentialite' },
+  ],
 })
 </script>

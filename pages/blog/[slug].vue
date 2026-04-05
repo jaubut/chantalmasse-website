@@ -187,8 +187,18 @@ if (!post.value) {
 
 useSeoMeta({
   title: () => post.value ? `${post.value.title} — Chantal Massé` : 'Chantal Massé',
+  ogTitle: () => post.value ? `${post.value.title} — Chantal Massé` : 'Chantal Massé',
   description: () => post.value?.excerpt ?? '',
+  ogDescription: () => post.value?.excerpt ?? '',
   ogImage: () => post.value?.image ?? '',
+  ogType: 'article',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: `https://chantalmasse.com/blog/${slug}` },
+  ],
 })
 
 const booking = useBooking()

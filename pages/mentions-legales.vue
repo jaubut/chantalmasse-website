@@ -37,6 +37,15 @@
 <script setup lang="ts">
 useSeoMeta({
   title: 'Mentions Légales — Chantal Massé',
+  ogTitle: 'Mentions Légales — Chantal Massé',
   description: 'Mentions légales du site de Chantal Massé, thérapeute.',
+  ogDescription: 'Mentions légales du site de Chantal Massé, thérapeute.',
+  ogType: 'website',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://chantalmasse.com/mentions-legales' },
+  ],
 })
 </script>
