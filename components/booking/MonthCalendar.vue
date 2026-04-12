@@ -48,7 +48,7 @@
         <button
           v-else
           class="h-12 w-full rounded-xl text-sm font-body font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary relative"
-          :class="dayClasses(cell)"
+          :class="isLoading ? 'bg-surface-container-high/50' : dayClasses(cell)"
           :disabled="!cell.isAvailable || cell.isPast || cell.isBeyondWindow"
           :aria-label="cell.date ? format(cell.date, 'd MMMM yyyy', { locale: fr }) : ''"
           @click="cell.isAvailable && !cell.isPast && !cell.isBeyondWindow && selectDate(cell.date!)"

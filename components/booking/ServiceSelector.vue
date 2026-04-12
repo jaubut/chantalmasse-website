@@ -16,24 +16,27 @@
         ]"
         @click="$emit('select', service)"
       >
-        <div
-          class="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-colors duration-300"
-          :class="service.id === 'individual' ? 'bg-primary-fixed group-hover:bg-primary/10' : 'bg-secondary-fixed group-hover:bg-secondary/10'"
-        >
-          <Icon
-            :icon="service.icon"
-            class="text-2xl"
-            :class="service.id === 'individual' ? 'text-primary' : 'text-secondary'"
-          />
+        <div class="flex items-center gap-3 mb-5">
+          <div
+            class="w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-300"
+            :class="service.id === 'individual' ? 'bg-primary-fixed group-hover:bg-primary/10' : 'bg-secondary-fixed group-hover:bg-secondary/10'"
+          >
+            <Icon
+              :icon="service.icon"
+              class="text-2xl"
+              :class="service.id === 'individual' ? 'text-primary' : 'text-secondary'"
+            />
+          </div>
+          <span class="font-body text-on-surface-variant text-sm font-light">{{ service.duration }}</span>
         </div>
 
-        <div class="flex items-center gap-3 mb-3">
+        <div class="flex items-center gap-3 mb-1">
           <h3 class="font-headline text-xl text-on-surface">{{ service.name }}</h3>
           <span
             class="text-xs font-body font-semibold px-3 py-1 rounded-full"
             :class="service.id === 'individual' ? 'bg-primary text-on-primary' : 'bg-secondary text-on-secondary'"
           >
-            {{ service.duration }}
+            {{ service.price }}&nbsp;$
           </span>
         </div>
 
@@ -61,6 +64,7 @@ export interface BookingService {
   name: string
   duration: string
   durationMinutes: number
+  price: number
   description: string
   icon: string
   colorId: string
@@ -76,6 +80,7 @@ const services: BookingService[] = [
     name: 'Thérapie Individuelle',
     duration: '60 minutes',
     durationMinutes: 60,
+    price: 105,
     description: 'Un espace sécurisant pour explorer vos émotions et initier un changement profond.',
     icon: 'material-symbols:person',
     colorId: '2',
@@ -85,6 +90,7 @@ const services: BookingService[] = [
     name: 'Coaching de Couple',
     duration: '90 minutes',
     durationMinutes: 90,
+    price: 160,
     description: 'Un dialogue intentionnel pour transformer les conflits en opportunités de connexion.',
     icon: 'material-symbols:favorite',
     colorId: '7',

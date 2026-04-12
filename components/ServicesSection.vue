@@ -15,60 +15,76 @@
       <!-- Cards grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-        <!-- Individual Therapy -->
-        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
-          <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
-            <Icon icon="material-symbols:person" class="text-2xl text-primary" />
-          </div>
-          <h3 class="font-headline text-3xl text-primary mb-2">Thérapie Individuelle</h3>
-          <p class="font-headline italic text-on-surface-variant mb-6">60 minutes pour soi</p>
-          <p class="text-on-surface-variant font-light mb-6">
-            Un espace sécurisé pour explorer vos patterns relationnels, vos blessures d'attachement et vos ressources intérieures.
-          </p>
-          <ul class="space-y-3 mb-10">
-            <li class="flex items-center gap-3 text-on-surface-variant font-light">
-              <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />
-              Approche centrée sur la personne
-            </li>
-            <li class="flex items-center gap-3 text-on-surface-variant font-light">
-              <Icon icon="material-symbols:check-circle" class="text-lg text-primary" />
-              Reçus d'assurance RITMA
-            </li>
-          </ul>
-          <button
-            class="w-full border border-outline-variant py-4 rounded-xl font-semibold group-hover:bg-primary group-hover:text-on-primary group-hover:border-primary transition-all duration-300"
-            @click="showIndividualModal = true"
-          >
-            En savoir plus
-          </button>
-        </div>
-
         <!-- Couple Coaching -->
-        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
+        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
           <div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
           </div>
-          <h3 class="font-headline text-3xl text-on-primary mb-2">Coaching de Couple</h3>
-          <p class="font-headline italic text-on-primary-container mb-6">90 minutes de dialogue</p>
-          <p class="text-on-primary-container font-light mb-6">
+          <h3 class="font-headline text-3xl text-primary mb-2">Coaching de Couple</h3>
+          <p class="font-headline italic text-on-surface-variant mb-6">90 minutes de dialogue</p>
+          <p class="text-on-surface-variant font-light mb-6">
             Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde.
+          </p>
+          <ul class="space-y-3 mb-10">
+            <li class="flex items-center gap-3 text-on-surface-variant font-light">
+              <Icon icon="material-symbols:check-circle" class="text-lg text-secondary" />
+              Dialogue intentionnel Imago
+            </li>
+            <li class="flex items-center gap-3 text-on-surface-variant font-light">
+              <Icon icon="material-symbols:check-circle" class="text-lg text-secondary" />
+              Outils de communication concrets
+            </li>
+          </ul>
+          <div class="flex flex-col gap-3">
+            <button
+              class="w-full bg-secondary text-on-secondary py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              @click="booking.open()"
+            >
+              Prendre rendez-vous
+            </button>
+            <NuxtLink
+              to="/coaching-de-couple"
+              class="block w-full border border-outline-variant py-3 rounded-xl text-center text-on-surface-variant font-light text-sm hover:bg-surface-container transition-colors"
+            >
+              Découvrir le coaching de couple
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- Individual Therapy -->
+        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
+          <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
+            <Icon icon="material-symbols:person" class="text-2xl text-primary" />
+          </div>
+          <h3 class="font-headline text-3xl text-on-primary mb-2">Thérapie Individuelle</h3>
+          <p class="font-headline italic text-on-primary-container mb-6">60 minutes pour soi</p>
+          <p class="text-on-primary-container font-light mb-6">
+            Un espace sécurisé pour explorer vos patterns relationnels, vos blessures d'attachement et vos ressources intérieures.
           </p>
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-primary-container font-light">
               <Icon icon="material-symbols:check-circle" class="text-lg text-on-primary" />
-              Dialogue intentionnel Imago
+              Approche centrée sur la personne
             </li>
             <li class="flex items-center gap-3 text-on-primary-container font-light">
               <Icon icon="material-symbols:check-circle" class="text-lg text-on-primary" />
-              Outils de communication concrets
+              Reçus d'assurance RITMA
             </li>
           </ul>
-          <button
-            class="w-full bg-surface text-primary py-4 rounded-xl font-semibold hover:bg-secondary-fixed transition-colors duration-300"
-            @click="showCoupleModal = true"
-          >
-            En savoir plus
-          </button>
+          <div class="flex flex-col gap-3">
+            <button
+              class="w-full bg-surface text-primary py-4 rounded-xl font-semibold hover:bg-primary-fixed transition-colors duration-300"
+              @click="booking.open()"
+            >
+              Prendre rendez-vous
+            </button>
+            <NuxtLink
+              to="/therapie-individuelle"
+              class="block w-full border border-on-primary/20 py-3 rounded-xl text-center text-on-primary-container font-light text-sm hover:bg-on-primary/5 transition-colors"
+            >
+              Découvrir la thérapie individuelle
+            </NuxtLink>
+          </div>
         </div>
 
       </div>

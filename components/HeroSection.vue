@@ -32,7 +32,48 @@
           </span>
         </span>
         <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] tracking-tight" data-animate>
-          Thérapeute en relation d'aide à <span class="italic">Shefford</span>
+          Thérapeute en relation d'aide à
+          <span
+            class="italic relative inline-block cursor-default"
+            @mouseenter="showMap = true"
+            @mouseleave="showMap = false"
+          >
+            Shefford
+            <Transition
+              enter-active-class="transition duration-300 ease-out"
+              enter-from-class="opacity-0 translate-y-2 scale-95"
+              enter-to-class="opacity-100 translate-y-0 scale-100"
+              leave-active-class="transition duration-200 ease-in"
+              leave-from-class="opacity-100 translate-y-0 scale-100"
+              leave-to-class="opacity-0 translate-y-2 scale-95"
+            >
+              <div
+                v-show="showMap"
+                class="absolute left-0 top-full mt-3 z-50 w-72 rounded-2xl overflow-hidden border border-outline-variant/30 shadow-xl"
+                style="backdrop-filter: blur(12px); background: rgba(254,248,243,0.85);"
+              >
+                <iframe
+                  v-if="mapLoaded"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2800!2d-72.6488387!3d45.404327!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc9d1ac7d71487f%3A0x84ccdfbeea780ace!2sChantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d&#39;aide+et+coach+de+couples!5e0!3m2!1sfr!2sca"
+                  width="288"
+                  height="180"
+                  style="border:0;"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  title="Carte de Shefford, Québec"
+                />
+                <div v-else class="w-full h-[180px] bg-surface-container animate-pulse" />
+                <a
+                  href="https://www.google.com/maps/place/Chantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d'aide+et+coach+de+couples/@45.4043307,-72.6537096,17z"
+                  target="_blank"
+                  rel="noopener"
+                  class="block px-4 py-3 not-italic tracking-wide hover:bg-surface-container transition-colors"
+                >
+                  <p class="font-body text-xs font-medium text-on-surface">245 rue Colette, Shefford</p>
+                </a>
+              </div>
+            </Transition>
+          </span>
         </h1>
         <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] tracking-tight" data-animate>
           Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
@@ -74,6 +115,13 @@
 
 <script setup lang="ts">
 const booking = useBooking()
+
+const showMap = ref(false)
+const mapLoaded = ref(false)
+
+watch(showMap, (visible) => {
+  if (visible && !mapLoaded.value) mapLoaded.value = true
+})
 
 const labels = ['Thérapeute en relations d\'aide', 'Coach de couple']
 const activeLabel = ref(0)

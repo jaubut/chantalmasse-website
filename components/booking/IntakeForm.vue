@@ -12,6 +12,10 @@
           <p class="font-semibold text-on-surface">{{ service.duration }}</p>
         </div>
         <div>
+          <span class="text-on-surface-variant text-xs uppercase tracking-wide">Tarif</span>
+          <p class="font-semibold text-on-surface">{{ service.price }}&nbsp;$</p>
+        </div>
+        <div>
           <span class="text-on-surface-variant text-xs uppercase tracking-wide">Date</span>
           <p class="font-semibold text-on-surface capitalize">{{ formattedDate }}</p>
         </div>

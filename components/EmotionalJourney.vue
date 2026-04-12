@@ -27,11 +27,11 @@
     <!-- Hero -->
     <section class="min-h-screen flex flex-col justify-end px-8 lg:px-20 pb-24 pt-32">
       <div class="max-w-screen-xl mx-auto w-full">
-        <h1
+        <h2
           class="font-headline italic text-white leading-[1.05] mb-6"
           style="font-size: clamp(2.5rem, 7vw, 5rem); letter-spacing: -0.02em;"
           data-animate
-        >{{ journeyHero.headline }}</h1>
+        >{{ journeyHero.headline }}</h2>
         <p
           class="text-white/60 font-light max-w-2xl mb-12"
           style="font-size: clamp(1rem, 2.5vw, 1.25rem); line-height: 1.8;"

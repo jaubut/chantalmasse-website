@@ -148,6 +148,7 @@ interface BookingResult {
 }
 
 const { isOpen, close } = useBooking()
+const { trackBookingStart, trackBookingComplete } = useTracking()
 
 const currentStep = ref<Step>('service')
 const transitionName = ref('slide-forward')
@@ -292,6 +293,7 @@ async function onFormSubmit(formData: {
       eventId: result.eventId,
     }
 
+    trackBookingComplete(selectedService.value.name, selectedService.value.price)
     advance('confirmation')
   } catch (err: any) {
     const msg = err?.data?.message || err?.message || 'Une erreur est survenue. Veuillez réessayer.'
@@ -312,6 +314,7 @@ function closeModal() {
 // Reset state when modal opens
 watch(isOpen, (val) => {
   if (val) {
+    trackBookingStart()
     currentStep.value = 'service'
     selectedService.value = null
     selectedDate.value = null

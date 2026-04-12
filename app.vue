@@ -6,5 +6,6 @@
     </main>
     <TheFooter />
     <BookingModal />
+    <ContactModal />
   </div>
 </template>

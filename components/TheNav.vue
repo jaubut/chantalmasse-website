@@ -8,15 +8,13 @@
   >
     <div class="max-w-screen-xl mx-auto px-8 py-4 flex items-center justify-between">
       <!-- Logo -->
-      <a href="/" :class="['font-headline italic text-2xl transition-colors duration-500', isJourney ? 'text-white' : 'text-primary']">
+      <NuxtLink to="/" :class="['font-headline italic text-2xl transition-colors duration-500', isJourney ? 'text-white' : 'text-primary']">
         Chantal Massé
-      </a>
+      </NuxtLink>
 
       <!-- Desktop links -->
       <div class="hidden md:flex items-center gap-10">
-        <a href="#services" :class="linkClass">Services</a>
-        <a href="#approche" :class="linkClass">Approche</a>
-        <a href="#apropos" :class="linkClass">À propos</a>
+        <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="linkClass">{{ link.label }}</a>
         <NuxtLink to="/blog" :class="linkClass">Blog</NuxtLink>
       </div>
 
@@ -28,9 +26,9 @@
         <a href="https://www.instagram.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Instagram" :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
           <Icon icon="mdi:instagram" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
         </a>
-        <a href="mailto:chantal.gmasse@gmail.com" :class="ctaClass" class="ml-2 px-8 py-3 rounded-xl font-semibold transition-all duration-500">
-          Contact
-        </a>
+        <button :class="ctaClass" class="ml-2 px-8 py-3 rounded-xl font-semibold transition-all duration-500" @click="contact.open()">
+          Me contacter
+        </button>
       </div>
 
       <!-- Hamburger -->
@@ -41,10 +39,9 @@
 
     <!-- Mobile drawer -->
     <div v-if="menuOpen" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
-      <a href="#services" :class="mobileLinkClass" @click="menuOpen = false">Services</a>
-      <a href="#approche" :class="mobileLinkClass" @click="menuOpen = false">Approche</a>
+      <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</a>
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
-      <a href="#booking" :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500" @click="menuOpen = false">Contact</a>
+      <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500" @click="contact.open(); menuOpen = false">Me contacter</button>
       <div class="flex items-center gap-3">
         <a href="https://www.facebook.com/chantalmassetherapeutecoach" target="_blank" rel="noopener" aria-label="Facebook" class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
           <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
@@ -61,10 +58,23 @@
 import { Icon } from '@iconify/vue'
 
 const route = useRoute()
+const contact = useContact()
 const menuOpen = ref(false)
 const scrolled = ref(false)
 
 const isJourney = computed(() => route.path === '/journey')
+const hasLocalAnchors = computed(() =>
+  ['/', '/coaching-de-couple', '/therapie-individuelle'].includes(route.path),
+)
+
+const navLinks = computed(() => {
+  const prefix = hasLocalAnchors.value ? '' : '/'
+  return [
+    { label: 'Services', href: `${prefix}#services` },
+    { label: 'Approche', href: `${prefix}#approche` },
+    { label: 'À propos', href: `${prefix}#apropos` },
+  ]
+})
 
 const navStyle = computed(() => {
   if (isJourney.value) {
