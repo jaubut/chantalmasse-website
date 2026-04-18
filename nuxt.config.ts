@@ -107,6 +107,8 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'fr',
       },
+      // Each page sets a full title; don't let @nuxtjs/seo append site.name a second time.
+      titleTemplate: '%s',
       script: [
         {
           src: 'https://www.googletagmanager.com/gtag/js?id=G-465141726',
