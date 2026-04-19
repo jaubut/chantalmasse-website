@@ -6,64 +6,11 @@
       data-lp-hero
       class="relative px-6 pt-24 pb-16 md:pt-32 md:pb-24"
     >
-      <div class="max-w-3xl mx-auto">
-        <!-- Trust pill -->
-        <span
-          class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-[11px] uppercase tracking-widest rounded-full px-4 py-2 mb-8"
-        >
-          20 ans de pratique · Shefford &amp; en vidéo
-        </span>
+      <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
 
-        <!-- H1 -->
-        <h1 class="font-headline italic text-primary leading-[1.05] text-[2.5rem] sm:text-5xl md:text-6xl tracking-tight mb-6">
-          Réserve ta séance avec Chantal, en moins de 2 minutes.
-        </h1>
-
-        <!-- Subtitle -->
-        <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-xl mb-10">
-          Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec.
-          Premier rendez-vous sans engagement — disponibilités dans les 7 à 14 jours.
-        </p>
-
-        <!-- Service switcher -->
-        <div class="mb-6">
-          <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface-variant mb-3">
-            Pour quel type de séance&nbsp;?
-          </p>
-          <div class="grid grid-cols-2 gap-2 max-w-md">
-            <button
-              v-for="opt in SERVICE_OPTIONS"
-              :key="opt.id"
-              type="button"
-              :class="[
-                'px-5 py-3.5 rounded-xl border text-sm font-semibold transition-all duration-200',
-                selectedService === opt.id
-                  ? 'bg-primary text-on-primary border-primary'
-                  : 'bg-surface-container-low text-primary border-outline-variant hover:border-primary',
-              ]"
-              @click="selectedService = opt.id"
-            >
-              {{ opt.label }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Primary CTA -->
-        <button
-          class="w-full sm:w-auto bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
-          @click="openBooking('hero')"
-        >
-          Prendre rendez-vous
-        </button>
-
-        <!-- Secondary reassurance -->
-        <p class="mt-4 text-sm text-on-surface-variant">
-          Sans engagement. Annulation possible jusqu'à 24&nbsp;h avant la séance.
-        </p>
-
-        <!-- Portrait -->
-        <div class="mt-14 md:mt-16">
-          <div class="aspect-[4/5] max-w-md mx-auto rounded-[2rem] overflow-hidden">
+        <!-- Portrait — order-2 on mobile, order-1 (left) on md+ -->
+        <div class="order-2 md:order-1">
+          <div class="aspect-[4/5] max-w-md mx-auto md:mx-0 rounded-[2rem] overflow-hidden">
             <img
               src="/images/chantal-hero.jpg"
               alt="Chantal Massé, thérapeute en relation d'aide"
@@ -74,6 +21,64 @@
             />
           </div>
         </div>
+
+        <!-- Text + CTA -->
+        <div class="order-1 md:order-2">
+          <!-- Trust pill -->
+          <span
+            class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-[11px] uppercase tracking-widest rounded-full px-4 py-2 mb-8"
+          >
+            20 ans de pratique · Shefford &amp; en vidéo
+          </span>
+
+          <!-- H1 -->
+          <h1 class="font-headline italic text-primary leading-[1.05] text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl tracking-tight mb-6">
+            Réserve ta séance avec Chantal, en moins de 2 minutes.
+          </h1>
+
+          <!-- Subtitle -->
+          <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-xl mb-10">
+            Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec.
+            Premier rendez-vous sans engagement — disponibilités dans les 7 à 14 jours.
+          </p>
+
+          <!-- Service switcher -->
+          <div class="mb-6">
+            <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface-variant mb-3">
+              Pour quel type de séance?
+            </p>
+            <div class="grid grid-cols-2 gap-2 max-w-md">
+              <button
+                v-for="opt in SERVICE_OPTIONS"
+                :key="opt.id"
+                type="button"
+                :class="[
+                  'px-5 py-3.5 rounded-xl border text-sm font-semibold transition-all duration-200',
+                  selectedService === opt.id
+                    ? 'bg-primary text-on-primary border-primary'
+                    : 'bg-surface-container-low text-primary border-outline-variant hover:border-primary',
+                ]"
+                @click="selectedService = opt.id"
+              >
+                {{ opt.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Primary CTA -->
+          <button
+            class="w-full sm:w-auto bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
+            @click="openBooking('hero')"
+          >
+            Prendre rendez-vous
+          </button>
+
+          <!-- Secondary reassurance -->
+          <p class="mt-4 text-sm text-on-surface-variant">
+            Sans engagement. Annulation possible jusqu'à 24h avant la séance.
+          </p>
+        </div>
+
       </div>
     </section>
 
@@ -109,21 +114,70 @@
         <h2 class="font-headline text-primary italic text-3xl md:text-4xl mb-10 md:mb-14">
           Ce que les autres disent.
         </h2>
-        <div class="space-y-6 md:space-y-8">
-          <figure
-            v-for="t in TESTIMONIALS"
-            :key="t.name"
-            class="bg-surface-container-low p-8 md:p-10 rounded-[2rem] editorial-shadow"
-          >
-            <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
-            <blockquote class="text-on-surface text-[17px] leading-relaxed mb-6">
-              {{ t.quote }}
-            </blockquote>
-            <figcaption>
-              <p class="font-semibold text-primary">{{ t.name }}</p>
-              <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
-            </figcaption>
-          </figure>
+        <div
+          class="relative"
+          @mouseenter="pauseCarousel = true"
+          @mouseleave="pauseCarousel = false"
+        >
+          <!-- Track -->
+          <div class="overflow-hidden">
+            <div
+              class="flex transition-transform duration-500 ease-out"
+              :style="{ transform: `translateX(-${activeTestimonial * 100}%)` }"
+            >
+              <figure
+                v-for="t in TESTIMONIALS"
+                :key="t.name"
+                class="shrink-0 w-full px-1"
+              >
+                <div class="bg-surface-container-low p-8 md:p-10 rounded-[2rem] editorial-shadow">
+                  <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
+                  <blockquote class="text-on-surface text-[17px] leading-relaxed mb-6 min-h-[9rem]">
+                    {{ t.quote }}
+                  </blockquote>
+                  <figcaption>
+                    <p class="font-semibold text-primary">{{ t.name }}</p>
+                    <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
+                  </figcaption>
+                </div>
+              </figure>
+            </div>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex items-center justify-between mt-6">
+            <button
+              type="button"
+              aria-label="Témoignage précédent"
+              class="w-10 h-10 rounded-full border border-outline-variant text-primary flex items-center justify-center hover:bg-surface-container transition-colors"
+              @click="prevTestimonial"
+            >
+              ←
+            </button>
+
+            <div class="flex items-center gap-2">
+              <button
+                v-for="(_, i) in TESTIMONIALS"
+                :key="i"
+                type="button"
+                :aria-label="`Voir témoignage ${i + 1}`"
+                :class="[
+                  'h-2 rounded-full transition-all duration-300',
+                  activeTestimonial === i ? 'w-8 bg-primary' : 'w-2 bg-outline-variant hover:bg-primary/40',
+                ]"
+                @click="activeTestimonial = i"
+              />
+            </div>
+
+            <button
+              type="button"
+              aria-label="Témoignage suivant"
+              class="w-10 h-10 rounded-full border border-outline-variant text-primary flex items-center justify-center hover:bg-surface-container transition-colors"
+              @click="nextTestimonial"
+            >
+              →
+            </button>
+          </div>
         </div>
         <div class="text-center mt-10">
           <a
@@ -143,7 +197,7 @@
     <section class="px-6 py-14 md:py-20 bg-surface-container-low">
       <div class="max-w-2xl mx-auto text-center">
         <p class="text-on-surface-variant mb-5 text-lg leading-relaxed">
-          Prêt·e à prendre le premier rendez-vous&nbsp;?
+          Prêt·e à prendre le premier rendez-vous?
         </p>
         <button
           class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
@@ -201,7 +255,7 @@
           <div>
             <p class="font-semibold text-primary mb-2">En vidéoconférence</p>
             <p class="text-on-surface-variant leading-relaxed">
-              Partout au Québec, lien Google&nbsp;Meet envoyé avec la confirmation. Aucune installation requise.
+              Partout au Québec, lien GoogleMeet envoyé avec la confirmation. Aucune installation requise.
             </p>
           </div>
         </div>
@@ -317,35 +371,57 @@ const TESTIMONIALS = [
 
 const FAQ = [
   {
-    question: 'Combien ça coûte&nbsp;?',
+    question: 'Combien ça coûte?',
     answer:
       'Les tarifs sont affichés clairement à la première étape de la réservation. Tu vois les prix avant de choisir ta plage horaire — aucune surprise.',
   },
   {
-    question: 'Combien de temps dure une séance&nbsp;?',
+    question: 'Combien de temps dure une séance?',
     answer: 'Thérapie individuelle : 60 minutes. Coaching de couple : 90 minutes.',
   },
   {
-    question: 'Est-ce remboursé par mes assurances&nbsp;?',
+    question: 'Est-ce remboursé par mes assurances?',
     answer:
       "La plupart des assurances privées (Sun Life, Manuvie, Desjardins, etc.) remboursent les services de thérapeute en relation d'aide. Je fournis un reçu officiel après chaque séance — vérifie auprès de ton assureur le pourcentage couvert.",
   },
   {
-    question: 'Quelle est la politique d\'annulation&nbsp;?',
+    question: 'Quelle est la politique d\'annulation?',
     answer:
       'Tu peux annuler ou reporter gratuitement jusqu\'à 24 heures avant la séance. Un lien d\'annulation est inclus dans ton courriel de confirmation.',
   },
   {
-    question: 'Présentiel ou vidéoconférence — comment choisir&nbsp;?',
+    question: 'Présentiel ou vidéoconférence — comment choisir?',
     answer:
       "La vidéo est aussi efficace que le présentiel pour la majorité des situations et t'évite le trajet. Le présentiel est privilégié si tu cherches un cadre plus défini ou si la vidéo te distrait. Tu peux alterner d'une séance à l'autre — c'est flexible.",
   },
   {
-    question: 'Quelle est ta formation&nbsp;?',
+    question: 'Quelle est ta formation?',
     answer:
       "Thérapeute en relation d'aide avec 20 ans de pratique, spécialisée en thérapie individuelle et coaching de couple. J'accompagne depuis Shefford et en vidéoconférence partout au Québec.",
   },
 ]
+
+const activeTestimonial = ref(0)
+const pauseCarousel = ref(false)
+let carouselTimer: ReturnType<typeof setInterval> | null = null
+
+function nextTestimonial(): void {
+  activeTestimonial.value = (activeTestimonial.value + 1) % TESTIMONIALS.length
+}
+
+function prevTestimonial(): void {
+  activeTestimonial.value = (activeTestimonial.value - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
+}
+
+onMounted(() => {
+  carouselTimer = setInterval(() => {
+    if (!pauseCarousel.value) nextTestimonial()
+  }, 7000)
+})
+
+onBeforeUnmount(() => {
+  if (carouselTimer) clearInterval(carouselTimer)
+})
 
 function openBooking(source: 'hero' | 'mid' | 'final') {
   trackEvent('lp_cta_click', {
