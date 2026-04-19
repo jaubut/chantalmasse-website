@@ -132,6 +132,7 @@ import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { useBooking } from '~/composables/useBooking'
 import type { BookingService } from './ServiceSelector.vue'
+import { getBookingService } from '~/utils/bookingServices'
 import type { TimeSlot } from '~/utils/bookingHelpers'
 
 type Step = 'service' | 'calendar' | 'time' | 'form' | 'confirmation'
@@ -147,7 +148,7 @@ interface BookingResult {
   eventId: string
 }
 
-const { isOpen, close } = useBooking()
+const { isOpen, close, preselectedServiceId } = useBooking()
 const { trackBookingStart, trackBookingComplete } = useTracking()
 
 const currentStep = ref<Step>('service')
@@ -315,8 +316,6 @@ function closeModal() {
 watch(isOpen, (val) => {
   if (val) {
     trackBookingStart()
-    currentStep.value = 'service'
-    selectedService.value = null
     selectedDate.value = null
     selectedSlot.value = null
     slotsForSelectedDate.value = []
@@ -325,6 +324,17 @@ watch(isOpen, (val) => {
     globalError.value = null
     confirmedFirstName.value = ''
     transitionName.value = 'slide-forward'
+
+    // If the caller pre-selected a service (e.g. from the LP's service switcher),
+    // skip the service-picker step and jump straight to the calendar.
+    const preselected = getBookingService(preselectedServiceId.value)
+    if (preselected) {
+      selectedService.value = preselected
+      currentStep.value = 'calendar'
+    } else {
+      selectedService.value = null
+      currentStep.value = 'service'
+    }
   }
 })
 </script>

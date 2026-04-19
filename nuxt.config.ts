@@ -21,10 +21,12 @@ export default defineNuxtConfig({
     '/inscription-confirmee': { prerender: true },
     '/coaching-de-couple': { prerender: true },
     '/therapie-individuelle': { prerender: true },
+    '/prendre-rendez-vous': { prerender: true },
     // Legacy URLs from the Wix site — keep 301s so old ads / backlinks / bookmarks survive.
     '/coaching-relationnel-couple': { redirect: { to: '/coaching-de-couple', statusCode: 301 } },
     '/coaching-relationnel-de-couple-chantal': { redirect: { to: '/coaching-de-couple', statusCode: 301 } },
     '/therapie-individuelle-chantal': { redirect: { to: '/therapie-individuelle', statusCode: 301 } },
+    // /book-online kept on / for now — flip to /prendre-rendez-vous if the A/B test wins.
     '/book-online': { redirect: { to: '/', statusCode: 301 } },
     '/booking-calendar': { redirect: { to: '/', statusCode: 301 } },
   },

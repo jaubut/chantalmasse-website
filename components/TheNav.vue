@@ -13,13 +13,13 @@
       </NuxtLink>
 
       <!-- Desktop links -->
-      <div class="hidden md:flex items-center gap-10">
+      <div v-if="!minimalNav" class="hidden md:flex items-center gap-10">
         <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="linkClass">{{ link.label }}</a>
         <NuxtLink to="/blog" :class="linkClass">Blog</NuxtLink>
       </div>
 
       <!-- Socials + CTA -->
-      <div class="hidden md:flex items-center gap-3">
+      <div v-if="!minimalNav" class="hidden md:flex items-center gap-3">
         <a href="https://www.facebook.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Facebook" :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
           <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
         </a>
@@ -32,13 +32,13 @@
       </div>
 
       <!-- Hamburger -->
-      <button class="md:hidden p-2" @click="menuOpen = !menuOpen" aria-label="Menu">
+      <button v-if="!minimalNav" class="md:hidden p-2" @click="menuOpen = !menuOpen" aria-label="Menu">
         <Icon :icon="menuOpen ? 'material-symbols:close' : 'material-symbols:menu'" class="text-2xl transition-colors duration-500" :class="isJourney ? 'text-white' : 'text-primary'" />
       </button>
     </div>
 
     <!-- Mobile drawer -->
-    <div v-if="menuOpen" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
+    <div v-if="menuOpen && !minimalNav" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
       <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</a>
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
       <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500" @click="contact.open(); menuOpen = false">Me contacter</button>
@@ -63,6 +63,7 @@ const menuOpen = ref(false)
 const scrolled = ref(false)
 
 const isJourney = computed(() => route.path === '/journey')
+const minimalNav = computed(() => Boolean(route.meta.minimalNav))
 const hasLocalAnchors = computed(() =>
   ['/', '/coaching-de-couple', '/therapie-individuelle'].includes(route.path),
 )

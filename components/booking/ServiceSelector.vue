@@ -58,42 +58,13 @@
 
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { BOOKING_SERVICES, type BookingService } from '~/utils/bookingServices'
 
-export interface BookingService {
-  id: string
-  name: string
-  duration: string
-  durationMinutes: number
-  price: number
-  description: string
-  icon: string
-  colorId: string
-}
+export type { BookingService }
 
 defineEmits<{
   select: [service: BookingService]
 }>()
 
-const services: BookingService[] = [
-  {
-    id: 'individual',
-    name: 'Thérapie Individuelle',
-    duration: '60 minutes',
-    durationMinutes: 60,
-    price: 105,
-    description: 'Un espace sécurisant pour explorer vos émotions et initier un changement profond.',
-    icon: 'material-symbols:person',
-    colorId: '2',
-  },
-  {
-    id: 'couple',
-    name: 'Coaching de Couple',
-    duration: '90 minutes',
-    durationMinutes: 90,
-    price: 160,
-    description: 'Un dialogue intentionnel pour transformer les conflits en opportunités de connexion.',
-    icon: 'material-symbols:favorite',
-    colorId: '7',
-  },
-]
+const services = BOOKING_SERVICES
 </script>
