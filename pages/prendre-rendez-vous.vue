@@ -28,7 +28,7 @@
           <span
             class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-[11px] uppercase tracking-widest rounded-full px-4 py-2 mb-8"
           >
-            20 ans de pratique · Shefford &amp; en vidéo
+            13 ans de pratique · Shefford &amp; en vidéo
           </span>
 
           <!-- H1 -->
@@ -39,7 +39,7 @@
           <!-- Subtitle -->
           <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-xl mb-10">
             Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec.
-            Premier rendez-vous sans engagement — disponibilités dans les 7 à 14 jours.
+            Disponibilités dans les 7 à 14 jours.
           </p>
 
           <!-- Service switcher -->
@@ -73,10 +73,6 @@
             Prendre rendez-vous
           </button>
 
-          <!-- Secondary reassurance -->
-          <p class="mt-4 text-sm text-on-surface-variant">
-            Sans engagement. Annulation possible jusqu'à 24h avant la séance.
-          </p>
         </div>
 
       </div>
@@ -336,11 +332,11 @@ const selectedService = ref<BookingServiceId>('individual')
 const STEPS = [
   {
     title: 'Choisis ton service et une heure',
-    body: 'Thérapie individuelle (60 min) ou coaching de couple (90 min), en présentiel ou en vidéoconférence. Disponibilités en temps réel, connectées à mon agenda.',
+    body: 'Thérapie individuelle (60 min) en présentiel ou en vidéoconférence. Coaching de couple (90 min) en présentiel. Disponibilités en temps réel, connectées à mon agenda.',
   },
   {
     title: 'Remplis un court formulaire',
-    body: 'Nom, courriel, et quelques mots sur ce qui t\'amène — seulement si tu le souhaites. Aucun dossier médical, aucun long questionnaire.',
+    body: 'Nom, courriel, et quelques mots sur ce qui t\'amène — seulement si tu le souhaites. Aucun long questionnaire.',
   },
   {
     title: 'Reçois ta confirmation',
@@ -397,7 +393,7 @@ const FAQ = [
   {
     question: 'Quelle est ta formation?',
     answer:
-      "Thérapeute en relation d'aide avec 20 ans de pratique, spécialisée en thérapie individuelle et coaching de couple. J'accompagne depuis Shefford et en vidéoconférence partout au Québec.",
+      "Thérapeute en relation d'aide avec 13 ans de pratique, spécialisée en thérapie individuelle et coaching de couple. J'accompagne depuis Shefford et en vidéoconférence partout au Québec.",
   },
 ]
 
