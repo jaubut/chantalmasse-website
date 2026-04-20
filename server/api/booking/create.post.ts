@@ -70,6 +70,9 @@ export default defineEventHandler(async (event) => {
     client.message ? `Message: ${client.message}` : null,
   ].filter(Boolean)
 
+  const cancelToken = crypto.randomUUID()
+  const config = useRuntimeConfig()
+
   // Create Google Calendar event
   let createdEvent
   try {
@@ -80,6 +83,9 @@ export default defineEventHandler(async (event) => {
       endISO: isoEnd,
       sessionType,
       colorId: serviceConfig.colorId,
+      clientEmail: client.email,
+      clientName: `${client.firstName} ${client.lastName}`,
+      cancelToken,
     })
   } catch (err) {
     console.error('[booking/create] Event creation error:', err)
@@ -92,9 +98,6 @@ export default defineEventHandler(async (event) => {
   const meetLink = createdEvent.conferenceData?.entryPoints?.find(
     (ep: any) => ep.entryPointType === 'video',
   )?.uri
-
-  const cancelToken = crypto.randomUUID()
-  const config = useRuntimeConfig()
 
   // Send confirmation email to client
   try {

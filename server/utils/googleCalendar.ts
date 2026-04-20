@@ -37,6 +37,9 @@ export async function createBookingEvent(params: {
   endISO: string
   sessionType: 'in-person' | 'video'
   colorId: string
+  clientEmail: string
+  clientName: string
+  cancelToken: string
 }) {
   const calendar = getCalendarClient()
   const config = useRuntimeConfig()
@@ -47,12 +50,23 @@ export async function createBookingEvent(params: {
     start: { dateTime: params.startISO, timeZone: 'America/Toronto' },
     end: { dateTime: params.endISO, timeZone: 'America/Toronto' },
     colorId: params.colorId,
+    attendees: [
+      { email: params.clientEmail, displayName: params.clientName, responseStatus: 'accepted' },
+    ],
     reminders: {
       useDefault: false,
       overrides: [
-        { method: 'email', minutes: 24 * 60 },
         { method: 'popup', minutes: 60 },
       ],
+    },
+    extendedProperties: {
+      private: {
+        clientEmail: params.clientEmail,
+        clientName: params.clientName,
+        cancelToken: params.cancelToken,
+        sessionType: params.sessionType,
+        reminderSent: '0',
+      },
     },
   }
 
@@ -73,4 +87,40 @@ export async function createBookingEvent(params: {
   })
 
   return res.data
+}
+
+export async function listPendingReminderEvents(params: {
+  timeMinISO: string
+  timeMaxISO: string
+}) {
+  const calendar = getCalendarClient()
+  const config = useRuntimeConfig()
+
+  const res = await calendar.events.list({
+    calendarId: config.googleCalendarId as string,
+    timeMin: params.timeMinISO,
+    timeMax: params.timeMaxISO,
+    singleEvents: true,
+    orderBy: 'startTime',
+    privateExtendedProperty: ['reminderSent=0'],
+  })
+
+  return res.data.items || []
+}
+
+export async function markReminderSent(eventId: string) {
+  const calendar = getCalendarClient()
+  const config = useRuntimeConfig()
+
+  await calendar.events.patch({
+    calendarId: config.googleCalendarId as string,
+    eventId,
+    requestBody: {
+      extendedProperties: {
+        private: {
+          reminderSent: '1',
+        },
+      },
+    },
+  })
 }
