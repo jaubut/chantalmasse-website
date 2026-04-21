@@ -118,7 +118,6 @@ type BookingInfo = {
 
 type State = 'loading' | 'confirm' | 'invalid' | 'done'
 
-const route = useRoute()
 const token = ref<string>('')
 const state = ref<State>('loading')
 const booking = ref<BookingInfo | null>(null)
@@ -136,9 +135,11 @@ useHead({
 })
 
 onMounted(async () => {
-  const raw = route.query.token
-  const t = Array.isArray(raw) ? raw[0] : raw
-  if (!t || typeof t !== 'string') {
+  // Read the token from window.location rather than useRoute().query — the
+  // page is reached from email/SMS links and any prerender-time route state
+  // would drop the query string. window.location is always fresh on mount.
+  const t = new URLSearchParams(window.location.search).get('token')
+  if (!t) {
     state.value = 'invalid'
     errorMessage.value = 'Aucun lien d\'annulation fourni.'
     return

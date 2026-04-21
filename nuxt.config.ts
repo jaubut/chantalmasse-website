@@ -22,6 +22,8 @@ export default defineNuxtConfig({
     '/coaching-de-couple': { prerender: true },
     '/therapie-individuelle': { prerender: true },
     '/prendre-rendez-vous': { prerender: true },
+    // /annuler is dynamic per token — must not be prerendered.
+    '/annuler': { prerender: false, robots: false },
     // Legacy URLs from the Wix site — keep 301s so old ads / backlinks / bookmarks survive.
     '/coaching-relationnel-couple': { redirect: { to: '/coaching-de-couple', statusCode: 301 } },
     '/coaching-relationnel-de-couple-chantal': { redirect: { to: '/coaching-de-couple', statusCode: 301 } },
