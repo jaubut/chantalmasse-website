@@ -40,6 +40,10 @@ export default defineNuxtConfig({
     emailFrom: process.env.EMAIL_FROM,
     emailTo: process.env.EMAIL_TO,
     bookingMinNoticeHours: process.env.BOOKING_MIN_NOTICE_HOURS || '24',
+    twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
+    twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
+    twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
+    siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',

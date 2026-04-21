@@ -1,5 +1,6 @@
 import { getEventsForMonth, createBookingEvent } from '~/server/utils/googleCalendar'
 import { clientConfirmationEmail, therapistNotificationEmail } from '~/server/utils/emailTemplates'
+import { bookingConfirmationSms, normalizePhone, sendSms } from '~/server/utils/sms'
 import { isSlotAvailable } from '~/utils/bookingHelpers'
 import { parseISO, format } from 'date-fns'
 import { fr } from 'date-fns/locale'
@@ -30,6 +31,16 @@ export default defineEventHandler(async (event) => {
   }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(client.email)) {
     throw createError({ statusCode: 400, message: 'Adresse courriel invalide' })
+  }
+
+  // SMS consent requires a phone number and a valid (normalizable) one.
+  const smsConsent = client.smsConsent === true
+  const normalizedPhone = normalizePhone(client.phone)
+  if (smsConsent && !normalizedPhone) {
+    throw createError({
+      statusCode: 400,
+      message: 'Un numéro de téléphone valide est requis pour les rappels SMS.',
+    })
   }
 
   const serviceConfig = SERVICE_CONFIG[serviceId]
@@ -85,6 +96,8 @@ export default defineEventHandler(async (event) => {
       colorId: serviceConfig.colorId,
       clientEmail: client.email,
       clientName: `${client.firstName} ${client.lastName}`,
+      clientPhone: normalizedPhone || undefined,
+      smsConsent,
       cancelToken,
     })
   } catch (err) {
@@ -159,6 +172,25 @@ export default defineEventHandler(async (event) => {
     })
   } catch (err) {
     console.error('[booking/create] Therapist email error:', err)
+  }
+
+  // Confirmation SMS — only when the client explicitly opted in. Failures
+  // are logged but don't surface to the user: the calendar event and emails
+  // are already through, and a missing SMS shouldn't fail a confirmed booking.
+  if (smsConsent && normalizedPhone) {
+    try {
+      const startTime = `${format(startET, 'HH')}h${format(startET, 'mm')}`
+      const body = bookingConfirmationSms({
+        firstName: client.firstName,
+        dateFormatted,
+        startTime,
+        sessionType,
+        cancelUrl: `${config.siteBaseUrl}/annuler?token=${cancelToken}`,
+      })
+      await sendSms(normalizedPhone, body)
+    } catch (err) {
+      console.error('[booking/create] Confirmation SMS error:', err)
+    }
   }
 
   return {

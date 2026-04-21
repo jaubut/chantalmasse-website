@@ -251,6 +251,7 @@ async function onFormSubmit(formData: {
   phone: string
   sessionType: 'in-person' | 'video'
   message: string
+  smsConsent: boolean
 }) {
   if (!selectedService.value || !selectedSlot.value) return
 
@@ -278,6 +279,7 @@ async function onFormSubmit(formData: {
           email: formData.email,
           phone: formData.phone || undefined,
           message: formData.message || undefined,
+          smsConsent: formData.smsConsent,
         },
       },
     })

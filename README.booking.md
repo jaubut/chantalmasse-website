@@ -61,7 +61,23 @@ Service accounts allow server-to-server access without OAuth user flow.
 
 ---
 
-## Step 6 — Configure Environment Variables
+## Step 6 — Set Up Twilio (SMS Reminders)
+
+Used for the opt-in confirmation + 24h-before SMS to clients.
+
+1. Go to https://www.twilio.com/try-twilio and create a fresh account
+2. Verify your Canadian identity + add a payment method (pay-as-you-go, ~$0.008 per SMS to Canada; small trial credit is provided)
+3. **Phone Numbers → Buy a Number** → filter by Country: Canada, Area Code: `450` (matches Shefford) → pick a local number → copy the E.164 value (e.g. `+14505551234`) → this is `TWILIO_FROM_NUMBER`
+4. Top-right account dropdown → **Account Info** → copy:
+   - **Account SID** → this is `TWILIO_ACCOUNT_SID`
+   - **Auth Token** → this is `TWILIO_AUTH_TOKEN`
+5. (Optional, recommended) In **Messaging → Services**, create a Messaging Service with the number pooled for delivery resilience. Not required for MVP.
+
+> CASL note: the booking form shows an explicit opt-in checkbox ("Recevoir une confirmation par SMS et un rappel 24h avant la séance"). No SMS is sent unless the client ticks it.
+
+---
+
+## Step 7 — Configure Environment Variables
 
 Create a `.env` file at the project root (never commit this file):
 
@@ -76,7 +92,13 @@ RESEND_API_KEY=re_xxxxxxxxxxxx
 EMAIL_FROM=reservations@chantalmasse.com
 EMAIL_TO=chantal@chantalmasse.com
 
+# Twilio (SMS confirmation + 24h reminder)
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_FROM_NUMBER=+14505551234
+
 # Booking config
+SITE_BASE_URL=https://chantalmasse.com
 BOOKING_TIMEZONE=America/Toronto
 BOOKING_ADVANCE_DAYS=60
 BOOKING_MIN_NOTICE_HOURS=24
@@ -86,11 +108,31 @@ BOOKING_MIN_NOTICE_HOURS=24
 
 ---
 
-## Step 7 — Vercel Deployment
+## Step 8 — Vercel Deployment
 
 In the Vercel project settings, add all environment variables from `.env` under **Settings → Environment Variables**.
 
 The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (do NOT use the Vercel multiline editor for this key — paste as a single line).
+
+---
+
+## Step 9 — Trigger.dev (24h Reminder Cron)
+
+The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs its own copy of the credentials.
+
+1. Open your project at https://cloud.trigger.dev
+2. **Environments → Production → Environment Variables**
+3. Add every variable that the `trigger/booking-reminder.ts` task reads:
+   - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
+   - `GOOGLE_PRIVATE_KEY` (same `\n`-escaped format as Vercel)
+   - `GOOGLE_CALENDAR_ID`
+   - `RESEND_API_KEY`
+   - `EMAIL_FROM`
+   - `TWILIO_ACCOUNT_SID`
+   - `TWILIO_AUTH_TOKEN`
+   - `TWILIO_FROM_NUMBER`
+   - `SITE_BASE_URL`
+4. Redeploy the task (`bunx trigger.dev@latest deploy`) so it picks up the new SMS code path.
 
 ---
 

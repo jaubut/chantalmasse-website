@@ -1,5 +1,5 @@
 <template>
-  <div class="px-2">
+  <div class="px-4">
     <!-- Recap card -->
     <div class="bg-primary-fixed rounded-xl p-4 mb-8 font-body text-sm">
       <div class="grid grid-cols-2 gap-x-6 gap-y-1.5">
@@ -85,7 +85,7 @@
       <div>
         <label class="font-body text-sm font-semibold text-on-surface block mb-2">
           Téléphone
-          <span class="font-normal text-on-surface-variant">(optionnel)</span>
+          <span class="font-normal text-on-surface-variant">{{ form.smsConsent ? '*' : '(optionnel)' }}</span>
         </label>
         <input
           v-model="form.phone"
@@ -93,7 +93,23 @@
           autocomplete="tel"
           placeholder="450 123-4567"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+          :class="errors.phone ? 'border-red-400 ring-1 ring-red-400' : ''"
         />
+        <p v-if="errors.phone" class="mt-1.5 text-xs font-body text-red-500">{{ errors.phone }}</p>
+
+        <!-- SMS consent -->
+        <label class="flex items-start gap-3 cursor-pointer group mt-4 py-2 min-h-11">
+          <div class="relative mt-0.5">
+            <input
+              v-model="form.smsConsent"
+              type="checkbox"
+              class="w-5 h-5 rounded accent-primary cursor-pointer"
+            />
+          </div>
+          <span class="font-body text-sm text-on-surface-variant leading-relaxed">
+            Recevoir une confirmation par SMS et un rappel 24h avant la séance.
+          </span>
+        </label>
       </div>
 
       <!-- Session type -->
@@ -144,7 +160,7 @@
       </div>
 
       <!-- Privacy checkbox -->
-      <label class="flex items-start gap-3 cursor-pointer group">
+      <label class="flex items-start gap-3 cursor-pointer group py-2 min-h-11">
         <div class="relative mt-0.5">
           <input
             v-model="form.privacy"
@@ -214,6 +230,7 @@ interface FormData {
   sessionType: 'in-person' | 'video'
   message: string
   privacy: boolean
+  smsConsent: boolean
 }
 
 const form = reactive<FormData>({
@@ -224,6 +241,7 @@ const form = reactive<FormData>({
   sessionType: 'in-person',
   message: '',
   privacy: false,
+  smsConsent: false,
 })
 
 const errors = reactive<Partial<Record<keyof FormData, string>>>({})
@@ -270,6 +288,14 @@ function validate(): boolean {
     errors.email = 'Le courriel est requis'
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
     errors.email = 'Adresse courriel invalide'
+  }
+  if (form.smsConsent) {
+    const digits = form.phone.replace(/\D/g, '')
+    if (!form.phone.trim()) {
+      errors.phone = 'Un numéro est requis pour les rappels SMS'
+    } else if (digits.length < 10) {
+      errors.phone = 'Numéro de téléphone invalide'
+    }
   }
   if (!form.sessionType) errors.sessionType = 'Veuillez choisir un type de séance'
   if (!form.privacy) errors.privacy = 'Vous devez accepter la politique de confidentialité'

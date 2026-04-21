@@ -39,20 +39,24 @@ export async function createBookingEvent(params: {
   colorId: string
   clientEmail: string
   clientName: string
+  clientPhone?: string
+  smsConsent?: boolean
   cancelToken: string
 }) {
   const calendar = getCalendarClient()
   const config = useRuntimeConfig()
 
+  // No `attendees` array: the service account cannot invite attendees
+  // without Google Workspace Domain-Wide Delegation, which Chantal's personal
+  // calendar setup doesn't have — Google rejects the insert with 403
+  // forbiddenForServiceAccounts. The client still gets the Resend confirmation
+  // email (with the Meet link) and the event is visible on Chantal's calendar.
   const event: Parameters<typeof calendar.events.insert>[0]['requestBody'] = {
     summary: params.title,
     description: params.description,
     start: { dateTime: params.startISO, timeZone: 'America/Toronto' },
     end: { dateTime: params.endISO, timeZone: 'America/Toronto' },
     colorId: params.colorId,
-    attendees: [
-      { email: params.clientEmail, displayName: params.clientName, responseStatus: 'accepted' },
-    ],
     reminders: {
       useDefault: false,
       overrides: [
@@ -66,6 +70,8 @@ export async function createBookingEvent(params: {
         cancelToken: params.cancelToken,
         sessionType: params.sessionType,
         reminderSent: '0',
+        ...(params.clientPhone ? { clientPhone: params.clientPhone } : {}),
+        ...(params.smsConsent ? { smsConsent: '1', smsReminderSent: '0' } : {}),
       },
     },
   }
@@ -83,7 +89,6 @@ export async function createBookingEvent(params: {
     calendarId: config.googleCalendarId as string,
     requestBody: event,
     conferenceDataVersion: params.sessionType === 'video' ? 1 : 0,
-    sendUpdates: 'all',
   })
 
   return res.data
@@ -119,6 +124,23 @@ export async function markReminderSent(eventId: string) {
       extendedProperties: {
         private: {
           reminderSent: '1',
+        },
+      },
+    },
+  })
+}
+
+export async function markSmsReminderSent(eventId: string) {
+  const calendar = getCalendarClient()
+  const config = useRuntimeConfig()
+
+  await calendar.events.patch({
+    calendarId: config.googleCalendarId as string,
+    eventId,
+    requestBody: {
+      extendedProperties: {
+        private: {
+          smsReminderSent: '1',
         },
       },
     },
