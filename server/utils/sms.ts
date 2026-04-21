@@ -89,3 +89,11 @@ export function bookingReminderSms(ctx: SmsContext): string {
     : 'Shefford, QC.'
   return `Rappel: ta séance avec Chantal, c'est demain à ${ctx.startTime}. ${where} Annuler: ${ctx.cancelUrl}`
 }
+
+export function bookingCancellationSms(ctx: {
+  firstName: string
+  dateFormatted: string
+  startTime: string
+}): string {
+  return `${ctx.firstName}, ta séance du ${ctx.dateFormatted} à ${ctx.startTime} avec Chantal est annulée. Reprendre un rendez-vous: https://chantalmasse.com/prendre-rendez-vous`
+}

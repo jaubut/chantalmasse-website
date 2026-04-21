@@ -130,6 +130,39 @@ export async function markReminderSent(eventId: string) {
   })
 }
 
+// Lookup a future event by its cancel token — embedded in
+// extendedProperties.private.cancelToken at creation. Returns null when
+// the token is unknown or the event has already passed (timeMin=now).
+// Scans the next 120 days which safely exceeds BOOKING_ADVANCE_DAYS=60.
+export async function findEventByCancelToken(token: string) {
+  const calendar = getCalendarClient()
+  const config = useRuntimeConfig()
+
+  const now = new Date()
+  const timeMax = new Date(now.getTime() + 120 * 24 * 60 * 60 * 1000)
+
+  const res = await calendar.events.list({
+    calendarId: config.googleCalendarId as string,
+    timeMin: now.toISOString(),
+    timeMax: timeMax.toISOString(),
+    singleEvents: true,
+    privateExtendedProperty: [`cancelToken=${token}`],
+    maxResults: 1,
+  })
+
+  return res.data.items?.[0] ?? null
+}
+
+export async function cancelEventById(eventId: string) {
+  const calendar = getCalendarClient()
+  const config = useRuntimeConfig()
+
+  await calendar.events.delete({
+    calendarId: config.googleCalendarId as string,
+    eventId,
+  })
+}
+
 export async function markSmsReminderSent(eventId: string) {
   const calendar = getCalendarClient()
   const config = useRuntimeConfig()
