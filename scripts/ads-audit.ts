@@ -192,9 +192,45 @@ async function campaignBreakdown(): Promise<CampaignRow[]> {
   return out
 }
 
+// Batch-resolve geoTargetConstants/1002550 → "Montréal, QC, Canada".
+// One query for all IDs instead of N — Google Ads doesn't support JOINs
+// across resources so this is the closest thing to it.
+async function resolveGeoNames(resourceNames: string[]): Promise<Map<string, string>> {
+  const unique = Array.from(new Set(resourceNames)).filter(Boolean)
+  if (unique.length === 0) return new Map()
+
+  const ids = unique.map(rn => rn.replace("geoTargetConstants/", "")).filter(Boolean)
+  if (ids.length === 0) return new Map()
+
+  const inList = ids.map(id => `'${id}'`).join(",")
+  const rows = await customer.query(`
+    SELECT
+      geo_target_constant.id,
+      geo_target_constant.name,
+      geo_target_constant.canonical_name,
+      geo_target_constant.target_type
+    FROM geo_target_constant
+    WHERE geo_target_constant.id IN (${inList})
+  `)
+
+  const map = new Map<string, string>()
+  for (const r of rows) {
+    const id = String(r.geo_target_constant?.id ?? "")
+    // canonical_name is e.g. "Montreal, Quebec, Canada" — more useful than
+    // name alone ("Montreal") because it disambiguates.
+    const canonical = (r.geo_target_constant?.canonical_name ?? "") as string
+    const targetType = (r.geo_target_constant?.target_type ?? "") as string
+    const suffix = targetType && targetType !== "City" ? ` [${targetType}]` : ""
+    map.set(`geoTargetConstants/${id}`, (canonical || "?") + suffix)
+  }
+  return map
+}
+
 async function geoBreakdown(): Promise<void> {
   // Geographic by city — surfaces the "Toronto / Moscow" waste noted in the
-  // April 2 audit.
+  // April 2 audit. Rows come back segmented by geo_target_city; we aggregate
+  // in JS because the API returns duplicates segmented by internal criteria
+  // (e.g. physical-presence vs area-of-interest match).
   const rows = await customer.query(`
     SELECT
       segments.geo_target_city,
@@ -204,35 +240,62 @@ async function geoBreakdown(): Promise<void> {
     FROM geographic_view
     WHERE segments.date BETWEEN '${start}' AND '${end}'
     ORDER BY metrics.cost_micros DESC
-    LIMIT 25
   `)
 
-  printSection("GEO (by city, top 25 by spend)")
-  console.log(`  ${"City ID".padEnd(40)} ${"Spend".padStart(9)} ${"Clicks".padStart(7)} ${"Conv".padStart(6)}`)
-  console.log(`  ${"-".repeat(68)}`)
+  // Aggregate by city (dedupes the physical-vs-interest split rows)
+  interface GeoAgg { cost: number; clicks: number; conv: number }
+  const byCity = new Map<string, GeoAgg>()
+  for (const r of rows) {
+    const m = r.metrics!
+    const cityId = (r.segments?.geo_target_city ?? "(not set)") as string
+    const prev = byCity.get(cityId) ?? { cost: 0, clicks: 0, conv: 0 }
+    prev.cost += Number(m.cost_micros ?? 0) / 1_000_000
+    prev.clicks += Number(m.clicks ?? 0)
+    prev.conv += Number(m.conversions ?? 0)
+    byCity.set(cityId, prev)
+  }
+
+  // Sort by spend desc, keep top 25
+  const sorted = [...byCity.entries()]
+    .sort((a, b) => b[1].cost - a[1].cost)
+    .slice(0, 25)
+
+  // Resolve names in one batch
+  const nameMap = await resolveGeoNames(sorted.map(([id]) => id))
+
+  printSection("GEO (top 25 cities by spend — deduped + resolved)")
+  console.log(`  ${"City".padEnd(44)} ${"Spend".padStart(9)} ${"Clicks".padStart(7)} ${"Conv".padStart(6)} ${"CPL".padStart(8)}`)
+  console.log(`  ${"-".repeat(80)}`)
 
   let totalCost = 0
   let totalClicks = 0
   let totalConv = 0
-  for (const r of rows) {
-    const m = r.metrics!
-    const cityId = (r.segments?.geo_target_city ?? "(not set)") as string
-    const cost = Number(m.cost_micros ?? 0) / 1_000_000
-    const clicks = Number(m.clicks ?? 0)
-    const conv = Number(m.conversions ?? 0)
-    totalCost += cost
-    totalClicks += clicks
-    totalConv += conv
+  for (const [cityId, agg] of sorted) {
+    const cityName = nameMap.get(cityId) ?? cityId
+    totalCost += agg.cost
+    totalClicks += agg.clicks
+    totalConv += agg.conv
+    const cpl = agg.conv > 0 ? `$${(agg.cost / agg.conv).toFixed(2)}` : "—"
     console.log(
-      `  ${cityId.slice(0, 40).padEnd(40)} ${fmtMoney(m.cost_micros).padStart(9)}` +
-      ` ${fmt.format(clicks).padStart(7)} ${conv.toFixed(1).padStart(6)}`
+      `  ${cityName.slice(0, 44).padEnd(44)} $${agg.cost.toFixed(2).padStart(8)}` +
+      ` ${fmt.format(agg.clicks).padStart(7)} ${agg.conv.toFixed(1).padStart(6)} ${cpl.padStart(8)}`
     )
   }
-  console.log(`  ${"-".repeat(68)}`)
+  console.log(`  ${"-".repeat(80)}`)
   console.log(
-    `  ${"TOTAL (top 25)".padEnd(40)} $${totalCost.toFixed(2).padStart(8)}` +
+    `  ${"TOTAL (top 25)".padEnd(44)} $${totalCost.toFixed(2).padStart(8)}` +
     ` ${fmt.format(totalClicks).padStart(7)} ${totalConv.toFixed(1).padStart(6)}`
   )
+
+  // Surface "waste" candidates — cities with spend but 0 conversions
+  const wasted = sorted.filter(([, agg]) => agg.cost > 1 && agg.conv === 0)
+  if (wasted.length > 0) {
+    console.log(`\n  ⚠ ${wasted.length} cit${wasted.length > 1 ? "ies" : "y"} with spend > $1 and zero conversions:`)
+    for (const [cityId, agg] of wasted) {
+      const cityName = nameMap.get(cityId) ?? cityId
+      console.log(`    • ${cityName.padEnd(44)} $${agg.cost.toFixed(2)} / ${agg.clicks} clicks`)
+    }
+  }
 }
 
 async function deviceBreakdown(): Promise<void> {
