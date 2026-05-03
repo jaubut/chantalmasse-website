@@ -136,9 +136,20 @@ const ctaClass = computed(() =>
     : 'bg-primary text-on-primary hover:bg-primary-container',
 )
 
+// Named handler so we can detach on unmount. The previous version used an
+// inline arrow + no cleanup, which leaked a fresh listener on every nav
+// remount (HMR, route change). Also evaluate once on mount so anchor-link
+// landings don't show the un-scrolled nav style on first paint.
+const onScroll = (): void => {
+  scrolled.value = window.scrollY > 20
+}
+
 onMounted(() => {
-  window.addEventListener('scroll', () => {
-    scrolled.value = window.scrollY > 20
-  })
+  onScroll()
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', onScroll)
 })
 </script>

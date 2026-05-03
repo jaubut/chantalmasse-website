@@ -178,7 +178,17 @@ useSeoMeta({
   description: 'Coaching de couple à Shefford et en vidéoconférence. Dialogue intentionnel Imago pour transformer les conflits en connexion. 90 min — 160$. Reçus RITMA.',
   ogTitle: 'Coaching de couple à Shefford | Chantal Massé',
   ogDescription: 'Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance.',
-  ogImage: '/images/chantal-hero.jpg',
+  // Absolute URL — Facebook + LinkedIn scrapers don't always resolve
+  // relative paths reliably (they break in email previews + staging).
+  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://chantalmasse.com/coaching-de-couple' },
+  ],
 })
 
 const painPoints = [

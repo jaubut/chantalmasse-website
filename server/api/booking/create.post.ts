@@ -1,14 +1,18 @@
 import { getEventsForMonth, createBookingEvent } from '~/server/utils/googleCalendar'
 import { clientConfirmationEmail, therapistNotificationEmail } from '~/server/utils/emailTemplates'
 import { bookingConfirmationSms, normalizePhone, sendSms } from '~/server/utils/sms'
+import { sendMetaCapiEvent, readFbCookies } from '~/server/utils/metaCapi'
 import { isSlotAvailable } from '~/utils/bookingHelpers'
 import { parseISO, format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { toZonedTime } from 'date-fns-tz'
 
-const SERVICE_CONFIG: Record<string, { name: string; colorId: string; durationMinutes: number }> = {
-  individual: { name: 'Thérapie Individuelle', colorId: '2', durationMinutes: 60 },
-  couple: { name: 'Coaching de Couple', colorId: '7', durationMinutes: 90 },
+// Service price kept here so the Meta CAPI Schedule event has a real `value`.
+// Keep in sync with the per-service pricing copy on /coaching-de-couple +
+// /therapie-individuelle.
+const SERVICE_CONFIG: Record<string, { name: string; colorId: string; durationMinutes: number; priceCad: number }> = {
+  individual: { name: 'Thérapie Individuelle', colorId: '2', durationMinutes: 60, priceCad: 105 },
+  couple:     { name: 'Coaching de Couple',    colorId: '7', durationMinutes: 90, priceCad: 160 },
 }
 
 export default defineEventHandler(async (event) => {
@@ -191,6 +195,49 @@ export default defineEventHandler(async (event) => {
     } catch (err) {
       console.error('[booking/create] Confirmation SMS error:', err)
     }
+  }
+
+  // Meta Conversions API — server-side mirror of the client-side Pixel
+  // 'Schedule' event. Survives ad blockers + iOS opt-outs that drop
+  // window.fbq() calls. Dedup'd against the Pixel via the event_id the
+  // client passes through (falls back to the Calendar eventId when absent).
+  // Fail-silent: never block the booking response on a tracking error.
+  try {
+    const eventId = typeof body.metaEventId === 'string' && body.metaEventId
+      ? body.metaEventId
+      : createdEvent.id
+    const fb = readFbCookies(name => getCookie(event, name))
+    const ipAddress = getRequestIP(event, { xForwardedFor: true })
+    const userAgent = getRequestHeader(event, 'user-agent')
+    const sourceUrl = `${config.siteBaseUrl}/prendre-rendez-vous`
+    const result = await sendMetaCapiEvent({
+      eventName: 'Schedule',
+      eventId,
+      eventSourceUrl: sourceUrl,
+      actionSource: 'website',
+      value: serviceConfig.priceCad,
+      currency: 'CAD',
+      contentName: serviceConfig.name,
+      contentCategory: serviceId,
+      user: {
+        email: client.email,
+        phone: normalizedPhone || client.phone,
+        firstName: client.firstName,
+        lastName: client.lastName,
+        countryCode: 'ca',
+        province: 'QC',
+        externalId: createdEvent.id,
+        ipAddress,
+        userAgent,
+        fbp: fb.fbp,
+        fbc: fb.fbc,
+      },
+    })
+    if (!result.ok) {
+      console.error('[booking/create] Meta CAPI error:', result.error, 'fbtrace:', result.fbtrace_id)
+    }
+  } catch (err) {
+    console.error('[booking/create] Meta CAPI threw:', err)
   }
 
   return {

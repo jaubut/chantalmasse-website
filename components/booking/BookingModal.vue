@@ -149,7 +149,7 @@ interface BookingResult {
 }
 
 const { isOpen, close, preselectedServiceId } = useBooking()
-const { trackBookingStart, trackBookingComplete } = useTracking()
+const { trackBookingStart, trackBookingComplete, newEventId } = useTracking()
 
 const currentStep = ref<Step>('service')
 const transitionName = ref('slide-forward')
@@ -258,6 +258,11 @@ async function onFormSubmit(formData: {
   isSubmitting.value = true
   submitError.value = null
 
+  // Generated once per submission and shared between the server-side Meta
+  // Conversions API call and the client-side Pixel 'Schedule' event so they
+  // dedup against each other in Events Manager.
+  const metaEventId = newEventId()
+
   try {
     const result = await $fetch<{
       success: boolean
@@ -273,6 +278,10 @@ async function onFormSubmit(formData: {
         isoStart: selectedSlot.value.isoStart,
         isoEnd: selectedSlot.value.isoEnd,
         sessionType: formData.sessionType,
+        // Shared between the client Pixel call and the server CAPI call.
+        // Generated here so both sides see the same id even when fbq is
+        // blocked (server still mirrors with the matching event_id).
+        metaEventId: metaEventId,
         client: {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -296,7 +305,7 @@ async function onFormSubmit(formData: {
       eventId: result.eventId,
     }
 
-    trackBookingComplete(selectedService.value.name, selectedService.value.price)
+    trackBookingComplete(selectedService.value.name, selectedService.value.price, metaEventId)
     advance('confirmation')
   } catch (err: any) {
     const msg = err?.data?.message || err?.message || 'Une erreur est survenue. Veuillez réessayer.'

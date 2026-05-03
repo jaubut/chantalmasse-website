@@ -185,7 +185,17 @@ useSeoMeta({
   description: 'Thérapie individuelle à Shefford et en vidéoconférence. Approche centrée sur la personne pour explorer vos patterns, apaiser les blessures et retrouver confiance. 60 min — 105$. Reçus RITMA.',
   ogTitle: 'Thérapie individuelle à Shefford | Chantal Massé',
   ogDescription: 'Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance.',
-  ogImage: '/images/chantal-hero.jpg',
+  // Absolute URL — Facebook + LinkedIn scrapers don't always resolve
+  // relative paths reliably (they break in email previews + staging).
+  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogType: 'website',
+  twitterCard: 'summary_large_image',
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://chantalmasse.com/therapie-individuelle' },
+  ],
 })
 
 const painPoints = [
