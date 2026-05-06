@@ -119,7 +119,12 @@
       <!-- Session type -->
       <div>
         <label class="font-body text-sm font-semibold text-on-surface block mb-3">Type de séance *</label>
-        <div class="flex flex-col sm:flex-row gap-3">
+        <!-- Coaching de couple is in-person only at Shefford. -->
+        <div v-if="isCoupleService" class="bg-surface-container-low border border-outline-variant/30 rounded-xl px-5 py-4">
+          <p class="font-body text-sm text-on-surface">📍 En personne — Shefford</p>
+          <p class="font-body text-xs text-on-surface-variant mt-1">Le coaching de couple se fait uniquement en présentiel.</p>
+        </div>
+        <div v-else class="flex flex-col sm:flex-row gap-3">
           <label
             class="flex-1 flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200"
             :class="form.sessionType === 'in-person' ? 'bg-primary-fixed border-primary' : 'bg-surface-container-low border-outline-variant/30 hover:border-primary/40'"
@@ -250,6 +255,15 @@ const form = reactive<FormData>({
 
 const errors = reactive<Partial<Record<keyof FormData, string>>>({})
 const prefilled = ref(false)
+
+// Coaching de couple is in-person only — lock sessionType when this is the
+// active service so the form can never submit "video" for couple.
+const isCoupleService = computed(() => props.service?.id === 'couple')
+watchEffect(() => {
+  if (isCoupleService.value && form.sessionType !== 'in-person') {
+    form.sessionType = 'in-person'
+  }
+})
 
 onMounted(() => {
   try {

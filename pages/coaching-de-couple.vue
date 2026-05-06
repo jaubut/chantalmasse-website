@@ -5,7 +5,7 @@
     <section class="min-h-[85vh] flex items-center justify-center px-8 lg:px-20 pt-28 pb-16 bg-background">
       <div class="max-w-3xl mx-auto w-full flex flex-col items-center text-center gap-6">
         <span class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2">
-          Coaching de couple — Shefford & vidéoconférence
+          Coaching de couple — Shefford, en présentiel
         </span>
         <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] tracking-tight">
           <span class="italic">Ce n'est pas un manque d'amour</span> qui sépare un couple, mais un manque d'outils.
@@ -30,8 +30,8 @@
             Membre RITMA — reçus d'assurance
           </span>
           <span class="flex items-center gap-1.5">
-            <Icon icon="material-symbols:videocam" class="text-primary" />
-            En personne ou vidéo
+            <Icon icon="material-symbols:location-on" class="text-primary" />
+            En personne, à Shefford
           </span>
         </div>
       </div>
@@ -148,7 +148,7 @@
                 </div>
                 <div class="flex justify-between py-3 border-b border-outline-variant/20">
                   <span class="text-on-surface">Format</span>
-                  <span class="text-on-surface-variant font-light">En personne ou vidéo</span>
+                  <span class="text-on-surface-variant font-light">En personne, à Shefford</span>
                 </div>
                 <div class="flex justify-between py-3">
                   <span class="text-on-surface">Assurance</span>
@@ -175,7 +175,7 @@ const booking = useBooking()
 
 useSeoMeta({
   title: 'Coaching de couple à Shefford | Chantal Massé — Thérapeute',
-  description: 'Coaching de couple à Shefford et en vidéoconférence. Dialogue intentionnel Imago pour transformer les conflits en connexion. 90 min — 160$. Reçus RITMA.',
+  description: 'Coaching de couple à Shefford, en présentiel. Dialogue intentionnel Imago pour transformer les conflits en connexion. 90 min — 160$. Reçus RITMA.',
   ogTitle: 'Coaching de couple à Shefford | Chantal Massé',
   ogDescription: 'Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance.',
   // Absolute URL — Facebook + LinkedIn scrapers don't always resolve

@@ -301,11 +301,11 @@ definePageMeta({
 useSeoMeta({
   title: 'Prendre rendez-vous avec Chantal Massé',
   description:
-    'Réserve ta séance avec Chantal Massé, thérapeute en relation d\'aide à Shefford et en vidéoconférence. Premier rendez-vous sans engagement.',
+    'Réserve ta séance avec Chantal Massé, thérapeute en relation d\'aide à Shefford et en vidéoconférence.',
   robots: 'noindex, nofollow',
   ogTitle: 'Prendre rendez-vous avec Chantal Massé',
   ogDescription:
-    'Réserve ta séance avec Chantal Massé, thérapeute en relation d\'aide à Shefford et en vidéoconférence. Premier rendez-vous sans engagement.',
+    'Réserve ta séance avec Chantal Massé, thérapeute en relation d\'aide à Shefford et en vidéoconférence.',
   ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
@@ -332,7 +332,7 @@ const selectedService = ref<BookingServiceId>('individual')
 const STEPS = [
   {
     title: 'Choisis ton service et une heure',
-    body: 'Thérapie individuelle (60 min) ou coaching de couple (90 min), en présentiel ou en vidéoconférence. Disponibilités en temps réel, connectées à mon agenda.',
+    body: 'Thérapie individuelle (60 min) en présentiel ou vidéoconférence. Coaching de couple (90 min) en présentiel. Disponibilités en temps réel, connectées à mon agenda.',
   },
   {
     title: 'Remplis un court formulaire',
