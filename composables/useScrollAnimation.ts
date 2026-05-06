@@ -1,5 +1,14 @@
-export function useScrollAnimation() {
+export function useScrollAnimation(): void {
   onMounted(() => {
+    const elements = document.querySelectorAll('[data-animate]')
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (prefersReducedMotion) {
+      elements.forEach((el) => el.classList.add('visible'))
+      return
+    }
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -11,7 +20,6 @@ export function useScrollAnimation() {
       { threshold: 0.1 }
     )
 
-    const elements = document.querySelectorAll('[data-animate]')
     elements.forEach((el) => observer.observe(el))
 
     onUnmounted(() => observer.disconnect())

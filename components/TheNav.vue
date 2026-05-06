@@ -8,7 +8,7 @@
   >
     <div class="max-w-screen-xl mx-auto px-8 py-4 flex items-center justify-between">
       <!-- Logo -->
-      <NuxtLink to="/" :class="['font-headline italic text-2xl transition-colors duration-500', isJourney ? 'text-white' : 'text-primary']">
+      <NuxtLink to="/" :class="['font-headline italic text-2xl transition-colors duration-500 inline-flex items-center min-h-[44px] -mx-2 px-2 -my-2 py-2', isJourney ? 'text-white' : 'text-primary']">
         Chantal Massé
       </NuxtLink>
 
@@ -20,19 +20,23 @@
 
       <!-- Socials + CTA -->
       <div v-if="!minimalNav" class="hidden md:flex items-center gap-3">
-        <a href="https://www.facebook.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Facebook" :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
-          <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+        <a href="https://www.facebook.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Facebook" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+          <span :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
+            <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+          </span>
         </a>
-        <a href="https://www.instagram.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Instagram" :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
-          <Icon icon="mdi:instagram" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+        <a href="https://www.instagram.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Instagram" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+          <span :class="['flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-300', socialClass]" :style="socialBgStyle">
+            <Icon icon="mdi:instagram" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+          </span>
         </a>
-        <button :class="ctaClass" class="ml-2 px-8 py-3 rounded-xl font-semibold transition-all duration-500" @click="contact.open()">
+        <button :class="ctaClass" class="ml-2 px-8 py-3 rounded-xl font-semibold transition-all duration-500 min-h-[44px]" @click="contact.open()">
           Me contacter
         </button>
       </div>
 
       <!-- Hamburger -->
-      <button v-if="!minimalNav" class="md:hidden p-2" @click="menuOpen = !menuOpen" aria-label="Menu">
+      <button v-if="!minimalNav" class="md:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] -mr-2" @click="menuOpen = !menuOpen" aria-label="Menu">
         <Icon :icon="menuOpen ? 'material-symbols:close' : 'material-symbols:menu'" class="text-2xl transition-colors duration-500" :class="isJourney ? 'text-white' : 'text-primary'" />
       </button>
     </div>
@@ -41,13 +45,17 @@
     <div v-if="menuOpen && !minimalNav" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
       <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</a>
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
-      <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500" @click="contact.open(); menuOpen = false">Me contacter</button>
+      <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500 min-h-[44px]" @click="contact.open(); menuOpen = false">Me contacter</button>
       <div class="flex items-center gap-3">
-        <a href="https://www.facebook.com/chantalmassetherapeutecoach" target="_blank" rel="noopener" aria-label="Facebook" class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
-          <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+        <a href="https://www.facebook.com/chantalmassetherapeutecoach" target="_blank" rel="noopener" aria-label="Facebook" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+          <span class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
+            <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+          </span>
         </a>
-        <a href="https://www.instagram.com/chantalmasse_therapeute" target="_blank" rel="noopener" aria-label="Instagram" class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
-          <Icon icon="mdi:instagram" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+        <a href="https://www.instagram.com/chantalmasse_therapeute" target="_blank" rel="noopener" aria-label="Instagram" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+          <span class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
+            <Icon icon="mdi:instagram" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
+          </span>
         </a>
       </div>
     </div>
