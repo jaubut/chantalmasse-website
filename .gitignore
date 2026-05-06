@@ -28,3 +28,6 @@ logs
 
 # TestSprite MCP scratch
 testsprite_tests/
+
+# Bun is the source of truth — npm lockfile is dead weight
+package-lock.json
