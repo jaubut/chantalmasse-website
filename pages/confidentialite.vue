@@ -47,6 +47,7 @@ useSeoMeta({
   ogDescription: 'Politique de confidentialité du site de Chantal Massé, thérapeute.',
   ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
   ogType: 'website',
+  twitterCard: 'summary_large_image',
 })
 
 useHead({

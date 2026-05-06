@@ -25,3 +25,6 @@ logs
 !.env.example
 .vercel
 .secrets/
+
+# TestSprite MCP scratch
+testsprite_tests/

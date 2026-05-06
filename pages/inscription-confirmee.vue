@@ -25,6 +25,7 @@ useSeoMeta({
   ogDescription: 'Merci pour votre inscription à l\'infolettre de Chantal Massé.',
   ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
   ogType: 'website',
+  twitterCard: 'summary_large_image',
   robots: 'noindex',
 })
 
