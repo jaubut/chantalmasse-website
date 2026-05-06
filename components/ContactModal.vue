@@ -41,6 +41,7 @@
                 v-model="form.name"
                 type="text"
                 required
+                maxlength="120"
                 class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
                 placeholder="Ton nom"
               />
@@ -53,6 +54,7 @@
                 v-model="form.contact"
                 type="text"
                 required
+                maxlength="160"
                 class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
                 placeholder="courriel@exemple.com ou 450-555-1234"
               />
@@ -65,6 +67,7 @@
                 v-model="form.message"
                 required
                 rows="4"
+                maxlength="4000"
                 class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-none"
                 placeholder="Comment puis-je t'aider?"
               />
@@ -124,9 +127,10 @@ async function handleSubmit() {
     await $fetch('/api/contact', {
       method: 'POST',
       body: {
-        name: form.name,
-        contact: form.contact,
-        message: form.message,
+        name: form.name.trim(),
+        contact: form.contact.trim(),
+        message: form.message.trim(),
+        website: form.website,
       },
     })
     sent.value = true

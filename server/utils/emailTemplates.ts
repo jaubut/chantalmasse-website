@@ -1,3 +1,5 @@
+import { escapeAttribute, escapeHtml, stripHeaderValue } from './input'
+
 export function clientConfirmationEmail(params: {
   firstName: string
   service: string
@@ -8,6 +10,12 @@ export function clientConfirmationEmail(params: {
   cancelToken: string
 }): { subject: string; html: string } {
   const subject = 'Confirmation — Votre séance avec Chantal Massé'
+  const firstName = escapeHtml(params.firstName)
+  const service = escapeHtml(params.service)
+  const date = escapeHtml(params.date)
+  const time = escapeHtml(params.time)
+  const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
+  const cancelToken = encodeURIComponent(params.cancelToken)
 
   const locationLine =
     params.sessionType === 'video'
@@ -18,7 +26,7 @@ export function clientConfirmationEmail(params: {
     params.sessionType === 'video' && params.meetLink
       ? `
       <div style="text-align:center; margin: 32px 0;">
-        <a href="${params.meetLink}" style="
+        <a href="${meetLink}" style="
           display:inline-block;
           background:#173028;
           color:#ffffff;
@@ -53,7 +61,7 @@ export function clientConfirmationEmail(params: {
           <td style="padding:48px 40px 24px;text-align:center;">
             <div style="font-size:64px;color:#3D9970;">✓</div>
             <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">Votre séance est confirmée!</h1>
-            <p style="color:#424845;margin:0;">Bonjour ${params.firstName}, nous avons bien enregistré votre rendez-vous.</p>
+            <p style="color:#424845;margin:0;">Bonjour ${firstName}, nous avons bien enregistré votre rendez-vous.</p>
           </td>
         </tr>
 
@@ -62,13 +70,13 @@ export function clientConfirmationEmail(params: {
           <td style="padding:0 40px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📋 Service :</strong> ${params.service}
+                <strong style="color:#173028;">📋 Service :</strong> ${service}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📅 Date :</strong> ${params.date}
+                <strong style="color:#173028;">📅 Date :</strong> ${date}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">🕐 Heure :</strong> ${params.time}
+                <strong style="color:#173028;">🕐 Heure :</strong> ${time}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
                 <strong style="color:#173028;">📍 Format :</strong> ${locationLine}
@@ -93,7 +101,7 @@ export function clientConfirmationEmail(params: {
           <td style="padding:0 40px 40px;text-align:center;">
             <p style="font-size:13px;color:#727975;">
               Besoin d'annuler?
-              <a href="https://chantalmasse.com/annuler?token=${params.cancelToken}" style="color:#173028;">Cliquez ici</a>
+              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Cliquez ici</a>
             </p>
           </td>
         </tr>
@@ -124,6 +132,10 @@ export function clientCancellationEmail(params: {
   time: string
 }): { subject: string; html: string } {
   const subject = 'Annulation confirmée — Séance avec Chantal Massé'
+  const firstName = escapeHtml(params.firstName)
+  const service = escapeHtml(params.service)
+  const date = escapeHtml(params.date)
+  const time = escapeHtml(params.time)
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -142,7 +154,7 @@ export function clientCancellationEmail(params: {
 
         <tr>
           <td style="padding:48px 40px 24px;text-align:center;">
-            <h1 style="font-size:26px;color:#173028;margin:0 0 12px;font-style:italic;">Rendez-vous annulé, ${params.firstName}.</h1>
+            <h1 style="font-size:26px;color:#173028;margin:0 0 12px;font-style:italic;">Rendez-vous annulé, ${firstName}.</h1>
             <p style="color:#424845;margin:0;">La séance suivante a été retirée du calendrier. Aucune action supplémentaire de votre part.</p>
           </td>
         </tr>
@@ -151,13 +163,13 @@ export function clientCancellationEmail(params: {
           <td style="padding:0 40px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Service :</strong> ${params.service}
+                <strong style="color:#173028;">Service :</strong> ${service}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Date :</strong> ${params.date}
+                <strong style="color:#173028;">Date :</strong> ${date}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Heure :</strong> ${params.time}
+                <strong style="color:#173028;">Heure :</strong> ${time}
               </td></tr>
             </table>
           </td>
@@ -196,7 +208,14 @@ export function therapistCancellationEmail(params: {
   date: string
   time: string
 }): { subject: string; html: string } {
-  const subject = `Annulation — ${params.clientName} · ${params.date}`
+  const subject = stripHeaderValue(`Annulation — ${params.clientName} · ${params.date}`, 160)
+  const clientName = escapeHtml(params.clientName)
+  const clientEmail = escapeHtml(params.clientEmail)
+  const clientEmailAttr = escapeAttribute(params.clientEmail)
+  const clientPhone = params.clientPhone ? escapeHtml(params.clientPhone) : ''
+  const service = escapeHtml(params.service)
+  const date = escapeHtml(params.date)
+  const time = escapeHtml(params.time)
 
   const html = `<!DOCTYPE html>
 <html lang="fr">
@@ -210,13 +229,13 @@ export function therapistCancellationEmail(params: {
     </tr>
     <tr>
       <td style="padding:24px 32px;">
-        <p style="margin:0 0 16px;font-size:15px;color:#1d1b19;"><strong>${params.clientName}</strong> vient d'annuler sa séance.</p>
+        <p style="margin:0 0 16px;font-size:15px;color:#1d1b19;"><strong>${clientName}</strong> vient d'annuler sa séance.</p>
         <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:8px;padding:16px;">
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Service :</strong> ${params.service}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Date :</strong> ${params.date}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Heure :</strong> ${params.time}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Courriel :</strong> <a href="mailto:${params.clientEmail}" style="color:#173028;">${params.clientEmail}</a></td></tr>
-          ${params.clientPhone ? `<tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Téléphone :</strong> ${params.clientPhone}</td></tr>` : ''}
+          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Service :</strong> ${service}</td></tr>
+          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Date :</strong> ${date}</td></tr>
+          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Heure :</strong> ${time}</td></tr>
+          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Courriel :</strong> <a href="mailto:${clientEmailAttr}" style="color:#173028;">${clientEmail}</a></td></tr>
+          ${clientPhone ? `<tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Téléphone :</strong> ${clientPhone}</td></tr>` : ''}
         </table>
         <p style="margin:16px 0 0;font-size:13px;color:#727975;">L'événement a été retiré de ton Google Calendar.</p>
       </td>
@@ -238,6 +257,12 @@ export function clientReminderEmail(params: {
   cancelToken: string
 }): { subject: string; html: string } {
   const subject = 'Rappel — Votre séance avec Chantal demain'
+  const firstName = escapeHtml(params.firstName)
+  const service = escapeHtml(params.service)
+  const date = escapeHtml(params.date)
+  const time = escapeHtml(params.time)
+  const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
+  const cancelToken = encodeURIComponent(params.cancelToken)
 
   const locationLine =
     params.sessionType === 'video'
@@ -248,7 +273,7 @@ export function clientReminderEmail(params: {
     params.sessionType === 'video' && params.meetLink
       ? `
       <div style="text-align:center; margin: 32px 0;">
-        <a href="${params.meetLink}" style="
+        <a href="${meetLink}" style="
           display:inline-block;
           background:#173028;
           color:#ffffff;
@@ -282,7 +307,7 @@ export function clientReminderEmail(params: {
         <tr>
           <td style="padding:48px 40px 24px;text-align:center;">
             <div style="font-size:48px;">⏰</div>
-            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">On se voit demain, ${params.firstName}.</h1>
+            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">On se voit demain, ${firstName}.</h1>
             <p style="color:#424845;margin:0;">Un petit rappel pour votre séance.</p>
           </td>
         </tr>
@@ -292,13 +317,13 @@ export function clientReminderEmail(params: {
           <td style="padding:0 40px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📋 Service :</strong> ${params.service}
+                <strong style="color:#173028;">📋 Service :</strong> ${service}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📅 Date :</strong> ${params.date}
+                <strong style="color:#173028;">📅 Date :</strong> ${date}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">🕐 Heure :</strong> ${params.time}
+                <strong style="color:#173028;">🕐 Heure :</strong> ${time}
               </td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
                 <strong style="color:#173028;">📍 Format :</strong> ${locationLine}
@@ -314,7 +339,7 @@ export function clientReminderEmail(params: {
           <td style="padding:0 40px 40px;text-align:center;">
             <p style="font-size:13px;color:#727975;">
               Un empêchement?
-              <a href="https://chantalmasse.com/annuler?token=${params.cancelToken}" style="color:#173028;">Annuler ou reporter</a>
+              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annuler ou reporter</a>
             </p>
           </td>
         </tr>
@@ -350,7 +375,16 @@ export function therapistNotificationEmail(params: {
   meetLink?: string
   eventId?: string
 }): { subject: string; html: string } {
-  const subject = `🗓 Nouvelle réservation — ${params.clientName}`
+  const subject = stripHeaderValue(`🗓 Nouvelle réservation — ${params.clientName}`, 160)
+  const clientName = escapeHtml(params.clientName)
+  const clientEmail = escapeHtml(params.clientEmail)
+  const clientEmailAttr = escapeAttribute(params.clientEmail)
+  const clientPhone = params.clientPhone ? escapeHtml(params.clientPhone) : ''
+  const service = escapeHtml(params.service)
+  const date = escapeHtml(params.date)
+  const time = escapeHtml(params.time)
+  const message = params.message ? escapeHtml(params.message).replace(/\n/g, '<br>') : ''
+  const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
 
   const sessionLabel =
     params.sessionType === 'video'
@@ -359,15 +393,15 @@ export function therapistNotificationEmail(params: {
 
   const meetRow =
     params.sessionType === 'video' && params.meetLink
-      ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🔗 Lien Meet :</strong> <a href="${params.meetLink}" style="color:#173028;">${params.meetLink}</a></td></tr>`
+      ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🔗 Lien Meet :</strong> <a href="${meetLink}" style="color:#173028;">${meetLink}</a></td></tr>`
       : ''
 
   const messageRow = params.message
-    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">💬 Message :</strong> ${params.message}</td></tr>`
+    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">💬 Message :</strong> ${message}</td></tr>`
     : ''
 
   const phoneRow = params.clientPhone
-    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📞 Téléphone :</strong> ${params.clientPhone}</td></tr>`
+    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📞 Téléphone :</strong> ${clientPhone}</td></tr>`
     : ''
 
   const html = `<!DOCTYPE html>
@@ -387,12 +421,12 @@ export function therapistNotificationEmail(params: {
         <tr>
           <td style="padding:32px 40px;">
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">👤 Client :</strong> ${params.clientName}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">✉️ Courriel :</strong> <a href="mailto:${params.clientEmail}" style="color:#173028;">${params.clientEmail}</a></td></tr>
+              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">👤 Client :</strong> ${clientName}</td></tr>
+              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">✉️ Courriel :</strong> <a href="mailto:${clientEmailAttr}" style="color:#173028;">${clientEmail}</a></td></tr>
               ${phoneRow}
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📋 Service :</strong> ${params.service}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📅 Date :</strong> ${params.date}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🕐 Heure :</strong> ${params.time}</td></tr>
+              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📋 Service :</strong> ${service}</td></tr>
+              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📅 Date :</strong> ${date}</td></tr>
+              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🕐 Heure :</strong> ${time}</td></tr>
               <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📍 Format :</strong> ${sessionLabel}</td></tr>
               ${meetRow}
               ${messageRow}

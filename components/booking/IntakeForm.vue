@@ -45,6 +45,7 @@
             type="text"
             required
             autocomplete="given-name"
+            maxlength="80"
             placeholder="Marie"
             class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             :class="errors.firstName ? 'border-red-400 ring-1 ring-red-400' : ''"
@@ -58,6 +59,7 @@
             type="text"
             required
             autocomplete="family-name"
+            maxlength="80"
             placeholder="Tremblay"
             class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
             :class="errors.lastName ? 'border-red-400 ring-1 ring-red-400' : ''"
@@ -74,6 +76,7 @@
           type="email"
           required
           autocomplete="email"
+          maxlength="254"
           placeholder="marie@exemple.com"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
           :class="errors.email ? 'border-red-400 ring-1 ring-red-400' : ''"
@@ -91,6 +94,7 @@
           v-model="form.phone"
           type="tel"
           autocomplete="tel"
+          maxlength="32"
           placeholder="450 123-4567"
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
           :class="errors.phone ? 'border-red-400 ring-1 ring-red-400' : ''"
@@ -129,7 +133,6 @@
             <span class="font-body text-sm text-on-surface">📍 En personne (Shefford)</span>
           </label>
           <label
-            v-if="service.id === 'individual'"
             class="flex-1 flex items-center gap-3 p-4 rounded-xl border cursor-pointer transition-all duration-200"
             :class="form.sessionType === 'video' ? 'bg-primary-fixed border-primary' : 'bg-surface-container-low border-outline-variant/30 hover:border-primary/40'"
           >
@@ -154,6 +157,7 @@
         <textarea
           v-model="form.message"
           rows="3"
+          maxlength="1200"
           placeholder="Ce que vous souhaitez aborder..."
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200 resize-none"
         />
@@ -171,7 +175,7 @@
         </div>
         <span class="font-body text-sm text-on-surface-variant leading-relaxed">
           J'accepte la
-          <a href="#" class="text-primary underline hover:opacity-70 transition-opacity">politique de confidentialité</a>
+          <NuxtLink to="/confidentialite" class="text-primary underline hover:opacity-70 transition-opacity">politique de confidentialité</NuxtLink>
           *
         </span>
       </label>
@@ -202,7 +206,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { BookingService } from './ServiceSelector.vue'
@@ -268,12 +272,6 @@ function clearSaved() {
   form.phone = ''
   prefilled.value = false
 }
-
-watch(() => props.service.id, (id) => {
-  if (id !== 'individual' && form.sessionType === 'video') {
-    form.sessionType = 'in-person'
-  }
-})
 
 const formattedDate = computed(() =>
   format(props.date, "d MMMM yyyy", { locale: fr }),

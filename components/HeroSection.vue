@@ -127,6 +127,7 @@ const labels = ['Thérapeute en relations d\'aide', 'Coach de couple']
 const activeLabel = ref(0)
 const ghostEls = ref<HTMLElement[]>([])
 const containerWidth = ref<number | null>(null)
+let labelTimer: ReturnType<typeof setInterval> | null = null
 
 function updateWidth() {
   const el = ghostEls.value[activeLabel.value]
@@ -135,9 +136,13 @@ function updateWidth() {
 
 onMounted(() => {
   updateWidth()
-  setInterval(() => {
+  labelTimer = setInterval(() => {
     activeLabel.value = (activeLabel.value + 1) % labels.length
     updateWidth()
   }, 3000)
+})
+
+onBeforeUnmount(() => {
+  if (labelTimer) clearInterval(labelTimer)
 })
 </script>

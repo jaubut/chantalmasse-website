@@ -394,6 +394,216 @@ async function wastedKeywords(): Promise<void> {
   }
 }
 
+// ── Daily impressions trend ────────────────────────────────────────────────
+// Surfaces "impressions fell off a cliff on date X" — usually a landing-page
+// issue (404), policy disapproval, or budget/bid change.
+async function impressionsTrend(): Promise<void> {
+  const rows = await customer.query(`
+    SELECT
+      segments.date,
+      metrics.impressions,
+      metrics.clicks,
+      metrics.cost_micros
+    FROM customer
+    WHERE segments.date BETWEEN '${start}' AND '${end}'
+    ORDER BY segments.date ASC
+  `)
+
+  printSection("DAILY TREND — impressions + clicks")
+  if (rows.length === 0) {
+    console.log("  No daily data.")
+    return
+  }
+
+  // ASCII-bar chart normalized to max impressions
+  const maxImpr = rows.reduce((m, r) => Math.max(m, Number(r.metrics?.impressions ?? 0)), 1)
+  const barWidth = 30
+
+  console.log(`  ${"Date".padEnd(12)} ${"Impr".padStart(6)} ${"Clicks".padStart(7)} ${"Spend".padStart(8)} Trend`)
+  console.log(`  ${"-".repeat(80)}`)
+
+  let prevImpr = -1
+  for (const r of rows) {
+    const date = r.segments?.date ?? ""
+    const impr = Number(r.metrics?.impressions ?? 0)
+    const clicks = Number(r.metrics?.clicks ?? 0)
+    const cost = Number(r.metrics?.cost_micros ?? 0) / 1_000_000
+    const barLen = Math.round((impr / maxImpr) * barWidth)
+    const bar = "█".repeat(barLen) + "·".repeat(barWidth - barLen)
+    // Dropoff marker: current day is <30% of the previous non-zero day
+    const drop = prevImpr > 0 && impr > 0 && impr / prevImpr < 0.3 ? " ⚠ dropoff" : ""
+    console.log(
+      `  ${date.padEnd(12)} ${fmt.format(impr).padStart(6)} ${fmt.format(clicks).padStart(7)}` +
+      ` $${cost.toFixed(2).padStart(7)} ${bar}${drop}`
+    )
+    if (impr > 0) prevImpr = impr
+  }
+
+  // Summary: avg of first third vs last third
+  const n = rows.length
+  const third = Math.floor(n / 3)
+  const firstThird = rows.slice(0, third)
+  const lastThird = rows.slice(n - third)
+  const avgFirst = firstThird.reduce((s, r) => s + Number(r.metrics?.impressions ?? 0), 0) / Math.max(1, firstThird.length)
+  const avgLast = lastThird.reduce((s, r) => s + Number(r.metrics?.impressions ?? 0), 0) / Math.max(1, lastThird.length)
+  const pctChange = avgFirst > 0 ? ((avgLast - avgFirst) / avgFirst) * 100 : 0
+  console.log(
+    `\n  First ${third}d avg: ${avgFirst.toFixed(0)} impr/day` +
+    ` · Last ${third}d avg: ${avgLast.toFixed(0)} impr/day` +
+    ` · Δ ${pctChange >= 0 ? "+" : ""}${pctChange.toFixed(0)}%`
+  )
+}
+
+// ── Final URLs — pull from ads + curl each to check status ────────────────
+// The #1 reason impressions drop after a site migration: Google sees 404s
+// on the landing pages and throttles delivery (plus quality score tanks).
+async function finalUrlsCheck(): Promise<void> {
+  // Get all final URLs from enabled ads in enabled ad groups in enabled campaigns
+  const rows = await customer.query(`
+    SELECT
+      campaign.name,
+      ad_group.name,
+      ad_group_ad.ad.final_urls,
+      ad_group_ad.ad.final_mobile_urls,
+      ad_group_ad.status,
+      ad_group.status,
+      campaign.status
+    FROM ad_group_ad
+    WHERE ad_group_ad.status = 'ENABLED'
+      AND ad_group.status = 'ENABLED'
+      AND campaign.status = 'ENABLED'
+  `)
+
+  // Dedupe URLs across ads, keep the campaign/ad_group they live in for the report
+  const urlMap = new Map<string, { campaign: string; adGroup: string }[]>()
+  for (const r of rows) {
+    const campaign = r.campaign?.name ?? ""
+    const adGroup = r.ad_group?.name ?? ""
+    const urls = [
+      ...(r.ad_group_ad?.ad?.final_urls ?? []),
+      ...(r.ad_group_ad?.ad?.final_mobile_urls ?? []),
+    ]
+    for (const url of urls) {
+      if (!url) continue
+      const prev = urlMap.get(url) ?? []
+      if (!prev.some(p => p.campaign === campaign && p.adGroup === adGroup)) {
+        prev.push({ campaign, adGroup })
+      }
+      urlMap.set(url, prev)
+    }
+  }
+
+  // Also get keyword-level final URLs (override ads if set)
+  const kwRows = await customer.query(`
+    SELECT
+      campaign.name,
+      ad_group.name,
+      ad_group_criterion.keyword.text,
+      ad_group_criterion.final_urls
+    FROM keyword_view
+    WHERE ad_group_criterion.status = 'ENABLED'
+      AND ad_group.status = 'ENABLED'
+      AND campaign.status = 'ENABLED'
+      AND ad_group_criterion.final_urls != ''
+  `).catch(() => [] as unknown[])  // optional — some accounts don't have keyword-level URLs
+
+  for (const r of kwRows as Array<{
+    campaign?: { name?: string }
+    ad_group?: { name?: string }
+    ad_group_criterion?: { final_urls?: string[]; keyword?: { text?: string } }
+  }>) {
+    const urls = r.ad_group_criterion?.final_urls ?? []
+    for (const url of urls) {
+      if (!url) continue
+      const prev = urlMap.get(url) ?? []
+      const campaign = r.campaign?.name ?? ""
+      const adGroup = r.ad_group?.name ?? ""
+      if (!prev.some(p => p.campaign === campaign && p.adGroup === adGroup)) {
+        prev.push({ campaign, adGroup })
+      }
+      urlMap.set(url, prev)
+    }
+  }
+
+  printSection("FINAL URLs — live HTTP status check")
+  if (urlMap.size === 0) {
+    console.log("  No enabled final URLs found.")
+    return
+  }
+
+  console.log(`  Checking ${urlMap.size} unique URLs...\n`)
+
+  const results: Array<{ url: string; status: number | string; locations: string[]; redirect?: string }> = []
+  for (const [url, locations] of urlMap) {
+    try {
+      const res = await fetch(url, {
+        method: "HEAD",
+        redirect: "manual",
+        signal: AbortSignal.timeout(10_000),
+        headers: { "User-Agent": "Mozilla/5.0 (compatible; ChantalAdsAudit/1.0)" },
+      })
+      let status: number | string = res.status
+      let redirect: string | undefined
+      // Follow one redirect to report final destination status
+      if (res.status >= 300 && res.status < 400) {
+        redirect = res.headers.get("location") ?? undefined
+        if (redirect) {
+          const final = await fetch(redirect, {
+            method: "HEAD",
+            redirect: "follow",
+            signal: AbortSignal.timeout(10_000),
+            headers: { "User-Agent": "Mozilla/5.0 (compatible; ChantalAdsAudit/1.0)" },
+          }).catch(() => null)
+          if (final) status = `${res.status}→${final.status}`
+        }
+      }
+      results.push({
+        url,
+        status,
+        locations: locations.map(l => `${l.campaign} / ${l.adGroup}`),
+        redirect,
+      })
+    } catch (err) {
+      results.push({
+        url,
+        status: err instanceof Error ? `ERR: ${err.message.slice(0, 30)}` : "ERR",
+        locations: locations.map(l => `${l.campaign} / ${l.adGroup}`),
+      })
+    }
+  }
+
+  // Sort: errors + 4xx + 5xx first, then OK
+  results.sort((a, b) => {
+    const aBad = typeof a.status === "string" || (typeof a.status === "number" && a.status >= 400)
+    const bBad = typeof b.status === "string" || (typeof b.status === "number" && b.status >= 400)
+    if (aBad && !bBad) return -1
+    if (!aBad && bBad) return 1
+    return 0
+  })
+
+  for (const r of results) {
+    const statusStr = String(r.status)
+    const bad =
+      typeof r.status === "string" ||
+      (typeof r.status === "number" && r.status >= 400)
+    const mark = bad ? "❌" : (typeof r.status === "number" && r.status >= 300 ? "↪ " : "✓ ")
+    console.log(`  ${mark} [${statusStr.padEnd(7)}] ${r.url}`)
+    if (r.redirect) console.log(`        → ${r.redirect}`)
+    for (const loc of r.locations) {
+      console.log(`        in: ${loc}`)
+    }
+  }
+
+  const broken = results.filter(
+    r => typeof r.status === "string" || (typeof r.status === "number" && r.status >= 400),
+  )
+  if (broken.length > 0) {
+    console.log(`\n  ⚠ ${broken.length} broken URL${broken.length > 1 ? "s" : ""}.`)
+    console.log(`  This is almost certainly the cause of any impression drop —`)
+    console.log(`  Google Ads throttles delivery to ads with 404 destinations.`)
+  }
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 
 async function main(): Promise<void> {
@@ -402,6 +612,8 @@ async function main(): Promise<void> {
 
   try {
     await accountSummary()
+    await impressionsTrend()
+    await finalUrlsCheck()
     await campaignBreakdown()
     await deviceBreakdown()
     await geoBreakdown()

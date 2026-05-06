@@ -46,6 +46,9 @@ export default defineNuxtConfig({
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
     siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
+    brevoApiKey: process.env.BREVO_API_KEY,
+    brevoListId: process.env.BREVO_LIST_ID,
+    brevoDoiTemplateId: process.env.BREVO_DOI_TEMPLATE_ID,
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',

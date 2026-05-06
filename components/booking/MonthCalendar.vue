@@ -121,7 +121,10 @@ const emit = defineEmits<{
   select: [date: Date]
 }>()
 
-const PUBLIC_ADVANCE_DAYS = 60
+const runtimeConfig = useRuntimeConfig()
+const publicAdvanceDays = computed(() =>
+  parseInt(runtimeConfig.public.bookingAdvanceDays as string, 10) || 60,
+)
 
 const today = new Date()
 const currentViewMonth = ref(new Date(today.getFullYear(), today.getMonth(), 1))
@@ -140,11 +143,11 @@ const isPrevDisabled = computed(() => {
 })
 
 const isNextDisabled = computed(() => {
-  const maxMonth = new Date(today.getFullYear(), today.getMonth() + Math.ceil(PUBLIC_ADVANCE_DAYS / 28), 1)
+  const maxMonth = new Date(today.getFullYear(), today.getMonth() + Math.ceil(publicAdvanceDays.value / 28), 1)
   return !isBefore(currentViewMonth.value, maxMonth)
 })
 
-const maxDate = computed(() => addDays(today, PUBLIC_ADVANCE_DAYS))
+const maxDate = computed(() => addDays(today, publicAdvanceDays.value))
 
 const availableDatesThisMonth = computed<string[]>(() => {
   const key = cacheKey(currentViewMonth.value)

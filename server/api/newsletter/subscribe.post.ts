@@ -1,21 +1,32 @@
 import { BrevoClient } from '@getbrevo/brevo'
+import { cleanText, isEmail } from '~/server/utils/input'
 
 export default defineEventHandler(async (event) => {
-  const { email, phone } = await readBody(event)
+  const config = useRuntimeConfig()
+  const { email: rawEmail, phone: rawPhone } = await readBody(event)
+  const email = cleanText(rawEmail, 254).toLowerCase()
+  const phone = cleanText(rawPhone, 32)
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  if (!email || !isEmail(email)) {
     throw createError({ statusCode: 400, statusMessage: 'Adresse courriel invalide.' })
   }
 
-  const client = new BrevoClient({
-    apiKey: process.env.BREVO_API_KEY!,
-  })
+  const listId = Number(config.brevoListId)
+  const templateId = Number(config.brevoDoiTemplateId)
+  if (!config.brevoApiKey || !Number.isInteger(listId) || !Number.isInteger(templateId)) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'L’inscription à l’infolettre est temporairement indisponible.',
+    })
+  }
+
+  const client = new BrevoClient({ apiKey: config.brevoApiKey as string })
 
   await client.contacts.createDoiContact({
     email,
-    includeListIds: [Number(process.env.BREVO_LIST_ID)],
-    templateId: Number(process.env.BREVO_DOI_TEMPLATE_ID),
-    redirectionUrl: `${process.env.NUXT_PUBLIC_SITE_URL}/inscription-confirmee`,
+    includeListIds: [listId],
+    templateId,
+    redirectionUrl: `${config.siteBaseUrl}/inscription-confirmee`,
     ...(phone ? { attributes: { SMS: phone } } : {}),
   })
 

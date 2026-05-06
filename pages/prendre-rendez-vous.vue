@@ -227,7 +227,7 @@
               </span>
             </summary>
             <div class="px-5 md:px-6 pb-5 md:pb-6 text-on-surface-variant leading-relaxed">
-              <p v-html="q.answer"></p>
+              <p>{{ q.answer }}</p>
             </div>
           </details>
         </div>
@@ -332,7 +332,7 @@ const selectedService = ref<BookingServiceId>('individual')
 const STEPS = [
   {
     title: 'Choisis ton service et une heure',
-    body: 'Thérapie individuelle (60 min) en présentiel ou en vidéoconférence. Coaching de couple (90 min) en présentiel. Disponibilités en temps réel, connectées à mon agenda.',
+    body: 'Thérapie individuelle (60 min) ou coaching de couple (90 min), en présentiel ou en vidéoconférence. Disponibilités en temps réel, connectées à mon agenda.',
   },
   {
     title: 'Remplis un court formulaire',

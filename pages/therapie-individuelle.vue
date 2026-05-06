@@ -16,7 +16,7 @@
         <div class="flex flex-col sm:flex-row gap-4 mt-2">
           <button
             class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-center hover:bg-primary-container transition-colors"
-            @click="booking.open()"
+            @click="booking.open('individual')"
           >
             Réserver une séance — 105$
           </button>
@@ -129,7 +129,7 @@
               </p>
               <button
                 class="bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl hover:scale-105 transition-transform"
-                @click="booking.open()"
+                @click="booking.open('individual')"
               >
                 Réserver une séance
               </button>

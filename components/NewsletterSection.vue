@@ -10,9 +10,14 @@
         </p>
         <form class="flex flex-col gap-4" @submit.prevent="subscribe">
           <div class="flex flex-col sm:flex-row gap-4">
+            <label for="newsletter-email" class="sr-only">Courriel</label>
             <input
+              id="newsletter-email"
               v-model="email"
               type="email"
+              required
+              autocomplete="email"
+              maxlength="254"
               placeholder="votre@courriel.com"
               :disabled="loading || success"
               class="flex-1 bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50"
@@ -33,14 +38,22 @@
             leave-from-class="opacity-100 translate-y-0"
             leave-to-class="opacity-0 -translate-y-2"
           >
-            <input
+            <div
               v-if="email.length > 0"
-              v-model="phone"
-              type="tel"
-              placeholder="Téléphone (optionnel)"
-              :disabled="loading || success"
-              class="bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50 w-full sm:w-auto sm:self-start"
-            />
+              class="w-full sm:w-auto sm:self-start"
+            >
+              <label for="newsletter-phone" class="sr-only">Téléphone optionnel</label>
+              <input
+                id="newsletter-phone"
+                v-model="phone"
+                type="tel"
+                autocomplete="tel"
+                maxlength="32"
+                placeholder="Téléphone (optionnel)"
+                :disabled="loading || success"
+                class="bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50 w-full"
+              />
+            </div>
           </Transition>
         </form>
         <p v-if="error" class="mt-3 text-sm text-red-400">{{ error }}</p>
@@ -88,7 +101,13 @@ async function subscribe() {
   error.value = ''
   loading.value = true
   try {
-    await $fetch('/api/newsletter/subscribe', { method: 'POST', body: { email: email.value, phone: phone.value || undefined } })
+    await $fetch('/api/newsletter/subscribe', {
+      method: 'POST',
+      body: {
+        email: email.value.trim(),
+        phone: phone.value.trim() || undefined,
+      },
+    })
     success.value = true
     email.value = ''
     phone.value = ''

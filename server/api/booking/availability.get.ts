@@ -1,5 +1,6 @@
 import { getEventsForMonth } from '~/server/utils/googleCalendar'
 import { getAvailableDatesInMonth } from '~/utils/bookingHelpers'
+import { addDays, endOfMonth, isAfter, isBefore, startOfMonth } from 'date-fns'
 
 const SERVICE_DURATIONS: Record<string, number> = {
   individual: 60,
@@ -35,6 +36,21 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const advanceDays = parseInt(config.public.bookingAdvanceDays as string, 10) || 60
   const minNoticeHours = parseInt(config.bookingMinNoticeHours as string, 10) || 24
+  const requestedMonthStart = startOfMonth(new Date(year, monthNum - 1, 1))
+  const currentMonthStart = startOfMonth(new Date())
+  const maxMonthEnd = endOfMonth(addDays(new Date(), advanceDays))
+
+  // Do not let arbitrary month probes fan out to Google Calendar. The UI only
+  // exposes the current booking window, and requests outside that window have
+  // no useful availability to return.
+  if (isBefore(requestedMonthStart, currentMonthStart) || isAfter(requestedMonthStart, maxMonthEnd)) {
+    return {
+      month,
+      service,
+      availableDates: [],
+      slotsByDate: {},
+    }
+  }
 
   let events: Awaited<ReturnType<typeof getEventsForMonth>>
   try {

@@ -1,11 +1,22 @@
+import { cleanMultilineText, cleanText, escapeHtml, isEmail, stripHeaderValue } from '~/server/utils/input'
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const body = await readBody(event)
 
-  const { name, contact, message } = body
+  const name = cleanText(body?.name, 120)
+  const contact = cleanText(body?.contact, 160)
+  const message = cleanMultilineText(body?.message, 4000)
+  const website = cleanText(body?.website, 200)
 
   if (!name || !contact || !message) {
     throw createError({ statusCode: 400, statusMessage: 'Tous les champs sont requis.' })
+  }
+  if (website) {
+    return { ok: true }
+  }
+  if (!config.resendApiKey || !config.emailFrom || !config.emailTo) {
+    throw createError({ statusCode: 503, statusMessage: 'Le formulaire est temporairement indisponible.' })
   }
 
   const html = `
@@ -37,19 +48,11 @@ export default defineEventHandler(async (event) => {
     body: {
       from: config.emailFrom,
       to: config.emailTo,
-      subject: `Nouveau message de ${name}`,
+      subject: stripHeaderValue(`Nouveau message de ${name}`, 160),
       html,
-      reply_to: contact.includes('@') ? contact : undefined,
+      reply_to: isEmail(contact) ? contact : undefined,
     },
   })
 
   return { ok: true }
 })
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-}
