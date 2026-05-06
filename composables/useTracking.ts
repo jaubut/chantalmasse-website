@@ -35,12 +35,19 @@ export function useTracking() {
   // Returns the event_id used for the Pixel 'Schedule' call so the booking
   // POST can pass it to the server for CAPI dedup. Always returns a string,
   // even when fbq isn't loaded — caller still ships it to the server.
+  //
+  // GA4 event is `generate_lead` (not `purchase`) — this is a lead-gen
+  // business, not e-commerce. The active Google Ads conversion action
+  // ("Envoi de formulaire pour prospects", category SUBMIT_LEAD_FORM) is
+  // imported from GA4's `generate_lead` event, so firing `purchase` here
+  // means Smart Bidding gets zero signal even when bookings complete.
   function trackBookingComplete(service: string, value: number, eventId?: string): string {
     const id = eventId ?? newEventId()
-    trackEvent('purchase', {
+    trackEvent('generate_lead', {
       currency: 'CAD',
       value,
-      items: [{ item_name: service }],
+      event_category: 'booking',
+      event_label: service,
     })
     // Meta uses 'Schedule' for appointment bookings. The third arg is the
     // dedup envelope — Pixel sends `event_id` to Meta so it can pair this
