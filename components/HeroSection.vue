@@ -85,7 +85,7 @@
 
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
-            class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-center hover:bg-primary-container transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            class="bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:bg-secondary-container transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             @click="booking.open()"
           >
             Prendre rendez-vous
