@@ -73,7 +73,7 @@
           </ul>
           <div class="flex flex-col gap-3">
             <button
-              class="w-full bg-secondary text-on-secondary py-4 rounded-xl font-semibold hover:bg-secondary-container transition-colors duration-300"
+              class="w-full bg-surface text-primary py-4 rounded-xl font-semibold hover:bg-primary-fixed transition-colors duration-300"
               @click="booking.open('individual')"
             >
               Prendre rendez-vous
@@ -140,7 +140,7 @@
           <!-- Footer -->
           <div class="px-8 pb-8 flex items-center justify-end">
             <button
-              class="bg-secondary text-on-secondary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
               @click="showCoupleModal = false; booking.open('couple')"
             >
               Réserver une séance →
@@ -197,7 +197,7 @@
           <!-- Footer -->
           <div class="px-8 pb-8 flex items-center justify-end">
             <button
-              class="bg-secondary text-on-secondary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              class="bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
               @click="showIndividualModal = false; booking.open('individual')"
             >
               Réserver une séance →
