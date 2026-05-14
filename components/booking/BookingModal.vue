@@ -149,7 +149,7 @@ interface BookingResult {
 }
 
 const { isOpen, close, preselectedServiceId } = useBooking()
-const { trackBookingStart, trackBookingComplete, newEventId } = useTracking()
+const { trackBookingStart, trackBookingComplete, trackBookingModalOpened, newEventId } = useTracking()
 
 const currentStep = ref<Step>('service')
 const transitionName = ref('slide-forward')
@@ -326,6 +326,10 @@ function closeModal() {
 // Reset state when modal opens
 watch(isOpen, (val) => {
   if (val) {
+    // booking_modal_opened fires the moment the modal renders (before any
+    // interaction). trackBookingStart still fires for GA4/Meta funnel
+    // continuity (begin_checkout / InitiateCheckout).
+    trackBookingModalOpened('modal', preselectedServiceId.value)
     trackBookingStart()
     selectedDate.value = null
     selectedSlot.value = null

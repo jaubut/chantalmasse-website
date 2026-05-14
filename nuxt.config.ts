@@ -53,6 +53,8 @@ export default defineNuxtConfig({
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
       bookingAdvanceDays: process.env.BOOKING_ADVANCE_DAYS || '60',
+      posthogKey: process.env.NUXT_PUBLIC_POSTHOG_KEY || '',
+      posthogHost: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
     },
   },
 

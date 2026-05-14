@@ -1,7 +1,21 @@
+import posthog from 'posthog-js'
+
 declare global {
   interface Window {
     gtag?: (...args: unknown[]) => void
     fbq?: (...args: unknown[]) => void
+  }
+}
+
+// Mirror an event into PostHog. Silently no-ops when PostHog isn't loaded
+// (missing key, SSR context, before plugin init). Kept as a thin wrapper so
+// the existing GA4/Meta call sites don't have to know PostHog exists.
+function capturePosthog(eventName: string, props?: Record<string, unknown>): void {
+  if (import.meta.server) return
+  try {
+    posthog.capture(eventName, props)
+  } catch {
+    // posthog not initialized — silent.
   }
 }
 
@@ -30,6 +44,10 @@ export function useTracking() {
     if (window.fbq) {
       window.fbq('track', eventName, params)
     }
+
+    // PostHog — same name + params. PostHog also receives a richer set of
+    // named events directly from the helpers below.
+    capturePosthog(eventName, params)
   }
 
   // Returns the event_id used for the Pixel 'Schedule' call so the booking
@@ -55,6 +73,14 @@ export function useTracking() {
     if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'Schedule', { content_name: service, value, currency: 'CAD' }, { eventID: id })
     }
+    // PostHog — dedicated funnel-friendly event name. trackEvent above also
+    // fires `generate_lead` into PostHog; this gives a cleaner, business-named
+    // event to anchor funnels on.
+    capturePosthog('booking_completed', {
+      service,
+      value,
+      currency: 'CAD',
+    })
     return id
   }
 
@@ -63,6 +89,7 @@ export function useTracking() {
     if (window.fbq) {
       window.fbq('track', 'Contact')
     }
+    capturePosthog('contact_submitted', { source: 'contact_modal' })
   }
 
   function trackBookingStart() {
@@ -70,6 +97,19 @@ export function useTracking() {
     if (window.fbq) {
       window.fbq('track', 'InitiateCheckout')
     }
+    capturePosthog('booking_started', { stage: 'first_interaction' })
+  }
+
+  // Fired when the booking modal first opens (before the user does anything
+  // inside it). Distinct from booking_started, which fires on first form
+  // interaction. Lets us measure "opened but bounced" separately from
+  // "engaged but didn't finish".
+  function trackBookingModalOpened(source: string, serviceId?: string | null) {
+    capturePosthog('booking_modal_opened', {
+      source,
+      service_id: serviceId ?? null,
+      page: typeof window !== 'undefined' ? window.location.pathname : null,
+    })
   }
 
   return {
@@ -77,6 +117,7 @@ export function useTracking() {
     trackBookingComplete,
     trackContactSubmit,
     trackBookingStart,
+    trackBookingModalOpened,
     newEventId,
   }
 }
