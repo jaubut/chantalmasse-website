@@ -5,7 +5,7 @@ date: 2026-05-25
 readTime: 5
 category: individuelle
 excerpt: "Au Québec, trois titres se ressemblent dans le domaine de la santé mentale. Ce qui compte vraiment, c'est ce que la personne en face de toi apporte dans la pièce. Voici ce que j'apporte."
-image: https://www.chantalmasse.com/images/chantal-hero.jpg
+image: https://images.unsplash.com/photo-1761289358623-3fddd0854000?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy
 ---
 
 Il y a une question que je reçois souvent, avant même le premier rendez-vous. Parfois dans un courriel, parfois dans un message hésitant envoyé tard le soir. La question ressemble à quelque chose comme : *est-ce que tu es vraiment qualifiée pour ça ?*
