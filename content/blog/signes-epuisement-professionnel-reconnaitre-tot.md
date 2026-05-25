@@ -5,7 +5,7 @@ date: 2026-05-25
 readTime: 3
 category: anxiete
 excerpt: "Avant l'effondrement, l'épuisement envoie des signaux discrets — sommeil non réparateur, irritabilité, cynisme. Comment les reconnaître à temps."
-image: https://www.chantalmasse.com/images/chantal-hero.jpg
+image: https://images.unsplash.com/photo-1529047033375-f402d3da24ca?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy
 ---
 L'épuisement ne ressemble pas à ce qu'on croit. On l'imagine comme une chute brutale, un moment précis où on s'effondre. Mais dans la pièce, ce n'est presque jamais ça.
 
