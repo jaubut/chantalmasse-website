@@ -41,6 +41,7 @@ export default defineNuxtConfig({
     resendApiKey: process.env.RESEND_API_KEY,
     emailFrom: process.env.EMAIL_FROM,
     emailTo: process.env.EMAIL_TO,
+    chantalMeetLink: process.env.CHANTAL_MEET_LINK,
     bookingMinNoticeHours: process.env.BOOKING_MIN_NOTICE_HOURS || '24',
     twilioAccountSid: process.env.TWILIO_ACCOUNT_SID,
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,

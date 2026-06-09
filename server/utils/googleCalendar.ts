@@ -42,15 +42,19 @@ export async function createBookingEvent(params: {
   clientPhone?: string
   smsConsent?: boolean
   cancelToken: string
+  meetLink?: string
 }) {
   const calendar = getCalendarClient()
   const config = useRuntimeConfig()
 
-  // No `attendees` array: the service account cannot invite attendees
-  // without Google Workspace Domain-Wide Delegation, which Chantal's personal
-  // calendar setup doesn't have — Google rejects the insert with 403
-  // forbiddenForServiceAccounts. The client still gets the Resend confirmation
-  // email (with the Meet link) and the event is visible on Chantal's calendar.
+  // No `attendees` array AND no conferenceData.createRequest: the service
+  // account cannot invite attendees OR create Google Meet conferences without
+  // Google Workspace Domain-Wide Delegation, which Chantal's personal calendar
+  // setup doesn't have — Google rejects the insert with 403
+  // forbiddenForServiceAccounts. For video séances we reuse Chantal's permanent
+  // Meet room (params.meetLink): it's written into the event description and
+  // stamped on extendedProperties.private so the reminder task can resurface it.
+  // The client gets the link in the Resend confirmation email.
   const event: Parameters<typeof calendar.events.insert>[0]['requestBody'] = {
     summary: params.title,
     description: params.description,
@@ -72,23 +76,16 @@ export async function createBookingEvent(params: {
         reminderSent: '0',
         ...(params.clientPhone ? { clientPhone: params.clientPhone } : {}),
         ...(params.smsConsent ? { smsConsent: '1', smsReminderSent: '0' } : {}),
+        ...(params.sessionType === 'video' && params.meetLink
+          ? { meetLink: params.meetLink }
+          : {}),
       },
     },
-  }
-
-  if (params.sessionType === 'video') {
-    ;(event as any).conferenceData = {
-      createRequest: {
-        requestId: crypto.randomUUID(),
-        conferenceSolutionKey: { type: 'hangoutsMeet' },
-      },
-    }
   }
 
   const res = await calendar.events.insert({
     calendarId: config.googleCalendarId as string,
     requestBody: event,
-    conferenceDataVersion: params.sessionType === 'video' ? 1 : 0,
   })
 
   return res.data

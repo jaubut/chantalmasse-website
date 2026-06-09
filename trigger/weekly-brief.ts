@@ -24,6 +24,7 @@ export const weeklyBrief = schedules.task({
   },
   // Give enough time for Apify scraping (up to 45s polling) + Claude + Resend
   maxDuration: 120,
+  machine: 'medium-1x',
   run: async (payload, { ctx }) => {
     logger.info('Starting weekly brief', { scheduledAt: payload.timestamp })
 

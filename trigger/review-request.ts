@@ -335,6 +335,7 @@ export const reviewRequest = schedules.task({
     timezone: 'America/Toronto',
   },
   maxDuration: 120,
+  machine: 'medium-1x',
   run: async (payload) => {
     logger.info('review-request: starting', { scheduledAt: payload.timestamp })
 

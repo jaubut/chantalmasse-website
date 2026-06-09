@@ -118,10 +118,17 @@ export default defineEventHandler(async (event) => {
   const dateFormatted = format(startET, "EEEE d MMMM yyyy", { locale: fr })
   const timeFormatted = `${format(startET, 'HH')}h${format(startET, 'mm')} — ${format(endET, 'HH')}h${format(endET, 'mm')}`
 
+  // Video séances reuse Chantal's permanent Meet room (service accounts on a
+  // personal calendar can't mint per-event Meet links — see googleCalendar.ts).
+  const meetLink = sessionType === 'video'
+    ? ((config.chantalMeetLink as string | undefined) || undefined)
+    : undefined
+
   const title = `Séance — ${clientInfo.firstName} ${clientInfo.lastName}`
   const descriptionParts = [
     `Service: ${serviceConfig.name}`,
     `Format: ${sessionType === 'video' ? 'En visioconférence' : 'En personne — Shefford, QC'}`,
+    meetLink ? `Lien Meet: ${meetLink}` : null,
     clientInfo.phone ? `Téléphone: ${clientInfo.phone}` : null,
     clientInfo.message ? `Message: ${clientInfo.message}` : null,
   ].filter(Boolean)
@@ -143,6 +150,7 @@ export default defineEventHandler(async (event) => {
       clientPhone: normalizedPhone || undefined,
       smsConsent,
       cancelToken,
+      meetLink,
     })
   } catch (err) {
     console.error('[booking/create] Event creation error:', err)
@@ -151,10 +159,6 @@ export default defineEventHandler(async (event) => {
       message: 'Impossible de créer l\'événement. Veuillez réessayer.',
     })
   }
-
-  const meetLink = createdEvent.conferenceData?.entryPoints?.find(
-    (ep: any) => ep.entryPointType === 'video',
-  )?.uri
 
   // Send confirmation email to client
   try {

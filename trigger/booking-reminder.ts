@@ -71,6 +71,7 @@ export const bookingReminder = schedules.task({
     timezone: 'America/Toronto',
   },
   maxDuration: 120,
+  machine: 'medium-1x',
   run: async (_payload, { ctx }) => {
     for (const envVar of [
       'GOOGLE_SERVICE_ACCOUNT_EMAIL',
@@ -142,9 +143,9 @@ export const bookingReminder = schedules.task({
 
       const service = ev.colorId ? SERVICE_NAME_BY_COLOR[ev.colorId] || 'Séance' : 'Séance'
 
-      const meetLink =
-        ev.conferenceData?.entryPoints?.find((ep: any) => ep.entryPointType === 'video')?.uri ||
-        undefined
+      // Video séances reuse Chantal's permanent Meet room, stamped on the event
+      // at booking time (no per-event conferenceData — see googleCalendar.ts).
+      const meetLink = priv.meetLink || undefined
 
       // Email branch — unchanged from the original task.
       if (emailPending) {
