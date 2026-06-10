@@ -5,6 +5,7 @@ import { fr } from 'date-fns/locale'
 import { toZonedTime } from 'date-fns-tz'
 import { clientReminderEmail } from '../server/utils/emailTemplates'
 import { bookingReminderSms, sendSms } from '../server/utils/sms'
+import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
 
 /**
  * Hourly scan for bookings starting in ~24h. Sends two reminder channels
@@ -38,7 +39,7 @@ const SERVICE_NAME_BY_COLOR: Record<string, string> = {
 function getCalendarClient() {
   const auth = new google.auth.JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
-    key: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    key: normalizeGooglePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
     scopes: ['https://www.googleapis.com/auth/calendar'],
   })
   return google.calendar({ version: 'v3', auth })

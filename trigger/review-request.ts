@@ -1,5 +1,6 @@
 import { schedules, logger } from '@trigger.dev/sdk/v3'
 import { google, type calendar_v3 } from 'googleapis'
+import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
 
 /**
  * Post-séance Google Review ask, fired daily at 10:00 ET.
@@ -91,7 +92,7 @@ interface BookingEvent {
 function getCalendarClient(): calendar_v3.Calendar {
   const auth = new google.auth.JWT({
     email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL!,
-    key: (process.env.GOOGLE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
+    key: normalizeGooglePrivateKey(process.env.GOOGLE_PRIVATE_KEY),
     scopes: ['https://www.googleapis.com/auth/calendar'],
   })
   return google.calendar({ version: 'v3', auth })
