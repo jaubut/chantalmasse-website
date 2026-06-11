@@ -72,6 +72,11 @@ onMounted(() => {
 // Hide the sticky bar when the booking modal is open so it doesn't overlap.
 watch(() => booking.isOpen.value, (open) => {
   if (open) visible.value = false
-  else if (!props.revealAfterSelector) visible.value = true
+  else if (!props.revealAfterSelector) {
+    visible.value = true
+  } else {
+    const target = document.querySelector(props.revealAfterSelector)
+    visible.value = !target || target.getBoundingClientRect().bottom < 0
+  }
 })
 </script>
