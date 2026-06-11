@@ -9,10 +9,10 @@
   >
     <div
       v-if="visible"
-      class="md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 bg-surface/90 backdrop-blur-md border-t border-outline-variant/40"
+      class="md:hidden fixed inset-x-0 bottom-0 z-40 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 bg-surface/90 backdrop-blur-md border-t border-outline-variant/40"
     >
       <button
-        class="w-full bg-primary text-on-primary py-4 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
+        class="w-full bg-primary text-on-primary py-4 rounded-xl font-semibold text-base hover:bg-primary-container active:brightness-90 transition-[background-color,filter]"
         @click="handleClick"
       >
         {{ label }}
@@ -71,12 +71,21 @@ onMounted(() => {
 
 // Hide the sticky bar when the booking modal is open so it doesn't overlap.
 watch(() => booking.isOpen.value, (open) => {
-  if (open) visible.value = false
-  else if (!props.revealAfterSelector) {
-    visible.value = true
-  } else {
-    const target = document.querySelector(props.revealAfterSelector)
-    visible.value = !target || target.getBoundingClientRect().bottom < 0
+  if (open) {
+    visible.value = false
+    return
   }
+  if (!props.revealAfterSelector) {
+    visible.value = true
+    return
+  }
+  // Defer the rect read: the modal may have held a focused input, and on iOS
+  // a synchronous measurement here runs against the still-contracted visual
+  // viewport before the keyboard finishes dismissing.
+  const selector = props.revealAfterSelector
+  setTimeout(() => {
+    const target = document.querySelector(selector)
+    visible.value = !target || target.getBoundingClientRect().bottom < 0
+  }, 300)
 })
 </script>
