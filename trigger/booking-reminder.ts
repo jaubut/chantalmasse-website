@@ -14,6 +14,16 @@ import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
  *   2. SMS via Twilio    — only when the booking opted in (smsConsent="1"),
  *                          gated by smsReminderSent="0"
  *
+ * Two booking sources are handled:
+ *   - Form bookings    — client data stamped on extendedProperties.private.
+ *   - Manual bookings  — entered directly in Google Calendar by Chantal, with
+ *                        the client attached as a guest. Email-only (attendees
+ *                        carry no phone/consent); the client address comes from
+ *                        the first non-self/non-organizer attendee, and we only
+ *                        treat colour-2/7 or "thérapie"/"coaching" events as
+ *                        sessions so guests on blocked/personal events are never
+ *                        emailed.
+ *
  * Window: events starting between now+23h and now+25h. The Google Calendar
  * extendedProperty AND-filter can't express "either flag pending", so we pull
  * the whole window once and branch in code.
@@ -113,13 +123,47 @@ export const bookingReminder = schedules.task({
 
     for (const ev of events) {
       const priv = ev.extendedProperties?.private || {}
-      const clientEmail = priv.clientEmail
-      const clientName = priv.clientName || ''
+      const summary = ev.summary || ''
+
+      // Form bookings stamp clientEmail on private props and carry no attendees.
+      // Manual bookings (Chantal enters them in Calendar) attach the client as a
+      // guest instead — the client is the first attendee that isn't her own
+      // self/organizer entry, the service account, or a resource.
+      const isManual = !priv.clientEmail
+      const attendeeEmail = (ev.attendees || []).find(
+        (a) =>
+          !!a.email &&
+          !a.self &&
+          !a.organizer &&
+          !a.resource &&
+          a.email !== process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
+          a.email !== calendarId,
+      )?.email
+
+      const clientEmail = priv.clientEmail || attendeeEmail
       const clientPhone = priv.clientPhone
       const cancelToken = priv.cancelToken || ''
       const sessionType = (priv.sessionType === 'video' ? 'video' : 'in-person') as
         | 'video'
         | 'in-person'
+
+      // Service from the colour the booking flow assigns, falling back to the
+      // "<service>-<name>" summary convention Chantal types for manual events.
+      let service = ev.colorId ? SERVICE_NAME_BY_COLOR[ev.colorId] : undefined
+      if (!service) {
+        if (/coaching de couple/i.test(summary)) service = 'Coaching de Couple'
+        else if (/th[ée]rapie/i.test(summary)) service = 'Thérapie Individuelle'
+        else service = 'Séance'
+      }
+
+      // Name: form bookings store it; for manual events parse the part after the
+      // first dash in "Thérapie ind-Annie-Pier Legault".
+      let clientName = priv.clientName || ''
+      if (!clientName && isManual) {
+        const dash = summary.indexOf('-')
+        if (dash !== -1) clientName = summary.slice(dash + 1).trim()
+      }
+      const firstName = clientName.split(' ')[0] || 'bonjour'
 
       const emailPending = priv.reminderSent !== '1'
       const smsPending = priv.smsConsent === '1' && priv.smsReminderSent !== '1'
@@ -129,20 +173,26 @@ export const bookingReminder = schedules.task({
         continue
       }
 
+      // Don't email guests on blocked/personal manual events ("plage bloquée",
+      // "Pause diné", a personal appointment). Only colour-2/7 or events whose
+      // title reads like a session qualify for an attendee-based reminder.
+      const looksLikeSession =
+        ev.colorId === '2' || ev.colorId === '7' || /th[ée]rapie|coaching/i.test(summary)
+      if (isManual && !looksLikeSession) {
+        continue
+      }
+
       if (!clientEmail || !ev.start?.dateTime || !ev.end?.dateTime || !ev.id) {
         logger.warn('Skipping event with missing fields', { id: ev.id })
         skipped++
         continue
       }
 
-      const firstName = clientName.split(' ')[0] || 'bonjour'
       const startET = toZonedTime(parseISO(ev.start.dateTime), 'America/Toronto')
       const endET = toZonedTime(parseISO(ev.end.dateTime), 'America/Toronto')
       const dateFormatted = format(startET, 'EEEE d MMMM yyyy', { locale: fr })
       const timeFormatted = `${format(startET, 'HH')}h${format(startET, 'mm')} — ${format(endET, 'HH')}h${format(endET, 'mm')}`
       const startTime = `${format(startET, 'HH')}h${format(startET, 'mm')}`
-
-      const service = ev.colorId ? SERVICE_NAME_BY_COLOR[ev.colorId] || 'Séance' : 'Séance'
 
       // Video séances reuse Chantal's permanent Meet room, stamped on the event
       // at booking time (no per-event conferenceData — see googleCalendar.ts).

@@ -287,6 +287,22 @@ export function clientReminderEmail(params: {
       </div>`
       : ''
 
+  // Manual (Calendar-entered) bookings have no cancel token — only render the
+  // self-serve cancel link when a real token exists, otherwise it points at
+  // /annuler?token=undefined.
+  const cancelBlock = params.cancelToken
+    ? `
+        <!-- Cancel link -->
+        <tr>
+          <td style="padding:0 40px 40px;text-align:center;">
+            <p style="font-size:13px;color:#727975;">
+              Un empêchement?
+              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annuler ou reporter</a>
+            </p>
+          </td>
+        </tr>`
+    : ''
+
   const html = `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
@@ -333,16 +349,7 @@ export function clientReminderEmail(params: {
         </tr>
 
         ${meetButton}
-
-        <!-- Cancel link -->
-        <tr>
-          <td style="padding:0 40px 40px;text-align:center;">
-            <p style="font-size:13px;color:#727975;">
-              Un empêchement?
-              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annuler ou reporter</a>
-            </p>
-          </td>
-        </tr>
+        ${cancelBlock}
 
         <!-- Footer -->
         <tr>
