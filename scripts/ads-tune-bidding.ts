@@ -26,9 +26,11 @@ interface Tuning {
   newTargetCpa: number     // CAD
 }
 
+// $250/month total cap, split evenly: $125/mo each ÷ 30.4 = ~$4.11/day each.
+// Google's monthly cap = daily budget × 30.4 (avg days per month).
 const TUNINGS: Tuning[] = [
-  { campaignName: "Thérapie individuelle", newBudgetDaily: 4.40, newTargetCpa: 1.80 },
-  { campaignName: "Thérapie couple",       newBudgetDaily: 8.00, newTargetCpa: 2.50 },
+  { campaignName: "Thérapie individuelle", newBudgetDaily: 4.11, newTargetCpa: 15.00 },
+  { campaignName: "Thérapie couple",       newBudgetDaily: 4.11, newTargetCpa: 12.00 },
 ]
 
 async function main() {
