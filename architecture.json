@@ -1,0 +1,1918 @@
+{
+  "generatedAt": "2026-09-08",
+  "repo": "chantalmasse-website",
+  "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Vercel): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
+  "targets": [
+    {
+      "name": "site",
+      "adapter": "nuxt",
+      "root": ".",
+      "cap": 600,
+      "modules": [
+        {
+          "path": "app.vue",
+          "lines": 19,
+          "kind": "app",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [
+            "onMounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/BookingSection.vue",
+          "lines": 79,
+          "kind": "component",
+          "exports": [
+            "BookingSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/BookingStickyBar.vue",
+          "lines": 92,
+          "kind": "component",
+          "exports": [
+            "BookingStickyBar"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/bookingServices.ts"
+          ],
+          "listeners": [
+            "onMounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/ContactModal.vue",
+          "lines": 179,
+          "kind": "component",
+          "exports": [
+            "ContactModal"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [
+            "/api/contact"
+          ],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/EmotionalJourney.vue",
+          "lines": 110,
+          "kind": "component",
+          "exports": [
+            "EmotionalJourney"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "components/journey/JourneyBentoSection.vue",
+            "components/journey/CursorSoul.vue",
+            "utils/journey-data.ts",
+            "composables/useScrollJourney.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/HeroSection.vue",
+          "lines": 153,
+          "kind": "component",
+          "exports": [
+            "HeroSection"
+          ],
+          "state": [
+            "let labelTimer"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [
+            "onMounted",
+            "onBeforeUnmount"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/MethodsSection.vue",
+          "lines": 129,
+          "kind": "component",
+          "exports": [
+            "MethodsSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/NewsletterSection.vue",
+          "lines": 121,
+          "kind": "component",
+          "exports": [
+            "NewsletterSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [
+            "/api/newsletter/subscribe"
+          ],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/PhilosophySection.vue",
+          "lines": 43,
+          "kind": "component",
+          "exports": [
+            "PhilosophySection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/ServicesSection.vue",
+          "lines": 241,
+          "kind": "component",
+          "exports": [
+            "ServicesSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/TestimonialsSection.vue",
+          "lines": 70,
+          "kind": "component",
+          "exports": [
+            "TestimonialsSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/TheFooter.vue",
+          "lines": 42,
+          "kind": "component",
+          "exports": [
+            "TheFooter"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/TheNav.vue",
+          "lines": 164,
+          "kind": "component",
+          "exports": [
+            "TheNav"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [
+            "onMounted",
+            "onBeforeUnmount"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/BookingModal.vue",
+          "lines": 406,
+          "kind": "component",
+          "exports": [
+            "BookingModal"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [
+            "/api/booking/create"
+          ],
+          "imports": [
+            "composables/useBooking.ts",
+            "components/booking/ServiceSelector.vue",
+            "utils/bookingServices.ts",
+            "utils/bookingHelpers.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/ConfirmationView.vue",
+          "lines": 191,
+          "kind": "component",
+          "exports": [
+            "BookingConfirmationView"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/bookingHelpers.ts",
+            "components/booking/ServiceSelector.vue"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/IntakeForm.vue",
+          "lines": 331,
+          "kind": "component",
+          "exports": [
+            "BookingIntakeForm"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "components/booking/ServiceSelector.vue",
+            "utils/bookingHelpers.ts"
+          ],
+          "listeners": [
+            "onMounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/MonthCalendar.vue",
+          "lines": 259,
+          "kind": "component",
+          "exports": [
+            "BookingMonthCalendar"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [
+            "/api/booking/availability"
+          ],
+          "imports": [
+            "components/booking/ServiceSelector.vue"
+          ],
+          "listeners": [
+            "onMounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/ServiceSelector.vue",
+          "lines": 71,
+          "kind": "component",
+          "exports": [
+            "BookingServiceSelector"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/bookingServices.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/booking/TimeSlotPicker.vue",
+          "lines": 104,
+          "kind": "component",
+          "exports": [
+            "BookingTimeSlotPicker"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "components/booking/ServiceSelector.vue",
+            "utils/bookingHelpers.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/CSSFallbackObject.vue",
+          "lines": 36,
+          "kind": "component",
+          "exports": [
+            "JourneyCSSFallbackObject"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "composables/useScrollJourney.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/CursorSoul.vue",
+          "lines": 89,
+          "kind": "component",
+          "exports": [
+            "JourneyCursorSoul"
+          ],
+          "state": [
+            "let target",
+            "let raf"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [
+            "onMounted",
+            "onUnmounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/GradientBackground.vue",
+          "lines": 13,
+          "kind": "component",
+          "exports": [
+            "JourneyGradientBackground"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/JourneyBentoSection.vue",
+          "lines": 92,
+          "kind": "component",
+          "exports": [
+            "JourneyBentoSection"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/journey-data.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/JourneyCTA.vue",
+          "lines": 26,
+          "kind": "component",
+          "exports": [
+            "JourneyCTA"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/journey-data.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "components/journey/JourneyText.vue",
+          "lines": 54,
+          "kind": "component",
+          "exports": [
+            "JourneyText"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "composables/useScrollJourney.ts",
+            "lib/journey-data.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "composables/useBooking.ts",
+          "lines": 24,
+          "kind": "composable",
+          "exports": [
+            "useBooking"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/bookingServices.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "composables/useContact.ts",
+          "lines": 18,
+          "kind": "composable",
+          "exports": [
+            "useContact"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "composables/useScrollAnimation.ts",
+          "lines": 28,
+          "kind": "composable",
+          "exports": [
+            "useScrollAnimation"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "composables/useScrollJourney.ts",
+          "lines": 137,
+          "kind": "composable",
+          "exports": [
+            "EmotionalState",
+            "useScrollJourney"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "composables/useTracking.ts",
+          "lines": 124,
+          "kind": "composable",
+          "exports": [
+            "useTracking"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "error.vue",
+          "lines": 29,
+          "kind": "lib",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "layouts/admin.vue",
+          "lines": 6,
+          "kind": "layout",
+          "exports": [
+            "layout:admin"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "nuxt.config.ts",
+          "lines": 152,
+          "kind": "config",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/annuler.vue",
+          "lines": 178,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/annuler",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [
+            "/api/booking/cancel-info",
+            "/api/booking/cancel"
+          ],
+          "imports": [],
+          "listeners": [
+            "onMounted"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "pages/blog/[slug].vue",
+          "lines": 233,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/blog/:slug",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [
+            "/api/newsletter/subscribe"
+          ],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/blog/index.vue",
+          "lines": 160,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/blog",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/coaching-de-couple.vue",
+          "lines": 258,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/coaching-de-couple",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/confidentialite.vue",
+          "lines": 59,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/confidentialite",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/index.vue",
+          "lines": 36,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/inscription-confirmee.vue",
+          "lines": 38,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/inscription-confirmee",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/journey.vue",
+          "lines": 26,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/journey",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/mentions-legales.vue",
+          "lines": 53,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/mentions-legales",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "pages/prendre-rendez-vous.vue",
+          "lines": 456,
+          "kind": "page",
+          "exports": [],
+          "state": [
+            "let carouselTimer"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/prendre-rendez-vous",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "utils/bookingServices.ts"
+          ],
+          "listeners": [
+            "onMounted",
+            "onBeforeUnmount"
+          ],
+          "sheets": 0
+        },
+        {
+          "path": "pages/therapie-individuelle.vue",
+          "lines": 265,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/therapie-individuelle",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "plugins/posthog.client.ts",
+          "lines": 54,
+          "kind": "plugin",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-add-sitelinks.ts",
+          "lines": 161,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-audit.ts",
+          "lines": 640,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-cleanup-conversions.ts",
+          "lines": 81,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "KEEP_IDS: Set"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-convert-shared-budget.ts",
+          "lines": 115,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "found: Map",
+            "budgetRns: Set"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-oauth-setup.ts",
+          "lines": 105,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-refresh-individuelle-copy.ts",
+          "lines": 126,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ads-tune-bidding.ts",
+          "lines": 119,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ga4-audit-part2.ts",
+          "lines": 78,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/ga4-audit.ts",
+          "lines": 115,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/investigate-deep-ads.ts",
+          "lines": 274,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "byDayCamp: Map",
+            "byWindowCamp: Map"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/investigate-recent-bookings.ts",
+          "lines": 161,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "MALE_NAMES: Set",
+            "FEMALE_NAMES: Set"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "scripts/investigate-recent-traffic.ts",
+          "lines": 267,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/booking/availability.get.ts",
+          "lines": 86,
+          "kind": "server-api",
+          "exports": [],
+          "state": [
+            "cache: Map"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "GET",
+              "path": "/api/booking/availability",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googleCalendar.ts",
+            "utils/bookingHelpers.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/booking/cancel-info.get.ts",
+          "lines": 56,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "GET",
+              "path": "/api/booking/cancel-info",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googleCalendar.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/booking/cancel.post.ts",
+          "lines": 133,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/booking/cancel",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googleCalendar.ts",
+            "server/utils/emailTemplates.ts",
+            "server/utils/sms.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/booking/create.post.ts",
+          "lines": 296,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/booking/create",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googleCalendar.ts",
+            "server/utils/emailTemplates.ts",
+            "server/utils/sms.ts",
+            "server/utils/metaCapi.ts",
+            "utils/bookingHelpers.ts",
+            "server/utils/input.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/contact.post.ts",
+          "lines": 59,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/contact",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/input.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/img-proxy.get.ts",
+          "lines": 51,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "GET",
+              "path": "/api/img-proxy",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/api/newsletter/subscribe.post.ts",
+          "lines": 35,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/newsletter/subscribe",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/input.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/briefService.ts",
+          "lines": 323,
+          "kind": "server-lib",
+          "exports": [
+            "BriefClientConfig",
+            "scrapeInstagram",
+            "generateBrief",
+            "sendBriefEmail"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "utils/agentPrompt.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/emailTemplates.ts",
+          "lines": 467,
+          "kind": "server-lib",
+          "exports": [
+            "clientConfirmationEmail",
+            "clientCancellationEmail",
+            "therapistCancellationEmail",
+            "clientReminderEmail",
+            "therapistNotificationEmail"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/input.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/googleCalendar.ts",
+          "lines": 179,
+          "kind": "server-lib",
+          "exports": [
+            "getCalendarClient",
+            "getEventsForMonth",
+            "createBookingEvent",
+            "listPendingReminderEvents",
+            "markReminderSent",
+            "findEventByCancelToken",
+            "cancelEventById",
+            "markSmsReminderSent"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/googlePrivateKey.ts",
+          "lines": 21,
+          "kind": "server-lib",
+          "exports": [
+            "normalizeGooglePrivateKey"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/input.ts",
+          "lines": 31,
+          "kind": "server-lib",
+          "exports": [
+            "cleanText",
+            "cleanMultilineText",
+            "isEmail",
+            "escapeHtml",
+            "escapeAttribute",
+            "stripHeaderValue"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/metaCapi.ts",
+          "lines": 178,
+          "kind": "server-lib",
+          "exports": [
+            "MetaCapiUserData",
+            "MetaCapiEvent",
+            "MetaCapiResult",
+            "sendMetaCapiEvent",
+            "readFbCookies"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "server/utils/sms.ts",
+          "lines": 100,
+          "kind": "server-lib",
+          "exports": [
+            "normalizePhone",
+            "SendSmsResult",
+            "sendSms",
+            "bookingConfirmationSms",
+            "bookingReminderSms",
+            "bookingCancellationSms"
+          ],
+          "state": [
+            "let cachedClient"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "trigger/booking-reminder.ts",
+          "lines": 283,
+          "kind": "trigger",
+          "exports": [
+            "bookingReminder"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/emailTemplates.ts",
+            "server/utils/sms.ts",
+            "server/utils/googlePrivateKey.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "trigger/review-request.ts",
+          "lines": 386,
+          "kind": "trigger",
+          "exports": [
+            "reviewRequest"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googlePrivateKey.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "trigger/weekly-brief.ts",
+          "lines": 67,
+          "kind": "trigger",
+          "exports": [
+            "weeklyBrief"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/briefService.ts"
+          ],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "utils/agentPrompt.ts",
+          "lines": 112,
+          "kind": "util",
+          "exports": [
+            "SYSTEM_PROMPT",
+            "buildWeeklyPrompt"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "utils/bookingHelpers.ts",
+          "lines": 276,
+          "kind": "util",
+          "exports": [
+            "BOOKING_TIMEZONE",
+            "WORKING_HOURS",
+            "BUFFER_MINUTES",
+            "SLOT_INTERVAL",
+            "TimeSlot",
+            "CalendarEvent",
+            "generateSlotsForDate",
+            "isSlotAvailable",
+            "getAvailableDatesInMonth",
+            "googleCalendarUrl",
+            "generateICS"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "utils/bookingServices.ts",
+          "lines": 41,
+          "kind": "util",
+          "exports": [
+            "BookingServiceId",
+            "BookingService",
+            "BOOKING_SERVICES",
+            "getBookingService"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "utils/journey-data.ts",
+          "lines": 133,
+          "kind": "util",
+          "exports": [
+            "BentoCard",
+            "JourneySection",
+            "journeyHero",
+            "journeySections",
+            "journeyCTA"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        },
+        {
+          "path": "utils/metaApi.ts",
+          "lines": 180,
+          "kind": "util",
+          "exports": [
+            "MetaPost",
+            "MetaInsights",
+            "detectPillar",
+            "mediaTypeToLabel",
+            "getMockInsights",
+            "getCachedInsights",
+            "setCachedInsights"
+          ],
+          "state": [
+            "let insightsCache"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0
+        }
+      ],
+      "fanIn": {
+        "TheNav": {
+          "module": "components/TheNav.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
+        "TheFooter": {
+          "module": "components/TheFooter.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
+        "BookingStickyBar": {
+          "module": "components/BookingStickyBar.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
+        "BookingModal": {
+          "module": "components/booking/BookingModal.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
+        "ContactModal": {
+          "module": "components/ContactModal.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
+        "useBooking": {
+          "module": "composables/useBooking.ts",
+          "callers": [
+            "components/BookingSection.vue",
+            "components/BookingStickyBar.vue",
+            "components/EmotionalJourney.vue",
+            "components/HeroSection.vue",
+            "components/ServicesSection.vue",
+            "components/booking/BookingModal.vue",
+            "components/journey/JourneyCTA.vue",
+            "pages/blog/[slug].vue",
+            "pages/coaching-de-couple.vue",
+            "pages/prendre-rendez-vous.vue",
+            "pages/therapie-individuelle.vue"
+          ]
+        },
+        "BookingServiceId": {
+          "module": "utils/bookingServices.ts",
+          "callers": [
+            "components/BookingStickyBar.vue",
+            "composables/useBooking.ts",
+            "pages/prendre-rendez-vous.vue"
+          ]
+        },
+        "useContact": {
+          "module": "composables/useContact.ts",
+          "callers": [
+            "components/ContactModal.vue",
+            "components/TheFooter.vue",
+            "components/TheNav.vue",
+            "pages/prendre-rendez-vous.vue"
+          ]
+        },
+        "useTracking": {
+          "module": "composables/useTracking.ts",
+          "callers": [
+            "components/ContactModal.vue",
+            "components/booking/BookingModal.vue",
+            "pages/prendre-rendez-vous.vue",
+            "plugins/posthog.client.ts"
+          ]
+        },
+        "journeyHero": {
+          "module": "utils/journey-data.ts",
+          "callers": [
+            "components/EmotionalJourney.vue"
+          ]
+        },
+        "journeySections": {
+          "module": "utils/journey-data.ts",
+          "callers": [
+            "components/EmotionalJourney.vue"
+          ]
+        },
+        "journeyCTA": {
+          "module": "utils/journey-data.ts",
+          "callers": [
+            "components/EmotionalJourney.vue",
+            "components/journey/JourneyCTA.vue"
+          ]
+        },
+        "useScrollJourney": {
+          "module": "composables/useScrollJourney.ts",
+          "callers": [
+            "components/EmotionalJourney.vue"
+          ]
+        },
+        "EmotionalState": {
+          "module": "composables/useScrollJourney.ts",
+          "callers": [
+            "components/EmotionalJourney.vue",
+            "components/journey/CSSFallbackObject.vue",
+            "components/journey/JourneyText.vue"
+          ]
+        },
+        "BookingService": {
+          "module": "utils/bookingServices.ts",
+          "callers": [
+            "components/booking/BookingModal.vue",
+            "components/booking/ConfirmationView.vue",
+            "components/booking/IntakeForm.vue",
+            "components/booking/MonthCalendar.vue",
+            "components/booking/ServiceSelector.vue",
+            "components/booking/TimeSlotPicker.vue"
+          ]
+        },
+        "TimeSlot": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "components/booking/BookingModal.vue",
+            "components/booking/IntakeForm.vue",
+            "components/booking/TimeSlotPicker.vue"
+          ]
+        },
+        "getBookingService": {
+          "module": "utils/bookingServices.ts",
+          "callers": [
+            "components/booking/BookingModal.vue"
+          ]
+        },
+        "googleCalendarUrl": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "components/booking/ConfirmationView.vue"
+          ]
+        },
+        "generateICS": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "components/booking/ConfirmationView.vue"
+          ]
+        },
+        "BOOKING_SERVICES": {
+          "module": "utils/bookingServices.ts",
+          "callers": [
+            "components/booking/ServiceSelector.vue"
+          ]
+        },
+        "JourneySection": {
+          "module": "utils/journey-data.ts",
+          "callers": [
+            "components/journey/JourneyBentoSection.vue"
+          ]
+        },
+        "HeroSection": {
+          "module": "components/HeroSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "ServicesSection": {
+          "module": "components/ServicesSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "PhilosophySection": {
+          "module": "components/PhilosophySection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "MethodsSection": {
+          "module": "components/MethodsSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "TestimonialsSection": {
+          "module": "components/TestimonialsSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "NewsletterSection": {
+          "module": "components/NewsletterSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "BookingSection": {
+          "module": "components/BookingSection.vue",
+          "callers": [
+            "pages/index.vue"
+          ]
+        },
+        "useScrollAnimation": {
+          "module": "composables/useScrollAnimation.ts",
+          "callers": [
+            "pages/index.vue",
+            "pages/journey.vue"
+          ]
+        },
+        "EmotionalJourney": {
+          "module": "components/EmotionalJourney.vue",
+          "callers": [
+            "pages/journey.vue"
+          ]
+        },
+        "getEventsForMonth": {
+          "module": "server/utils/googleCalendar.ts",
+          "callers": [
+            "server/api/booking/availability.get.ts",
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "getAvailableDatesInMonth": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "server/api/booking/availability.get.ts",
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "findEventByCancelToken": {
+          "module": "server/utils/googleCalendar.ts",
+          "callers": [
+            "server/api/booking/cancel-info.get.ts",
+            "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "cancelEventById": {
+          "module": "server/utils/googleCalendar.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "clientCancellationEmail": {
+          "module": "server/utils/emailTemplates.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "therapistCancellationEmail": {
+          "module": "server/utils/emailTemplates.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "sendSms": {
+          "module": "server/utils/sms.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts",
+            "server/api/booking/create.post.ts",
+            "trigger/booking-reminder.ts"
+          ]
+        },
+        "bookingCancellationSms": {
+          "module": "server/utils/sms.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "cleanText": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/api/booking/create.post.ts",
+            "server/api/contact.post.ts",
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
+        "cleanMultilineText": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/api/booking/create.post.ts",
+            "server/api/contact.post.ts"
+          ]
+        },
+        "isEmail": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/api/booking/create.post.ts",
+            "server/api/contact.post.ts",
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
+        "normalizePhone": {
+          "module": "server/utils/sms.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "BOOKING_TIMEZONE": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "createBookingEvent": {
+          "module": "server/utils/googleCalendar.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "clientConfirmationEmail": {
+          "module": "server/utils/emailTemplates.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "therapistNotificationEmail": {
+          "module": "server/utils/emailTemplates.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "bookingConfirmationSms": {
+          "module": "server/utils/sms.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "readFbCookies": {
+          "module": "server/utils/metaCapi.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "sendMetaCapiEvent": {
+          "module": "server/utils/metaCapi.ts",
+          "callers": [
+            "server/api/booking/create.post.ts"
+          ]
+        },
+        "escapeHtml": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/api/contact.post.ts",
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "stripHeaderValue": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/api/contact.post.ts",
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "buildWeeklyPrompt": {
+          "module": "utils/agentPrompt.ts",
+          "callers": [
+            "server/utils/briefService.ts"
+          ]
+        },
+        "SYSTEM_PROMPT": {
+          "module": "utils/agentPrompt.ts",
+          "callers": [
+            "server/utils/briefService.ts"
+          ]
+        },
+        "detectPillar": {
+          "module": "utils/metaApi.ts",
+          "callers": [
+            "server/utils/briefService.ts"
+          ]
+        },
+        "escapeAttribute": {
+          "module": "server/utils/input.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "normalizeGooglePrivateKey": {
+          "module": "server/utils/googlePrivateKey.ts",
+          "callers": [
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
+          ]
+        },
+        "clientReminderEmail": {
+          "module": "server/utils/emailTemplates.ts",
+          "callers": [
+            "trigger/booking-reminder.ts"
+          ]
+        },
+        "bookingReminderSms": {
+          "module": "server/utils/sms.ts",
+          "callers": [
+            "trigger/booking-reminder.ts"
+          ]
+        },
+        "BriefClientConfig": {
+          "module": "server/utils/briefService.ts",
+          "callers": [
+            "trigger/weekly-brief.ts"
+          ]
+        },
+        "scrapeInstagram": {
+          "module": "server/utils/briefService.ts",
+          "callers": [
+            "trigger/weekly-brief.ts"
+          ]
+        },
+        "generateBrief": {
+          "module": "server/utils/briefService.ts",
+          "callers": [
+            "trigger/weekly-brief.ts"
+          ]
+        },
+        "sendBriefEmail": {
+          "module": "server/utils/briefService.ts",
+          "callers": [
+            "trigger/weekly-brief.ts"
+          ]
+        }
+      }
+    }
+  ],
+  "refs": []
+}

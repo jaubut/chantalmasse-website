@@ -1,0 +1,22 @@
+{
+  "repo": "chantalmasse-website",
+  "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Vercel): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
+  "targets": [
+    {
+      "name": "site",
+      "adapter": "nuxt",
+      "root": ".",
+      "cap": 600,
+      "ignore": [
+        "dist",
+        "testsprite_tests",
+        "memory",
+        "content"
+      ],
+      "extraDirs": [
+        "trigger",
+        "scripts"
+      ]
+    }
+  ]
+}
