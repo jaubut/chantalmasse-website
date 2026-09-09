@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08",
+  "generatedAt": "2026-09-09",
   "repo": "chantalmasse-website",
   "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Vercel): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
   "targets": [
@@ -23,7 +23,8 @@
           "listeners": [
             "onMounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/BookingSection.vue",
@@ -39,7 +40,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/BookingStickyBar.vue",
@@ -59,7 +63,8 @@
           "listeners": [
             "onMounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/ContactModal.vue",
@@ -77,7 +82,10 @@
           ],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/EmotionalJourney.vue",
@@ -98,7 +106,8 @@
             "composables/useScrollJourney.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/HeroSection.vue",
@@ -119,7 +128,8 @@
             "onMounted",
             "onBeforeUnmount"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/MethodsSection.vue",
@@ -135,7 +145,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/NewsletterSection.vue",
@@ -153,7 +166,8 @@
           ],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/PhilosophySection.vue",
@@ -169,7 +183,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/ServicesSection.vue",
@@ -185,7 +200,11 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "vue"
+          ]
         },
         {
           "path": "components/TestimonialsSection.vue",
@@ -201,7 +220,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/TheFooter.vue",
@@ -217,7 +237,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/TheNav.vue",
@@ -236,7 +257,10 @@
             "onMounted",
             "onBeforeUnmount"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/booking/BookingModal.vue",
@@ -259,7 +283,13 @@
             "utils/bookingHelpers.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "date-fns",
+            "date-fns/locale",
+            "vue"
+          ]
         },
         {
           "path": "components/booking/ConfirmationView.vue",
@@ -278,7 +308,11 @@
             "components/booking/ServiceSelector.vue"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "vue"
+          ]
         },
         {
           "path": "components/booking/IntakeForm.vue",
@@ -299,7 +333,12 @@
           "listeners": [
             "onMounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns",
+            "date-fns/locale",
+            "vue"
+          ]
         },
         {
           "path": "components/booking/MonthCalendar.vue",
@@ -321,7 +360,13 @@
           "listeners": [
             "onMounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "date-fns",
+            "date-fns/locale",
+            "vue"
+          ]
         },
         {
           "path": "components/booking/ServiceSelector.vue",
@@ -339,7 +384,10 @@
             "utils/bookingServices.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/booking/TimeSlotPicker.vue",
@@ -358,7 +406,13 @@
             "utils/bookingHelpers.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "date-fns",
+            "date-fns/locale",
+            "vue"
+          ]
         },
         {
           "path": "components/journey/CSSFallbackObject.vue",
@@ -376,7 +430,8 @@
             "composables/useScrollJourney.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/journey/CursorSoul.vue",
@@ -398,7 +453,10 @@
             "onMounted",
             "onUnmounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "vue"
+          ]
         },
         {
           "path": "components/journey/GradientBackground.vue",
@@ -414,7 +472,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/journey/JourneyBentoSection.vue",
@@ -432,7 +491,10 @@
             "utils/journey-data.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "components/journey/JourneyCTA.vue",
@@ -450,7 +512,8 @@
             "utils/journey-data.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "components/journey/JourneyText.vue",
@@ -469,7 +532,8 @@
             "lib/journey-data.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "composables/useBooking.ts",
@@ -487,7 +551,8 @@
             "utils/bookingServices.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "composables/useContact.ts",
@@ -503,7 +568,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "composables/useScrollAnimation.ts",
@@ -519,7 +585,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "composables/useScrollJourney.ts",
@@ -536,7 +603,11 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "gsap",
+            "gsap/ScrollTrigger"
+          ]
         },
         {
           "path": "composables/useTracking.ts",
@@ -552,7 +623,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "posthog-js"
+          ]
         },
         {
           "path": "error.vue",
@@ -566,7 +640,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "#app"
+          ]
         },
         {
           "path": "layouts/admin.vue",
@@ -582,7 +659,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "nuxt.config.ts",
@@ -596,7 +674,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/annuler.vue",
@@ -621,7 +700,11 @@
           "listeners": [
             "onMounted"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue",
+            "vue"
+          ]
         },
         {
           "path": "pages/blog/[slug].vue",
@@ -643,7 +726,8 @@
           ],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/blog/index.vue",
@@ -663,7 +747,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/coaching-de-couple.vue",
@@ -683,7 +768,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "pages/confidentialite.vue",
@@ -703,7 +791,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/index.vue",
@@ -723,7 +812,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/inscription-confirmee.vue",
@@ -743,7 +833,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "pages/journey.vue",
@@ -763,7 +856,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/mentions-legales.vue",
@@ -783,7 +877,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/prendre-rendez-vous.vue",
@@ -810,7 +905,8 @@
             "onMounted",
             "onBeforeUnmount"
           ],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "pages/therapie-individuelle.vue",
@@ -830,7 +926,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@iconify/vue"
+          ]
         },
         {
           "path": "plugins/posthog.client.ts",
@@ -844,7 +943,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "posthog-js"
+          ]
         },
         {
           "path": "scripts/ads-add-sitelinks.ts",
@@ -858,7 +960,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ads-audit.ts",
@@ -872,7 +977,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ads-cleanup-conversions.ts",
@@ -888,7 +996,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ads-convert-shared-budget.ts",
@@ -905,7 +1016,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ads-oauth-setup.ts",
@@ -919,7 +1033,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "scripts/ads-refresh-individuelle-copy.ts",
@@ -933,7 +1048,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ads-tune-bidding.ts",
@@ -947,7 +1065,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/ga4-audit-part2.ts",
@@ -961,7 +1082,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@google-analytics/data"
+          ]
         },
         {
           "path": "scripts/ga4-audit.ts",
@@ -975,7 +1099,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@google-analytics/data"
+          ]
         },
         {
           "path": "scripts/investigate-deep-ads.ts",
@@ -992,7 +1119,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "google-ads-api"
+          ]
         },
         {
           "path": "scripts/investigate-recent-bookings.ts",
@@ -1009,7 +1139,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "googleapis"
+          ]
         },
         {
           "path": "scripts/investigate-recent-traffic.ts",
@@ -1023,7 +1156,11 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@google-analytics/data",
+            "google-ads-api"
+          ]
         },
         {
           "path": "server/api/booking/availability.get.ts",
@@ -1048,7 +1185,10 @@
             "utils/bookingHelpers.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns"
+          ]
         },
         {
           "path": "server/api/booking/cancel-info.get.ts",
@@ -1070,7 +1210,12 @@
             "server/utils/googleCalendar.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns",
+            "date-fns-tz",
+            "date-fns/locale"
+          ]
         },
         {
           "path": "server/api/booking/cancel.post.ts",
@@ -1094,7 +1239,12 @@
             "server/utils/sms.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns",
+            "date-fns-tz",
+            "date-fns/locale"
+          ]
         },
         {
           "path": "server/api/booking/create.post.ts",
@@ -1121,7 +1271,12 @@
             "server/utils/input.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns",
+            "date-fns-tz",
+            "date-fns/locale"
+          ]
         },
         {
           "path": "server/api/contact.post.ts",
@@ -1143,7 +1298,8 @@
             "server/utils/input.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/api/img-proxy.get.ts",
@@ -1163,7 +1319,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/api/newsletter/subscribe.post.ts",
@@ -1185,7 +1342,10 @@
             "server/utils/input.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@getbrevo/brevo"
+          ]
         },
         {
           "path": "server/utils/briefService.ts",
@@ -1206,7 +1366,11 @@
             "utils/agentPrompt.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@anthropic-ai/sdk",
+            "resend"
+          ]
         },
         {
           "path": "server/utils/emailTemplates.ts",
@@ -1228,7 +1392,8 @@
             "server/utils/input.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/utils/googleCalendar.ts",
@@ -1251,7 +1416,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "googleapis"
+          ]
         },
         {
           "path": "server/utils/googlePrivateKey.ts",
@@ -1267,7 +1435,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/utils/input.ts",
@@ -1288,7 +1457,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/utils/metaCapi.ts",
@@ -1308,7 +1478,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/utils/sms.ts",
@@ -1331,7 +1502,10 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "twilio"
+          ]
         },
         {
           "path": "trigger/booking-reminder.ts",
@@ -1351,7 +1525,14 @@
             "server/utils/googlePrivateKey.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@trigger.dev/sdk/v3",
+            "date-fns",
+            "date-fns-tz",
+            "date-fns/locale",
+            "googleapis"
+          ]
         },
         {
           "path": "trigger/review-request.ts",
@@ -1369,7 +1550,11 @@
             "server/utils/googlePrivateKey.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@trigger.dev/sdk/v3",
+            "googleapis"
+          ]
         },
         {
           "path": "trigger/weekly-brief.ts",
@@ -1387,7 +1572,10 @@
             "server/utils/briefService.ts"
           ],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "@trigger.dev/sdk/v3"
+          ]
         },
         {
           "path": "utils/agentPrompt.ts",
@@ -1404,7 +1592,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "utils/bookingHelpers.ts",
@@ -1430,7 +1619,11 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": [
+            "date-fns",
+            "date-fns-tz"
+          ]
         },
         {
           "path": "utils/bookingServices.ts",
@@ -1449,7 +1642,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "utils/journey-data.ts",
@@ -1469,7 +1663,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "utils/metaApi.ts",
@@ -1493,7 +1688,8 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
-          "sheets": 0
+          "sheets": 0,
+          "externals": []
         }
       ],
       "fanIn": {
@@ -1909,6 +2105,147 @@
           "module": "server/utils/briefService.ts",
           "callers": [
             "trigger/weekly-brief.ts"
+          ]
+        }
+      },
+      "packages": {
+        "#app": {
+          "version": null,
+          "modules": [
+            "error.vue"
+          ]
+        },
+        "@anthropic-ai/sdk": {
+          "version": "0.80.0",
+          "modules": [
+            "server/utils/briefService.ts"
+          ]
+        },
+        "@getbrevo/brevo": {
+          "version": "5.0.3",
+          "modules": [
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
+        "@google-analytics/data": {
+          "version": "5.2.1",
+          "modules": [
+            "scripts/ga4-audit-part2.ts",
+            "scripts/ga4-audit.ts",
+            "scripts/investigate-recent-traffic.ts"
+          ]
+        },
+        "@iconify/vue": {
+          "version": "5.0.0",
+          "modules": [
+            "components/BookingSection.vue",
+            "components/ContactModal.vue",
+            "components/MethodsSection.vue",
+            "components/ServicesSection.vue",
+            "components/TheNav.vue",
+            "components/booking/BookingModal.vue",
+            "components/booking/ConfirmationView.vue",
+            "components/booking/MonthCalendar.vue",
+            "components/booking/ServiceSelector.vue",
+            "components/booking/TimeSlotPicker.vue",
+            "components/journey/JourneyBentoSection.vue",
+            "pages/annuler.vue",
+            "pages/coaching-de-couple.vue",
+            "pages/inscription-confirmee.vue",
+            "pages/therapie-individuelle.vue"
+          ]
+        },
+        "@trigger.dev/sdk": {
+          "version": "4.4.4",
+          "modules": [
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts",
+            "trigger/weekly-brief.ts"
+          ]
+        },
+        "date-fns": {
+          "version": "4.1.0",
+          "modules": [
+            "components/booking/BookingModal.vue",
+            "components/booking/IntakeForm.vue",
+            "components/booking/MonthCalendar.vue",
+            "components/booking/TimeSlotPicker.vue",
+            "server/api/booking/availability.get.ts",
+            "server/api/booking/cancel-info.get.ts",
+            "server/api/booking/cancel.post.ts",
+            "server/api/booking/create.post.ts",
+            "trigger/booking-reminder.ts",
+            "utils/bookingHelpers.ts"
+          ]
+        },
+        "date-fns-tz": {
+          "version": "3.2.0",
+          "modules": [
+            "server/api/booking/cancel-info.get.ts",
+            "server/api/booking/cancel.post.ts",
+            "server/api/booking/create.post.ts",
+            "trigger/booking-reminder.ts",
+            "utils/bookingHelpers.ts"
+          ]
+        },
+        "google-ads-api": {
+          "version": "23.0.0",
+          "modules": [
+            "scripts/ads-add-sitelinks.ts",
+            "scripts/ads-audit.ts",
+            "scripts/ads-cleanup-conversions.ts",
+            "scripts/ads-convert-shared-budget.ts",
+            "scripts/ads-refresh-individuelle-copy.ts",
+            "scripts/ads-tune-bidding.ts",
+            "scripts/investigate-deep-ads.ts",
+            "scripts/investigate-recent-traffic.ts"
+          ]
+        },
+        "googleapis": {
+          "version": "171.4.0",
+          "modules": [
+            "scripts/investigate-recent-bookings.ts",
+            "server/utils/googleCalendar.ts",
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
+          ]
+        },
+        "gsap": {
+          "version": "3.14.2",
+          "modules": [
+            "composables/useScrollJourney.ts"
+          ]
+        },
+        "posthog-js": {
+          "version": "1.373.4",
+          "modules": [
+            "composables/useTracking.ts",
+            "plugins/posthog.client.ts"
+          ]
+        },
+        "resend": {
+          "version": "6.9.4",
+          "modules": [
+            "server/utils/briefService.ts"
+          ]
+        },
+        "twilio": {
+          "version": "6.0.0",
+          "modules": [
+            "server/utils/sms.ts"
+          ]
+        },
+        "vue": {
+          "version": "3.5.30",
+          "modules": [
+            "components/ServicesSection.vue",
+            "components/booking/BookingModal.vue",
+            "components/booking/ConfirmationView.vue",
+            "components/booking/IntakeForm.vue",
+            "components/booking/MonthCalendar.vue",
+            "components/booking/TimeSlotPicker.vue",
+            "components/journey/CursorSoul.vue",
+            "pages/annuler.vue"
           ]
         }
       }
