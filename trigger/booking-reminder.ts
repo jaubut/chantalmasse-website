@@ -6,6 +6,11 @@ import { toZonedTime } from 'date-fns-tz'
 import { clientReminderEmail } from '../server/utils/emailTemplates'
 import { bookingReminderSms, sendSms } from '../server/utils/sms'
 import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
+import {
+  classifySession,
+  greetingName,
+  resolveGuestEmails,
+} from '../server/utils/chantalSessionRules'
 
 /**
  * Hourly scan for bookings starting in ~24h. Sends two reminder channels
@@ -17,12 +22,13 @@ import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
  * Two booking sources are handled:
  *   - Form bookings    — client data stamped on extendedProperties.private.
  *   - Manual bookings  — entered directly in Google Calendar by Chantal, with
- *                        the client attached as a guest. Email-only (attendees
- *                        carry no phone/consent); the client address comes from
- *                        the first non-self/non-organizer attendee, and we only
- *                        treat colour-2/7 or "thérapie"/"coaching" events as
- *                        sessions so guests on blocked/personal events are never
- *                        emailed.
+ *                        the clients attached as guests. Email-only (attendees
+ *                        carry no phone/consent). EVERY qualifying guest is
+ *                        emailed, so both partners on a couple booking get a
+ *                        reminder. Whether an event is a séance is decided by
+ *                        the shared blocklist in server/utils/chantalSessionRules,
+ *                        mirroring the dashboard's invoice sync, so séances
+ *                        titled with a bare patient name are no longer dropped.
  *
  * Window: events starting between now+23h and now+25h. The Google Calendar
  * extendedProperty AND-filter can't express "either flag pending", so we pull
@@ -118,6 +124,7 @@ export const bookingReminder = schedules.task({
     let emailSent = 0
     let smsSent = 0
     let skipped = 0
+    let notSession = 0
     let emailFailed = 0
     let smsFailed = 0
 
@@ -125,71 +132,95 @@ export const bookingReminder = schedules.task({
       const priv = ev.extendedProperties?.private || {}
       const summary = ev.summary || ''
 
-      // Form bookings stamp clientEmail on private props and carry no attendees.
-      // Manual bookings (Chantal enters them in Calendar) attach the client as a
-      // guest instead — the client is the first attendee that isn't her own
-      // self/organizer entry, the service account, or a resource.
-      const isManual = !priv.clientEmail
-      const attendeeEmail = (ev.attendees || []).find(
-        (a) =>
-          !!a.email &&
-          !a.self &&
-          !a.organizer &&
-          !a.resource &&
-          a.email !== process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL &&
-          a.email !== calendarId,
-      )?.email
+      if (!ev.id || !ev.start?.dateTime || !ev.end?.dateTime) {
+        logger.warn('Skipping event with missing id/start/end', { id: ev.id, summary })
+        skipped++
+        continue
+      }
 
-      const clientEmail = priv.clientEmail || attendeeEmail
+      const startISO = ev.start.dateTime
+      const endISO = ev.end.dateTime
+      const durationMin = Math.round(
+        (new Date(endISO).getTime() - new Date(startISO).getTime()) / 60000,
+      )
+
+      // Form bookings stamp clientEmail on private props. Manual bookings
+      // (Chantal types them into Calendar) attach the clients as guests instead.
+      const isManual = !priv.clientEmail
+
+      // Manual titles are inconsistent, so they go through the shared blocklist
+      // gate rather than the old colour/keyword allowlist, which silently
+      // dropped every séance titled with a bare patient name. Form bookings are
+      // sessions by construction and bypass the gate.
+      if (isManual) {
+        const verdict = classifySession({
+          summary,
+          status: ev.status,
+          startDateTime: startISO,
+          durationMin,
+        })
+        if (!verdict.session) {
+          logger.info('Not a session, skipping', {
+            eventId: ev.id,
+            summary,
+            reason: verdict.reason,
+          })
+          notSession++
+          continue
+        }
+      }
+
+      // Every guest, not just the first: a couple booking carries both partners
+      // and the old .find() left the second one with no reminder at all.
+      const recipients = isManual
+        ? resolveGuestEmails(ev.attendees, {
+            serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+            calendarId,
+          })
+        : [priv.clientEmail!.trim().toLowerCase()]
+
       const clientPhone = priv.clientPhone
       const cancelToken = priv.cancelToken || ''
       const sessionType = (priv.sessionType === 'video' ? 'video' : 'in-person') as
         | 'video'
         | 'in-person'
 
-      // Service from the colour the booking flow assigns, falling back to the
-      // "<service>-<name>" summary convention Chantal types for manual events.
       let service = ev.colorId ? SERVICE_NAME_BY_COLOR[ev.colorId] : undefined
       if (!service) {
-        if (/coaching de couple/i.test(summary)) service = 'Coaching de Couple'
-        else if (/th[ée]rapie/i.test(summary)) service = 'Thérapie Individuelle'
+        if (/couple/i.test(summary)) service = 'Coaching de Couple'
+        else if (/th[ée]rapie|individuel/i.test(summary)) service = 'Thérapie Individuelle'
         else service = 'Séance'
       }
 
-      // Name: form bookings store it; for manual events parse the part after the
-      // first dash in "Thérapie ind-Annie-Pier Legault".
-      let clientName = priv.clientName || ''
-      if (!clientName && isManual) {
-        const dash = summary.indexOf('-')
-        if (dash !== -1) clientName = summary.slice(dash + 1).trim()
-      }
-      const firstName = clientName.split(' ')[0] || 'bonjour'
+      const firstName = greetingName(summary, priv.clientName)
 
-      const emailPending = priv.reminderSent !== '1'
+      // Addresses already emailed for this event, so a partial failure retries
+      // only what did not get through instead of double-sending to everyone.
+      const alreadySent = new Set(
+        (priv.reminderSentTo || '')
+          .split(',')
+          .map((e) => e.trim().toLowerCase())
+          .filter(Boolean),
+      )
+      const emailDone = priv.reminderSent === '1'
+      const pending = emailDone ? [] : recipients.filter((e) => !alreadySent.has(e))
       const smsPending = priv.smsConsent === '1' && priv.smsReminderSent !== '1'
 
-      if (!emailPending && !smsPending) {
-        // Both channels already handled; nothing to do.
-        continue
-      }
-
-      // Don't email guests on blocked/personal manual events ("plage bloquée",
-      // "Pause diné", a personal appointment). Only colour-2/7 or events whose
-      // title reads like a session qualify for an attendee-based reminder.
-      const looksLikeSession =
-        ev.colorId === '2' || ev.colorId === '7' || /th[ée]rapie|coaching/i.test(summary)
-      if (isManual && !looksLikeSession) {
-        continue
-      }
-
-      if (!clientEmail || !ev.start?.dateTime || !ev.end?.dateTime || !ev.id) {
-        logger.warn('Skipping event with missing fields', { id: ev.id })
+      if (!recipients.length) {
+        logger.warn('No recipient resolvable for session', {
+          eventId: ev.id,
+          summary,
+          isManual,
+          attendees: (ev.attendees || []).length,
+        })
         skipped++
         continue
       }
 
-      const startET = toZonedTime(parseISO(ev.start.dateTime), 'America/Toronto')
-      const endET = toZonedTime(parseISO(ev.end.dateTime), 'America/Toronto')
+      if (emailDone && !smsPending) continue
+
+      const startET = toZonedTime(parseISO(startISO), 'America/Toronto')
+      const endET = toZonedTime(parseISO(endISO), 'America/Toronto')
       const dateFormatted = format(startET, 'EEEE d MMMM yyyy', { locale: fr })
       const timeFormatted = `${format(startET, 'HH')}h${format(startET, 'mm')} — ${format(endET, 'HH')}h${format(endET, 'mm')}`
       const startTime = `${format(startET, 'HH')}h${format(startET, 'mm')}`
@@ -198,41 +229,64 @@ export const bookingReminder = schedules.task({
       // at booking time (no per-event conferenceData — see googleCalendar.ts).
       const meetLink = priv.meetLink || undefined
 
-      // Email branch — unchanged from the original task.
-      if (emailPending) {
-        try {
-          const { subject, html } = clientReminderEmail({
-            firstName,
-            service,
-            date: dateFormatted,
-            time: timeFormatted,
-            sessionType,
-            meetLink,
-            cancelToken,
-          })
+      if (!emailDone) {
+        const delivered: string[] = []
 
-          await sendResend(clientEmail, subject, html)
+        for (const to of pending) {
+          try {
+            const { subject, html } = clientReminderEmail({
+              firstName,
+              service,
+              date: dateFormatted,
+              time: timeFormatted,
+              sessionType,
+              meetLink,
+              cancelToken,
+            })
 
-          await calendar.events.patch({
-            calendarId,
-            eventId: ev.id,
-            requestBody: {
-              extendedProperties: { private: { reminderSent: '1' } },
-            },
-          })
+            await sendResend(to, subject, html)
 
-          emailSent++
-          logger.info('Email reminder sent', { eventId: ev.id, to: clientEmail })
-        } catch (err) {
-          emailFailed++
-          logger.error('Email reminder failed', {
-            eventId: ev.id,
-            error: err instanceof Error ? err.message : String(err),
-          })
+            delivered.push(to)
+            emailSent++
+            logger.info('Email reminder sent', { eventId: ev.id, to })
+          } catch (err) {
+            emailFailed++
+            logger.error('Email reminder failed', {
+              eventId: ev.id,
+              to,
+              error: err instanceof Error ? err.message : String(err),
+            })
+          }
+        }
+
+        const confirmed = recipients.filter((e) => alreadySent.has(e) || delivered.includes(e))
+        const allDelivered = confirmed.length === recipients.length
+
+        if (delivered.length || allDelivered) {
+          try {
+            await calendar.events.patch({
+              calendarId,
+              eventId: ev.id,
+              requestBody: {
+                extendedProperties: {
+                  private: {
+                    reminderSentTo: confirmed.join(','),
+                    ...(allDelivered ? { reminderSent: '1' } : {}),
+                  },
+                },
+              },
+            })
+          } catch (err) {
+            // Losing this stamp means the next hourly run re-sends, so make it loud.
+            logger.error('Failed to stamp reminder state on event', {
+              eventId: ev.id,
+              error: err instanceof Error ? err.message : String(err),
+            })
+          }
         }
       }
 
-      // SMS branch — only when client opted in and we have a phone on file.
+      // SMS branch — form bookings only: manual guests carry no phone or consent.
       if (smsPending) {
         if (!clientPhone) {
           logger.warn('smsConsent set but no clientPhone on event', { eventId: ev.id })
@@ -275,6 +329,7 @@ export const bookingReminder = schedules.task({
       emailSent,
       smsSent,
       skipped,
+      notSession,
       emailFailed,
       smsFailed,
     }

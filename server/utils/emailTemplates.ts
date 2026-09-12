@@ -257,7 +257,10 @@ export function clientReminderEmail(params: {
   cancelToken: string
 }): { subject: string; html: string } {
   const subject = 'Rappel — Votre séance avec Chantal demain'
-  const firstName = escapeHtml(params.firstName)
+  // Manual Calendar bookings do not always yield a usable first name; greeting
+  // someone by a placeholder is worse than greeting them by nothing.
+  const firstName = escapeHtml(params.firstName || '')
+  const greeting = firstName ? `On se voit demain, ${firstName}.` : 'On se voit demain.'
   const service = escapeHtml(params.service)
   const date = escapeHtml(params.date)
   const time = escapeHtml(params.time)
@@ -323,7 +326,7 @@ export function clientReminderEmail(params: {
         <tr>
           <td style="padding:48px 40px 24px;text-align:center;">
             <div style="font-size:48px;">⏰</div>
-            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">On se voit demain, ${firstName}.</h1>
+            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">${greeting}</h1>
             <p style="color:#424845;margin:0;">Un petit rappel pour votre séance.</p>
           </td>
         </tr>

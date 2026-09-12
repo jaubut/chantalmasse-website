@@ -31,3 +31,4 @@ testsprite_tests/
 
 # Bun is the source of truth — npm lockfile is dead weight
 package-lock.json
+.test-out/
