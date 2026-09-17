@@ -2,6 +2,9 @@
   "name": "chantalmasse-website",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
@@ -27,7 +30,7 @@
     "google-ads-api": "^23.0.0",
     "googleapis": "^171.4.0",
     "gsap": "^3.14.2",
-    "nuxt": "^4.4.2",
+    "nuxt": "^4.5.2",
     "posthog-js": "^1.373.4",
     "resend": "^6.9.4",
     "twilio": "^6.0.0",
