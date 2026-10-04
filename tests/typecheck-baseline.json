@@ -1,6 +1,5 @@
 {
   "components/booking/BookingModal.vue: TS2322: Type 'Step | undefined' is not assignable to type 'Step'.": 1,
-  "components/journey/JourneyText.vue: TS2307: Cannot find module '~/lib/journey-data' or its corresponding type declarations.": 1,
   "composables/useScrollJourney.ts: TS18048: 'curr' is possibly 'undefined'.": 4,
   "composables/useScrollJourney.ts: TS18048: 'next' is possibly 'undefined'.": 3,
   "composables/useScrollJourney.ts: TS2532: Object is possibly 'undefined'.": 10,
