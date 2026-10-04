@@ -223,7 +223,10 @@ async function subscribe() {
 }
 
 function formatDate(dateStr: string): string {
+  // Frontmatter dates are calendar dates (YYYY-MM-DD = UTC midnight): format in UTC
+  // so the server and a Quebec browser render the same day (no hydration mismatch).
   return new Date(dateStr).toLocaleDateString('fr-CA', {
+    timeZone: 'UTC',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
