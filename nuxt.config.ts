@@ -73,6 +73,8 @@ export default defineNuxtConfig({
     name: 'Chantal Massé — Thérapeute en relation d\'aide',
     description: 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.',
     defaultLocale: 'fr',
+    // No i18n module: nuxt-schema-org >=6.4 reads WebSite.inLanguage from currentLocale only
+    currentLocale: 'fr',
   },
 
   // ─── Sitemap ───────────────────────────────────────────────────────────────

@@ -21,7 +21,7 @@
     "@google-analytics/data": "^5.2.1",
     "@nuxt/content": "^3.12.0",
     "@nuxt/image": "^2.0.0",
-    "@nuxtjs/seo": "^5.0.2",
+    "@nuxtjs/seo": "^5.3.16",
     "@tailwindcss/typography": "^0.5.19",
     "@trigger.dev/sdk": "4.4.4",
     "better-sqlite3": "^12.8.0",
@@ -34,8 +34,8 @@
     "posthog-js": "^1.373.4",
     "resend": "^6.9.4",
     "twilio": "^6.0.0",
-    "vue": "^3.5.13",
-    "vue-router": "^4.4.5"
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
