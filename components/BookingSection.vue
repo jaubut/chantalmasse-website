@@ -59,8 +59,9 @@
                 <span class="text-on-surface-variant font-light">09:00 — 17:00</span>
               </div>
               <div class="flex justify-between py-4">
-                <span class="text-outline font-medium">Vendredi — Dimanche</span>
-                <span class="text-outline font-light">Fermé</span>
+                <!-- outline darkened just enough for WCAG AA (4.96:1 on surface; outline token is 4.23:1) -->
+                <span class="text-[#676e6a] font-medium">Vendredi — Dimanche</span>
+                <span class="text-[#676e6a] font-light">Fermé</span>
               </div>
             </div>
           </div>

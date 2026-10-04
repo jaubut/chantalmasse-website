@@ -4,11 +4,14 @@ import { expect, test, waitForHydration } from './fixtures'
 // Gate only on serious/critical WCAG A/AA violations; minor/moderate ones are
 // printed for information but don't block a dependency update.
 //
-// Pre-existing serious violations on main (2026-10-04), tolerated so the gate
-// is green without restyling the client site; any OTHER serious/critical rule
-// fails. Remove an entry once the design is fixed.
-const KNOWN_SERIOUS = new Set(['color-contrast'])
+// Reduced motion: the site then renders every [data-animate] block in its final
+// state. Otherwise axe samples reveal fades mid-transition (blended colours =
+// false contrast failures) and skips still-hidden blocks entirely.
+//
+// Tolerated pre-existing serious rules (none today); any other fails.
+const KNOWN_SERIOUS = new Set<string>()
 test('home page has no serious or critical accessibility violations', async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('/')
   await waitForHydration(page)
   const results = await new AxeBuilder({ page })
