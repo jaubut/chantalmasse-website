@@ -39,8 +39,13 @@ First time: `bun install`, then `bunx playwright install chromium`.
 
 Every smoke test also fails on any console error or uncaught exception, and on any same-origin asset returning ≥ 400. Third-party requests (GA4, Meta Pixel, PostHog, Wix/Unsplash images) are answered locally, so CI never pollutes Chantal's analytics. Images from a host not in `ALLOWED_IMAGE_HOSTS` fail the suite.
 
+The smoke build and server run in UTC (like Vercel); the browser runs in `America/Toronto` (like Chantal's visitors).
+
+Known production bugs, pinned by `test.fixme` (un-fixme once fixed):
+- the Google Ads deep link `/prendre-rendez-vous?book=open&service=couple` doesn't open the modal or preselect the service;
+- blog dates: `new Date('YYYY-MM-DD')` is UTC midnight, so the server renders "15 février" and Quebec browsers hydrate to "14 février", with a hydration mismatch. That one console error is tolerated on `/blog` pages only (`KNOWN_CONSOLE_ERRORS` in `tests/smoke/fixtures.ts`).
+
 Known gaps:
-- `test.fixme`: the Google Ads deep link `/prendre-rendez-vous?book=open&service=couple` is broken in production (the modal doesn't open). Un-fixme the test once it's fixed.
 - Real deliverability of Resend/Brevo/Twilio/Google and the external image CDNs is out of scope by design.
 
 ## CI and the dependency autopilot

@@ -12,7 +12,7 @@
     "test:watch": "vitest",
     "typecheck": "bun scripts/typecheck-baseline.ts",
     "typecheck:update-baseline": "bun scripts/typecheck-baseline.ts --update",
-    "build:smoke": "NITRO_PRESET=node-server nuxt build",
+    "build:smoke": "TZ=UTC NITRO_PRESET=node-server nuxt build",
     "test:smoke": "bun run build:smoke && playwright test"
   },
   "dependencies": {
