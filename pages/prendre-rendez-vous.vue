@@ -318,7 +318,6 @@ useHead({
 const booking = useBooking()
 const contact = useContact()
 const { trackEvent } = useTracking()
-const route = useRoute()
 
 const heroEl = ref<HTMLElement | null>(null)
 
@@ -435,15 +434,24 @@ watch(selectedService, (val) => {
   })
 })
 
-// Auto-open modal if ?book=open is in the URL (Google Ads deep-link support)
-onMounted(() => {
-  const q = route.query
-  if (typeof q.service === 'string' && (q.service === 'individual' || q.service === 'couple')) {
+// Auto-open modal if ?book=open is in the URL (Google Ads deep-link support).
+// This route is prerendered: while hydrating, Nuxt swaps the route (and the
+// URL) for the query-less payload path and only restores the real one on
+// app:suspense:resolve, after onMounted. So watch the query instead of
+// reading it once on mount.
+const route = useRoute()
+
+function applyDeepLink(q: typeof route.query) {
+  if (q.service === 'individual' || q.service === 'couple') {
     selectedService.value = q.service
   }
   if (q.book === 'open' || q.book === 'true' || q.book === '1') {
     booking.open(selectedService.value)
   }
+}
+
+onMounted(() => {
+  watch(() => route.query, applyDeepLink, { immediate: true })
 })
 </script>
 
