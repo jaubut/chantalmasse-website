@@ -1,4 +1,4 @@
-import { readdirSync, statSync } from 'node:fs'
+import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
 import { expect, test, waitForHydration } from './fixtures'
 
@@ -126,9 +126,26 @@ test('SEO files are generated', async ({ request }) => {
   const sitemap = await request.get('/sitemap.xml')
   expect(sitemap.status()).toBe(200)
   const xml = await sitemap.text()
-  // Today's sitemap: the static pages (blog articles are not listed yet).
   for (const path of ['/', '/blog', '/coaching-de-couple', '/therapie-individuelle', '/prendre-rendez-vous']) {
     expect(xml).toContain(`<loc>https://chantalmasse.com${path}</loc>`)
   }
   expect(xml).not.toContain('/inscription-confirmee')
+})
+
+test('sitemap lists every blog article with its frontmatter date as lastmod', async ({ request }) => {
+  const dir = join(process.cwd(), 'content/blog')
+  const articles = readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => {
+    const fm = readFileSync(join(dir, f), 'utf8')
+    return { slug: fm.match(/^slug:\s*(\S+)/m)![1], date: fm.match(/^date:\s*(\S+)/m)![1] }
+  })
+  expect(articles.length).toBeGreaterThan(0)
+  const xml = await (await request.get('/sitemap.xml')).text()
+  for (const { slug, date } of articles) {
+    // The article itself is prerendered and served...
+    expect((await request.get(`/blog/${slug}`)).status(), `/blog/${slug}`).toBe(200)
+    // ...and listed in the sitemap with its publication date.
+    const entry = xml.match(new RegExp(`<url>\\s*<loc>https://chantalmasse.com/blog/${slug}</loc>[\\s\\S]*?</url>`))
+    expect(entry, `/blog/${slug} in sitemap`).not.toBeNull()
+    expect(entry![0], `lastmod of /blog/${slug}`).toContain(`<lastmod>${date}`)
+  }
 })
