@@ -44,10 +44,8 @@ test('every article is prerendered and answers 200', async ({ request }) => {
   }
 })
 
-// KNOWN BUG (production, 2026-10-04): article dates are rendered from
-// new Date('YYYY-MM-DD') (UTC midnight). Vercel renders "15 février 2026",
-// then a browser in Quebec hydrates to "14 février 2026" (hydration mismatch).
-test.fixme('an article shows the same date before and after hydration', async ({ page, request }) => {
+// Regression: frontmatter dates must not shift a day in Quebec (UTC server, America/Toronto browser).
+test('an article shows the same date before and after hydration', async ({ page, request }) => {
   const html = await (await request.get('/blog/l-amour-conscient')).text()
   const ssrDate = html.match(/\d{1,2} [^\s<]+ 20\d\d/)?.[0]
   await page.goto('/blog/l-amour-conscient')

@@ -17,9 +17,6 @@ export const ALLOWED_IMAGE_HOSTS = [/(^|\.)wixstatic\.com$/, /^images\.unsplash\
 // without changing site behaviour. Scoped to the pages where they occur;
 // remove an entry once fixed (the matching test.fixme then gets un-fixme'd).
 const KNOWN_CONSOLE_ERRORS: Array<{ page: RegExp; text: RegExp }> = [
-  // Blog dates: new Date('YYYY-MM-DD') is UTC midnight, so the UTC server
-  // renders the 15th and a browser in Quebec re-renders the 14th.
-  { page: /\/blog(\/|$)/, text: /Hydration completed but contains mismatches/ },
 ]
 
 export interface Guard {
