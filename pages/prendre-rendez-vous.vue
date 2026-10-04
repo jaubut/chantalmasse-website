@@ -318,7 +318,6 @@ useHead({
 const booking = useBooking()
 const contact = useContact()
 const { trackEvent } = useTracking()
-const route = useRoute()
 
 const heroEl = ref<HTMLElement | null>(null)
 
@@ -435,13 +434,17 @@ watch(selectedService, (val) => {
   })
 })
 
-// Auto-open modal if ?book=open is in the URL (Google Ads deep-link support)
+// Auto-open modal if ?book=open is in the URL (Google Ads deep-link support).
+// Read window.location, not useRoute().query: this route is prerendered, so
+// the hydrated route has an empty query on mount (same fix as /annuler).
 onMounted(() => {
-  const q = route.query
-  if (typeof q.service === 'string' && (q.service === 'individual' || q.service === 'couple')) {
-    selectedService.value = q.service
+  const q = new URLSearchParams(window.location.search)
+  const service = q.get('service')
+  if (service === 'individual' || service === 'couple') {
+    selectedService.value = service
   }
-  if (q.book === 'open' || q.book === 'true' || q.book === '1') {
+  const book = q.get('book')
+  if (book === 'open' || book === 'true' || book === '1') {
     booking.open(selectedService.value)
   }
 })

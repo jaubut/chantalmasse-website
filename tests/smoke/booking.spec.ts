@@ -118,17 +118,21 @@ test('booking: a server-side refusal (409) is shown to the client', async ({ pag
   await expect(dialog.getByText("Ce créneau n'est plus disponible")).toBeVisible()
 })
 
-// KNOWN BUG (production, 2026-10-04): the Google Ads deep link does nothing —
-// the modal stays closed and the service is not preselected. The page reads
-// useRoute().query in onMounted on a prerendered route. Un-fixme once fixed.
-test.fixme('booking: /prendre-rendez-vous?book=open preselects couple coaching (Ads deep link)', async ({ page }) => {
-  const date = nextBookableDate()
-  await mockAvailability(page, date)
-  await page.goto('/prendre-rendez-vous?book=open&service=couple')
-  const dialog = page.getByRole('dialog')
-  await expect(dialog).toHaveAttribute('aria-label', 'Choisir une date')
-  await expect(dialog.getByText("Les disponibilités sont affichées en heure de l'Est (ET)")).toBeVisible()
-})
+// Google Ads deep link: the prerendered page must read the query client-side,
+// open the modal and skip straight to the calendar for the requested service.
+for (const service of ['individual', 'couple'] as const) {
+  test(`booking: /prendre-rendez-vous?book=open preselects ${service} (Ads deep link)`, async ({ page }) => {
+    const date = nextBookableDate()
+    await mockAvailability(page, date)
+    const availability = page.waitForRequest((req) =>
+      req.url().includes('/api/booking/availability') && new URL(req.url()).searchParams.get('service') === service)
+    await page.goto(`/prendre-rendez-vous?book=open&service=${service}`)
+    const dialog = page.getByRole('dialog')
+    await expect(dialog).toHaveAttribute('aria-label', 'Choisir une date')
+    await expect(dialog.getByText("Les disponibilités sont affichées en heure de l'Est (ET)")).toBeVisible()
+    await availability
+  })
+}
 
 test('booking: the real API refuses invalid requests (no secrets configured)', async ({ request }) => {
   const bad = await request.get('/api/booking/availability?month=nope&service=individual')
