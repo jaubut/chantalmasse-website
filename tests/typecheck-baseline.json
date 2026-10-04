@@ -1,0 +1,18 @@
+{
+  "components/booking/BookingModal.vue: TS2322: Type 'Step | undefined' is not assignable to type 'Step'.": 1,
+  "components/journey/JourneyText.vue: TS2307: Cannot find module '~/lib/journey-data' or its corresponding type declarations.": 1,
+  "composables/useScrollJourney.ts: TS18048: 'curr' is possibly 'undefined'.": 4,
+  "composables/useScrollJourney.ts: TS18048: 'next' is possibly 'undefined'.": 3,
+  "composables/useScrollJourney.ts: TS2532: Object is possibly 'undefined'.": 10,
+  "scripts/ads-add-sitelinks.ts: TS2345: Argument of type '(r: { resource_name: string; }) => string' is not assignable to parameter of type '(value: IMutateAssetResult, index: number, array: IMutateAssetResult[]) => string'.": 1,
+  "scripts/ads-add-sitelinks.ts: TS2578: Unused '@ts-expect-error' directive.": 2,
+  "scripts/ads-cleanup-conversions.ts: TS2578: Unused '@ts-expect-error' directive.": 1,
+  "scripts/ads-convert-shared-budget.ts: TS2578: Unused '@ts-expect-error' directive.": 2,
+  "scripts/ads-refresh-individuelle-copy.ts: TS2578: Unused '@ts-expect-error' directive.": 2,
+  "scripts/ads-tune-bidding.ts: TS2578: Unused '@ts-expect-error' directive.": 2,
+  "server/api/booking/availability.get.ts: TS18048: 'monthNum' is possibly 'undefined'.": 1,
+  "server/api/booking/availability.get.ts: TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.": 3,
+  "server/api/booking/create.post.ts: TS2322: Type 'string | null | undefined' is not assignable to type 'string | undefined'.": 2,
+  "server/utils/googleCalendar.ts: TS2339: Property 'requestBody' does not exist on type 'BodyResponseCallback<Schema$Event>'.": 1,
+  "utils/bookingHelpers.ts: TS2345: Argument of type 'number | undefined' is not assignable to parameter of type 'number'.": 4
+}
