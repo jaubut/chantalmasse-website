@@ -24,7 +24,7 @@
     "@nuxtjs/seo": "^5.3.16",
     "@tailwindcss/typography": "^0.5.20",
     "@trigger.dev/sdk": "4.7.2",
-    "better-sqlite3": "^12.8.0",
+    "better-sqlite3": "^13.0.3",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "google-ads-api": "^25.1.0",
