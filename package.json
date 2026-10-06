@@ -13,7 +13,9 @@
     "typecheck": "bun scripts/typecheck-baseline.ts",
     "typecheck:update-baseline": "bun scripts/typecheck-baseline.ts --update",
     "build:smoke": "TZ=UTC NITRO_PRESET=node-server nuxt build",
-    "test:smoke": "bun run build:smoke && playwright test"
+    "test:smoke": "bun run build:smoke && playwright test",
+    "test:reminder": "esbuild --bundle --platform=node --format=esm --log-level=warning --alias:@trigger.dev/sdk/v3=./tests/stubs/trigger-sdk.ts --alias:googleapis=./tests/stubs/googleapis.ts --alias:twilio=./tests/stubs/twilio.ts --outfile=.test-out/booking-reminder.mjs tests/booking-reminder.test.ts && node .test-out/booking-reminder.mjs",
+    "test:rules": "esbuild --bundle --platform=node --format=esm --log-level=warning --outfile=.test-out/session-rules.mjs tests/session-rules.test.ts && node .test-out/session-rules.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.131.0",
