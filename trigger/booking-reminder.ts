@@ -158,6 +158,8 @@ export const bookingReminder = schedules.task({
           status: ev.status,
           startDateTime: startISO,
           durationMin,
+          colorId: ev.colorId,
+          attendees: ev.attendees || [],
         })
         if (!verdict.session) {
           logger.info('Not a session, skipping', {
@@ -269,10 +271,11 @@ export const bookingReminder = schedules.task({
               eventId: ev.id,
               requestBody: {
                 extendedProperties: {
-                  private: {
-                    reminderSentTo: confirmed.join(','),
-                    ...(allDelivered ? { reminderSent: '1' } : {}),
-                  },
+                  // Once everyone has it, reminderSent alone closes the event;
+                  // the per-address list only matters for retrying a partial send.
+                  private: allDelivered
+                    ? { reminderSent: '1' }
+                    : { reminderSentTo: confirmed.join(',') },
                 },
               },
             })

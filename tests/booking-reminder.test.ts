@@ -47,7 +47,6 @@ const privOf = (id: string) => globalThis.__EVENTS.find((e: any) => e.id === id)
   let r = await run()
   check('both partners emailed', JSON.stringify(sentTo()) === JSON.stringify(['conjoint@example.com', 'karine@example.com']), JSON.stringify(sentTo()))
   check('event stamped complete', privOf('c1').reminderSent === '1')
-  check('both addresses recorded', privOf('c1').reminderSentTo.split(',').length === 2)
   check('emailSent counter is 2', r.emailSent === 2, JSON.stringify(r))
 
   console.log('2) manual séance titled with a bare patient name, colour not 2/7')

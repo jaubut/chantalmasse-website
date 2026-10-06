@@ -70,7 +70,7 @@ async function main() {
 
     const isManual = !priv.clientEmail
     if (isManual) {
-      const verdict = classifySession({ summary, status: ev.status, startDateTime: startISO, durationMin })
+      const verdict = classifySession({ summary, status: ev.status, startDateTime: startISO, durationMin, colorId: ev.colorId, attendees: ev.attendees || [] })
       if (!verdict.session) continue
     }
     sessions++

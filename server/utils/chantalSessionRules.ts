@@ -31,6 +31,9 @@ export interface SessionGateInput {
   /** Event start; absent or date-only means an all-day block. */
   startDateTime?: string | null
   durationMin: number
+  /** Manual bookings only: with guests attached, a positive client signal is also required. */
+  colorId?: string | null
+  attendees?: CalendarAttendee[] | null
 }
 
 export interface SessionVerdict {
@@ -52,7 +55,28 @@ export function classifySession(ev: SessionGateInput): SessionVerdict {
   if (ev.durationMin < MIN_SESSION_MINUTES) {
     return { session: false, reason: `duration ${ev.durationMin}min below ${MIN_SESSION_MINUTES}min minimum` }
   }
+  // The blocklist is fine for billing, but here a false positive emails a
+  // third party ("Souper famille" with a cousin as guest). So a guest is only
+  // emailed when something says it is a séance: a séance colour, a service
+  // label in the title, or the title naming one of the guests ("Anne Boutin"
+  // with anne.boutin@… attached).
+  const guests = (ev.attendees || []).filter((a) => !a.self && !a.organizer && !a.resource)
+  if (guests.length && !hasClientSignal(ev.summary, ev.colorId, guests)) {
+    return { session: false, reason: 'no séance colour, service label, or guest named in title' }
+  }
   return { session: true, reason: 'session' }
+}
+
+const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+function hasClientSignal(summary: string, colorId: string | null | undefined, attendees: CalendarAttendee[]): boolean {
+  if (colorId === '2' || colorId === '7') return true
+  if (SERVICE_LABEL.test(summary)) return true
+  const nameTokens = fold(extractPatientName(summary)).split(/[^a-z]+/).filter((t) => t.length >= 3)
+  return attendees.some((a) => {
+    const hay = fold(`${a.email || ''} ${a.displayName || ''}`)
+    return nameTokens.some((t) => hay.includes(t))
+  })
 }
 
 /**
@@ -100,6 +124,7 @@ export function greetingName(summary: string, clientName?: string | null): strin
 
 export interface CalendarAttendee {
   email?: string | null
+  displayName?: string | null
   self?: boolean | null
   organizer?: boolean | null
   resource?: boolean | null
