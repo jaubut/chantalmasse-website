@@ -125,5 +125,29 @@ describe('trigger: review-request', () => {
     expect(writes).toEqual([])
     expect(cal.events.patch).not.toHaveBeenCalled()
   })
-})
 
+  it('asks manual bookings via their guests, but never guests of personal events', async () => {
+    const { task, cal } = await loadTask()
+    const at = { start: { dateTime: '2026-10-03T14:00:00Z' }, end: { dateTime: '2026-10-03T15:00:00Z' } }
+    cal.events.list.mockResolvedValue({ data: { items: [
+      { id: 'm1', summary: 'Anne Boutin', ...at,
+        attendees: [{ email: 'calendar@example.com', self: true }, { email: 'anne.boutin@example.com' }] },
+      { id: 'm2', summary: 'Coaching de couple-Karine Roy', colorId: '7', ...at,
+        attendees: [{ email: 'karine@example.com' }, { email: 'conjoint@example.com', displayName: 'Marc Roy' }] },
+      { id: 'p1', summary: 'Souper famille', ...at, attendees: [{ email: 'cousin@example.com' }] },
+    ] } })
+    const writes: string[] = []
+    const sent: Array<{ to: string[]; html: string }> = []
+    routeFetch({
+      [TURSO]: tursoRoute({}, writes),
+      [RESEND]: (init) => { sent.push(JSON.parse(String(init.body))); return jsonResponse({ id: 'r' }) },
+    })
+
+    const result = await task.run({ timestamp: new Date() })
+
+    expect(result).toEqual({ scanned: 3, sent: 3, skipped: 0, failed: 0 })
+    expect(sent.map((m) => m.to[0])).toEqual(['anne.boutin@example.com', 'karine@example.com', 'conjoint@example.com'])
+    expect(sent[0]!.html).toContain('Bonjour Anne,')
+    expect(sent[2]!.html).toContain('Bonjour Marc,')
+  })
+})
