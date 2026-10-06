@@ -1,6 +1,7 @@
 import { schedules, logger } from '@trigger.dev/sdk/v3'
 import { google, type calendar_v3 } from 'googleapis'
 import { normalizeGooglePrivateKey } from '../server/utils/googlePrivateKey'
+import { classifySession, greetingName, resolveGuestEmails } from '../server/utils/chantalSessionRules'
 
 /**
  * Post-séance Google Review ask, fired daily at 10:00 ET.
@@ -119,16 +120,40 @@ async function fetchPastBookings(cal: calendar_v3.Calendar): Promise<BookingEven
     const startISO = e.start?.dateTime ?? e.start?.date ?? ''
     if (!e.id || !startISO) continue
     const priv = (e.extendedProperties?.private as Record<string, string> | undefined) ?? {}
-    const email = priv.clientEmail?.trim().toLowerCase() ?? ''
-    if (!email || !email.includes('@')) continue
     if (priv.reviewRequestedAt) continue
-    out.push({
-      id: e.id,
-      startISO,
-      summary: e.summary ?? '',
-      email,
-      name: priv.clientName ?? '',
+    const summary = e.summary ?? ''
+
+    const email = priv.clientEmail?.trim().toLowerCase() ?? ''
+    if (email) {
+      if (email.includes('@')) out.push({ id: e.id, startISO, summary, email, name: priv.clientName ?? '' })
+      continue
+    }
+
+    // Manual booking: Chantal typed it into Calendar and attached the clients
+    // as guests. Same gate and guest rules as the 24h reminder.
+    const durationMin = e.end?.dateTime
+      ? Math.round((new Date(e.end.dateTime).getTime() - new Date(startISO).getTime()) / 60000)
+      : 0
+    const verdict = classifySession({
+      summary,
+      status: e.status,
+      startDateTime: e.start?.dateTime ?? e.start?.date,
+      durationMin,
+      colorId: e.colorId,
+      attendees: e.attendees ?? [],
     })
+    if (!verdict.session) continue
+    const guests = resolveGuestEmails(e.attendees, {
+      serviceAccountEmail: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      calendarId,
+    })
+    for (const guest of guests) {
+      // The title names one partner, so on a couple booking only trust a
+      // guest's own display name; otherwise fall back to the generic greeting.
+      const display = e.attendees?.find((a) => a.email?.toLowerCase() === guest)?.displayName ?? ''
+      const name = display || (guests.length === 1 ? greetingName(summary) : '')
+      out.push({ id: e.id, startISO, summary, email: guest, name })
+    }
   }
   return out
 }
