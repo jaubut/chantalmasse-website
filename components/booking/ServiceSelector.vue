@@ -8,7 +8,7 @@
       <button
         v-for="service in services"
         :key="service.id"
-        class="group text-left p-8 rounded-[1.5rem] border-2 transition-all duration-300 ease-out focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        class="group text-left p-8 rounded-[1.5rem] border-2 transition-all duration-300 ease-out focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
         :class="[
           service.id === 'individual'
             ? 'bg-surface-container-low border-outline-variant/30 hover:border-primary hover:bg-primary-fixed'

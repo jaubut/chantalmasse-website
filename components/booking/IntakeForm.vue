@@ -47,7 +47,7 @@
             autocomplete="given-name"
             maxlength="80"
             placeholder="Marie"
-            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200"
             :class="errors.firstName ? 'border-red-400 ring-1 ring-red-400' : ''"
           />
           <p v-if="errors.firstName" class="mt-1.5 text-xs font-body text-red-500">{{ errors.firstName }}</p>
@@ -61,7 +61,7 @@
             autocomplete="family-name"
             maxlength="80"
             placeholder="Tremblay"
-            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200"
             :class="errors.lastName ? 'border-red-400 ring-1 ring-red-400' : ''"
           />
           <p v-if="errors.lastName" class="mt-1.5 text-xs font-body text-red-500">{{ errors.lastName }}</p>
@@ -78,7 +78,7 @@
           autocomplete="email"
           maxlength="254"
           placeholder="marie@exemple.com"
-          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200"
           :class="errors.email ? 'border-red-400 ring-1 ring-red-400' : ''"
         />
         <p v-if="errors.email" class="mt-1.5 text-xs font-body text-red-500">{{ errors.email }}</p>
@@ -96,7 +96,7 @@
           autocomplete="tel"
           maxlength="32"
           placeholder="450 123-4567"
-          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200"
           :class="errors.phone ? 'border-red-400 ring-1 ring-red-400' : ''"
         />
         <p v-if="errors.phone" class="mt-1.5 text-xs font-body text-red-500">{{ errors.phone }}</p>
@@ -164,7 +164,7 @@
           rows="3"
           maxlength="1200"
           placeholder="Ce que vous souhaitez aborder..."
-          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all duration-200 resize-none"
+          class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200 resize-none"
         />
       </div>
 

@@ -100,7 +100,7 @@
         @click.self="showCoupleModal = false"
       >
         <!-- Overlay -->
-        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showCoupleModal = false" />
+        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-xs" @click="showCoupleModal = false" />
 
         <!-- Card -->
         <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden my-8">
@@ -160,7 +160,7 @@
         @click.self="showIndividualModal = false"
       >
         <!-- Overlay -->
-        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-sm" @click="showIndividualModal = false" />
+        <div class="fixed inset-0 bg-on-surface/60 backdrop-blur-xs" @click="showIndividualModal = false" />
 
         <!-- Card -->
         <div class="relative z-10 w-full max-w-xl bg-surface rounded-[2rem] shadow-2xl overflow-hidden my-8">

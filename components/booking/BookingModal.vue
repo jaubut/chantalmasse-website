@@ -7,7 +7,7 @@
         @click.self="closeModal"
       >
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-[#1d1b19]/60 backdrop-blur-sm" @click="closeModal" />
+        <div class="absolute inset-0 bg-[#1d1b19]/60 backdrop-blur-xs" @click="closeModal" />
 
         <!-- Card -->
         <div

@@ -76,7 +76,7 @@
           </p>
           <ul class="space-y-4">
             <li v-for="formation in formations" :key="formation.title" class="flex items-start gap-4">
-              <span class="mt-1 w-2 h-2 rounded-full bg-secondary flex-shrink-0"></span>
+              <span class="mt-1 w-2 h-2 rounded-full bg-secondary shrink-0"></span>
               <div>
                 <p class="text-on-surface font-medium">{{ formation.title }}</p>
                 <p v-if="formation.institution" class="text-sm text-on-surface-variant font-light">{{ formation.institution }}</p>

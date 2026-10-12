@@ -46,7 +46,7 @@
             prose-strong:text-on-surface prose-strong:font-semibold
 
             prose-a:text-primary prose-a:font-medium prose-a:underline prose-a:decoration-primary-fixed
-            prose-a:underline-offset-2 hover:prose-a:decoration-primary
+            prose-a:underline-offset-2 prose-a:hover:decoration-primary
 
             prose-ul:my-6 prose-ul:space-y-2
             prose-ol:my-6 prose-ol:space-y-2
@@ -112,7 +112,7 @@
                 type="email"
                 placeholder="votre@courriel.com"
                 :disabled="loading || success"
-                class="bg-white/15 text-white rounded-xl px-5 py-4 outline-none placeholder-white/40 focus:ring-2 focus:ring-primary-fixed/50 disabled:opacity-50"
+                class="bg-white/15 text-white rounded-xl px-5 py-4 outline-hidden placeholder-white/40 focus:ring-2 focus:ring-primary-fixed/50 disabled:opacity-50"
               />
               <button
                 type="submit"

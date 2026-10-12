@@ -85,14 +85,14 @@
 
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
-            class="bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:bg-secondary-container transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            class="bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:bg-secondary-container transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             @click="booking.open()"
           >
             Prendre rendez-vous
           </button>
           <a
             href="#services"
-            class="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary px-10 py-5 rounded-xl text-center font-medium hover:bg-primary hover:text-on-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            class="inline-flex items-center justify-center gap-2 border-2 border-primary text-primary px-10 py-5 rounded-xl text-center font-medium hover:bg-primary hover:text-on-primary transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             En savoir plus
             <span aria-hidden="true">&rarr;</span>
