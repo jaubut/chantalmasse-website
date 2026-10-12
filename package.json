@@ -30,7 +30,7 @@
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "google-ads-api": "^25.1.0",
-    "googleapis": "^183.0.0",
+    "googleapis": "^185.0.0",
     "gsap": "^3.15.0",
     "nuxt": "^4.6.1",
     "posthog-js": "^1.438.7",
