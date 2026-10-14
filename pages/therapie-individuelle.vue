@@ -7,7 +7,7 @@
         <span class="inline-flex items-center bg-primary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2">
           Thérapie individuelle — Shefford & vidéoconférence
         </span>
-        <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] tracking-tight">
+        <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] lg:leading-none tracking-tight">
           Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir.
         </h1>
         <p class="text-on-surface-variant text-lg max-w-xl font-light">

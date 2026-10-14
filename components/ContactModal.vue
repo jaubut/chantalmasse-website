@@ -7,7 +7,7 @@
         @click.self="close"
       >
         <!-- Overlay -->
-        <div class="absolute inset-0 bg-[#1d1b19]/60 backdrop-blur-sm" @click="close" />
+        <div class="absolute inset-0 bg-[#1d1b19]/60 backdrop-blur-xs" @click="close" />
 
         <!-- Card -->
         <div
@@ -42,7 +42,7 @@
                 type="text"
                 required
                 maxlength="120"
-                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
                 placeholder="Ton nom"
               />
             </div>
@@ -55,7 +55,7 @@
                 type="text"
                 required
                 maxlength="160"
-                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
+                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors"
                 placeholder="courriel@exemple.com ou 450-555-1234"
               />
             </div>
@@ -68,7 +68,7 @@
                 required
                 rows="4"
                 maxlength="4000"
-                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-none"
+                class="w-full px-4 py-3 rounded-xl border border-outline-variant/40 bg-surface-container-low text-on-surface placeholder:text-on-surface-variant/40 focus:outline-hidden focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors resize-none"
                 placeholder="Comment puis-je t'aider?"
               />
             </div>

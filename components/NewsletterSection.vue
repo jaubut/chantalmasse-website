@@ -20,7 +20,7 @@
               maxlength="254"
               placeholder="votre@courriel.com"
               :disabled="loading || success"
-              class="flex-1 bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50"
+              class="flex-1 bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-hidden placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50"
             />
             <button
               type="submit"
@@ -51,7 +51,7 @@
                 maxlength="32"
                 placeholder="Téléphone (optionnel)"
                 :disabled="loading || success"
-                class="bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-none placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50 w-full"
+                class="bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-hidden placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50 w-full"
               />
             </div>
           </Transition>

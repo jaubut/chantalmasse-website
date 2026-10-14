@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col items-center justify-center px-8 bg-background">
     <p class="text-on-surface-variant text-sm uppercase tracking-widest mb-6">{{ error?.statusCode || 404 }}</p>
-    <h1 class="font-headline italic text-4xl lg:text-6xl text-primary leading-tight tracking-tight text-center mb-4">
+    <h1 class="font-headline italic text-4xl lg:text-6xl text-primary leading-tight lg:leading-none tracking-tight text-center mb-4">
       Cette page n'existe pas
     </h1>
     <p class="text-on-surface-variant text-lg font-light text-center max-w-md mb-12">

@@ -118,7 +118,7 @@ Run before any deployment or client preview. Adversarial check against the origi
 - **Multi-channel contact always** — form + phone + email on every page with a CTA
 - **Font rationale required** — never pick a font without documenting why in the mood board
 - **Gradient transitions** must feel intentional — every color shift needs a reason tied to the emotional arc
-- Colors follow Material Design 3 roles — see `tailwind.config.ts`
+- Colors follow Material Design 3 roles — see the `@theme` block in `assets/css/main.css`
 - French-first copy — all UI text in French, `tu` (not `vous`)
 
 ## Don'ts

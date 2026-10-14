@@ -56,7 +56,7 @@ Owns section order and initialises scroll animation. No local state.
 - `[data-animate]` / `[data-animate].visible` — scroll-reveal keyframe (opacity + translateY)
 - Material Symbols font-variation-settings global reset
 
-### Design Tokens (`tailwind.config.ts`)
+### Design Tokens (`@theme` in `assets/css/main.css`)
 All colors follow a **Material Design 3** role naming scheme:
 
 | Role group | Key tokens |
@@ -82,7 +82,7 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 - **Icon usage**: Material Symbols icon font (ligature-based). Icon weight/fill globally set to `wght 300, FILL 0` via `main.css`. Individual icons can override with inline `style="font-variation-settings: ..."` (see star icons in TestimonialsSection).
 - **Responsive layout**: mobile-first. Breakpoint in use is `md` (hamburger/desktop nav split) and `lg` (two-column grid layouts).
 - **Color on dark backgrounds**: when a section uses `bg-primary` or `bg-tertiary`, text switches to `text-on-primary` / `text-on-tertiary` and supporting colors shift to their container equivalents.
-- **No TypeScript in components**: all `.vue` files use plain JS inside `<script setup>`. TypeScript is used in `.ts` files only (`nuxt.config.ts`, `tailwind.config.ts`, `useScrollAnimation.ts`).
+- **No TypeScript in components**: all `.vue` files use plain JS inside `<script setup>`. TypeScript is used in `.ts` files only (`nuxt.config.ts`, `useScrollAnimation.ts`).
 - **No state management library**: all state is local `ref()` inside each component.
 
 ---

@@ -1,6 +1,69 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+  --color-primary: #173028;
+  --color-primary-container: #2d463e;
+  --color-primary-fixed: #cce9dd;
+  --color-primary-fixed-dim: #b1cdc2;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #98b3a9;
+  --color-secondary: #515d85;
+  --color-secondary-container: #c4d0ff;
+  --color-secondary-fixed: #dbe1ff;
+  --color-secondary-fixed-dim: #b9c5f3;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #4c5880;
+  --color-tertiary: #30273a;
+  --color-tertiary-container: #463d51;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #b5a8c1;
+  --color-surface: #fef8f3;
+  --color-surface-container: #f2ede8;
+  --color-surface-container-low: #f8f3ee;
+  --color-surface-container-high: #ece7e2;
+  --color-surface-container-highest: #e6e2dd;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #fef8f3;
+  --color-on-surface: #1d1b19;
+  --color-on-surface-variant: #424845;
+  --color-outline: #727975;
+  --color-outline-variant: #c2c8c4;
+  /* Emotional journey gradient stops */
+  --color-journey-crisis-from: #1a0a0a;
+  --color-journey-crisis-to: #2d1520;
+  --color-journey-awareness-from: #2d1520;
+  --color-journey-awareness-to: #3a2a1a;
+  --color-journey-process-from: #3a2a1a;
+  --color-journey-process-to: #2a3a2d;
+  --color-journey-relief-from: #2a3a2d;
+  --color-journey-relief-to: #fef8f3;
+
+  --font-headline: Newsreader, serif;
+  --font-body: Manrope, sans-serif;
+
+  /* v3 radius overrides (DEFAULT/lg/xl/full) */
+  --radius: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+}
+
+/* v3 compat: v4 defaults borders to currentColor and buttons to cursor:default */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+}
 
 @layer base {
   body {
@@ -14,10 +77,8 @@
   }
 }
 
-@layer utilities {
-  .editorial-shadow {
-    box-shadow: 0 24px 48px -12px rgba(29, 27, 25, 0.04);
-  }
+@utility editorial-shadow {
+  box-shadow: 0 24px 48px -12px rgba(29, 27, 25, 0.04);
 }
 
 /* ── Claymorphism (journey nav) ───────────────────────────────── */
@@ -140,15 +201,19 @@
 
 /* ── Scroll Animations ───────────────────────────────────────── */
 
+/* Tailwind 4 moves translate-* utilities to the `translate` property; reset it too
+   so [data-animate] elements keep the v3 look (utility translates were overridden). */
 html.has-js [data-animate] {
   opacity: 0;
   transform: translateY(24px);
+  translate: unset;
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
 html.has-js [data-animate].visible {
   opacity: 1;
   transform: none;
+  translate: unset;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,6 +221,7 @@ html.has-js [data-animate].visible {
   html.has-js [data-animate].visible {
     opacity: 1;
     transform: none;
+    translate: unset;
     transition: none;
   }
 }

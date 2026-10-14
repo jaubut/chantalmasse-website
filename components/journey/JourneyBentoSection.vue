@@ -40,7 +40,7 @@
               v-if="card.icon"
               :icon="card.icon"
               :class="[
-                'flex-shrink-0',
+                'shrink-0',
                 light ? 'text-primary/30' : 'text-white/30',
                 card.span === 'tall' ? 'text-4xl mb-2' : 'text-2xl mt-1',
               ]"

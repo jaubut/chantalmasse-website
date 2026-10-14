@@ -21,7 +21,7 @@
             <span class="text-xs text-on-surface-variant font-light">{{ formatDate(post.date) }}</span>
           </div>
 
-          <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-tight tracking-tight mb-6">
+          <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-tight lg:leading-none tracking-tight mb-6">
             {{ post.title }}
           </h1>
 
@@ -46,7 +46,7 @@
             prose-strong:text-on-surface prose-strong:font-semibold
 
             prose-a:text-primary prose-a:font-medium prose-a:underline prose-a:decoration-primary-fixed
-            prose-a:underline-offset-2 hover:prose-a:decoration-primary
+            prose-a:underline-offset-2 prose-a:hover:decoration-primary
 
             prose-ul:my-6 prose-ul:space-y-2
             prose-ol:my-6 prose-ol:space-y-2
@@ -85,7 +85,7 @@
           <!-- Booking -->
           <div>
             <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-4">Prochaine étape</p>
-            <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight">
+            <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight lg:leading-none">
               Prêt à aller plus loin ?
             </h2>
             <p class="text-primary-fixed-dim font-light text-lg mb-10">
@@ -112,7 +112,7 @@
                 type="email"
                 placeholder="votre@courriel.com"
                 :disabled="loading || success"
-                class="bg-white/15 text-white rounded-xl px-5 py-4 outline-none placeholder-white/40 focus:ring-2 focus:ring-primary-fixed/50 disabled:opacity-50"
+                class="bg-white/15 text-white rounded-xl px-5 py-4 outline-hidden placeholder-white/40 focus:ring-2 focus:ring-primary-fixed/50 disabled:opacity-50"
               />
               <button
                 type="submit"

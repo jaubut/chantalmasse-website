@@ -27,7 +27,7 @@
       <button
         v-for="slot in slots"
         :key="slot.isoStart"
-        class="group relative text-left p-4 rounded-xl border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        class="group relative text-left p-4 rounded-xl border transition-all duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
         :class="
           isSelected(slot)
             ? 'bg-primary text-on-primary border-primary'
