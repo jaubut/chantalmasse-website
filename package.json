@@ -18,40 +18,44 @@
     "test:rules": "esbuild --bundle --platform=node --format=esm --log-level=warning --outfile=.test-out/session-rules.mjs tests/session-rules.test.ts && node .test-out/session-rules.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.131.0",
+    "@anthropic-ai/sdk": "^0.133.0",
     "@getbrevo/brevo": "^6.0.3",
     "@google-analytics/data": "^7.2.1",
     "@nuxt/content": "^3.16.1",
     "@nuxt/image": "^2.1.0",
     "@nuxtjs/seo": "^5.3.16",
     "@tailwindcss/typography": "^0.5.20",
-    "@trigger.dev/sdk": "4.7.2",
+    "@trigger.dev/sdk": "4.7.3",
     "better-sqlite3": "^13.0.3",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "google-ads-api": "^25.1.0",
-    "googleapis": "^183.0.0",
+    "googleapis": "^185.0.0",
     "gsap": "^3.15.0",
-    "nuxt": "^4.5.2",
-    "posthog-js": "^1.435.8",
-    "resend": "^6.32.0",
+    "nuxt": "^4.6.1",
+    "posthog-js": "^1.438.7",
+    "resend": "^6.32.1",
     "twilio": "^6.1.2",
     "vue": "^3.5.43",
-    "vue-router": "^5.3.1"
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@iconify-json/material-symbols": "^1.2.94",
+    "@iconify-json/material-symbols": "^1.2.95",
     "@iconify/vue": "^5.0.3",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@playwright/test": "^1.63.0",
+    "@playwright/test": "^1.64.0",
     "@types/better-sqlite3": "^9.6.0",
     "h3": "^1.15.10",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
-    "vitest": "^3.2.7",
-    "vue-tsc": "^3.3.12"
+    "vitest": "^5.0.3",
+    "vue-tsc": "^3.3.13"
+  },
+  "overrides": {
+    "postcss-selector-parser": "^7.1.6",
+    "ws": "^8.21.3"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
