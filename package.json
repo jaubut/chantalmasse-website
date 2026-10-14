@@ -54,6 +54,7 @@
     "vue-tsc": "^3.3.13"
   },
   "overrides": {
+    "pathe": "^2.0.3",
     "postcss-selector-parser": "^7.1.6",
     "ws": "^8.21.3"
   },
