@@ -31,7 +31,7 @@
             >{{ label }}</span>
           </span>
         </span>
-        <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] tracking-tight" data-animate>
+        <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight" data-animate>
           Thérapeute en relation d'aide à
           <span
             class="italic relative inline-block cursor-default"
@@ -75,7 +75,7 @@
             </Transition>
           </span>
         </h1>
-        <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] tracking-tight" data-animate>
+        <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight" data-animate>
           Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
         </h2>
 

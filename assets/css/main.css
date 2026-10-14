@@ -201,15 +201,19 @@
 
 /* ── Scroll Animations ───────────────────────────────────────── */
 
+/* Tailwind 4 moves translate-* utilities to the `translate` property; reset it too
+   so [data-animate] elements keep the v3 look (utility translates were overridden). */
 html.has-js [data-animate] {
   opacity: 0;
   transform: translateY(24px);
+  translate: unset;
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
 html.has-js [data-animate].visible {
   opacity: 1;
   transform: none;
+  translate: unset;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -217,6 +221,7 @@ html.has-js [data-animate].visible {
   html.has-js [data-animate].visible {
     opacity: 1;
     transform: none;
+    translate: unset;
     transition: none;
   }
 }

@@ -32,12 +32,12 @@
           </span>
 
           <!-- H1 -->
-          <h1 class="font-headline italic text-primary leading-[1.05] text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl tracking-tight mb-6">
+          <h1 class="font-headline italic text-primary leading-[1.05] sm:leading-none text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl tracking-tight mb-6">
             Réserve ta séance avec Chantal, en moins de 2 minutes.
           </h1>
 
           <!-- Subtitle -->
-          <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed max-w-xl mb-10">
+          <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed md:leading-7 max-w-xl mb-10">
             Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec.
             Disponibilités dans les 7 à 14 jours.
           </p>
@@ -261,7 +261,7 @@
     <!-- ── FINAL CTA ──────────────────────────────────────────────────── -->
     <section class="px-6 py-20 md:py-28">
       <div class="max-w-2xl mx-auto text-center">
-        <p class="font-headline italic text-primary text-2xl md:text-3xl leading-snug mb-8">
+        <p class="font-headline italic text-primary text-2xl md:text-3xl leading-snug md:leading-9 mb-8">
           Le premier pas est le plus difficile.<br>
           On commence quand tu es prêt·e.
         </p>

@@ -21,7 +21,7 @@
             <span class="text-xs text-on-surface-variant font-light">{{ formatDate(post.date) }}</span>
           </div>
 
-          <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-tight tracking-tight mb-6">
+          <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-tight lg:leading-none tracking-tight mb-6">
             {{ post.title }}
           </h1>
 
@@ -85,7 +85,7 @@
           <!-- Booking -->
           <div>
             <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-4">Prochaine étape</p>
-            <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight">
+            <h2 class="font-headline text-4xl lg:text-5xl italic text-white mb-6 leading-tight lg:leading-none">
               Prêt à aller plus loin ?
             </h2>
             <p class="text-primary-fixed-dim font-light text-lg mb-10">
