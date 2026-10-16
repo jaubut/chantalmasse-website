@@ -132,7 +132,7 @@ The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs 
    - `TWILIO_AUTH_TOKEN`
    - `TWILIO_FROM_NUMBER`
    - `SITE_BASE_URL`
-4. Redeploy the task (`bunx trigger.dev@latest deploy`) so it picks up the new SMS code path.
+4. Task deploys are automatic: `.github/workflows/trigger-deploy.yml` runs `trigger.dev deploy` on every push to `main` that touches `trigger/**`, `server/utils/**`, `trigger.config.ts`, `package.json` or `bun.lock`. The CLI version is read from the pinned `@trigger.dev/sdk` in `package.json` (keep it an exact version — no `^`), so CLI and SDK always match. Requires the repo secret `TRIGGER_ACCESS_TOKEN` (a trigger.dev personal access token). To redeploy by hand, use **Actions → Trigger.dev deploy → Run workflow**.
 
 ---
 
