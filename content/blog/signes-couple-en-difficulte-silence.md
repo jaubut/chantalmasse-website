@@ -1,7 +1,7 @@
 ---
-slug: 'signes-couple-en-difficulte-silence'
+slug: signes-couple-en-difficulte-silence
 title: 'Quand le silence s''installe : reconnaître les signes d''un couple en difficulté'
-date: '2026-10-14'
+date: 2026-10-14
 readTime: 5
 category: 'couple'
 excerpt: 'Le silence qui s''installe n''est pas toujours la paix. Les signes d''un couple en difficulté, et le moment où il vaut la peine d''en parler.'
