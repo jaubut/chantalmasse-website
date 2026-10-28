@@ -1,0 +1,75 @@
+name: Trigger.dev deploy
+
+# Deploys the trigger/ tasks to Trigger.dev production whenever code they bundle
+# changes on main. Before this, deploys were manual and prod ran a stale bundle
+# for 8 days after PR #33 merged.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'trigger/**'
+      - 'server/utils/**'
+      - 'utils/**'
+      - 'trigger.config.ts'
+      - 'package.json'
+      - 'bun.lock'
+      - '.github/workflows/trigger-deploy.yml'
+  workflow_dispatch:
+
+# Never cancel a deploy mid-flight; queue the next one instead.
+concurrency:
+  group: trigger-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: 'true'
+      NUXT_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - name: Install (frozen lockfile)
+        run: bun install --frozen-lockfile
+
+      # The CLI must match the SDK exactly or deploy aborts with
+      # "Version mismatch detected while running in CI".
+      - name: Read @trigger.dev/sdk version from package.json
+        id: sdk
+        run: |
+          version="$(node -p "require('./package.json').dependencies['@trigger.dev/sdk'] || ''")"
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::@trigger.dev/sdk must be pinned to an exact version in package.json (got '${version}')"
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+      - name: Check TRIGGER_ACCESS_TOKEN secret
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$TRIGGER_ACCESS_TOKEN" ]; then
+            echo "::error::Repo secret TRIGGER_ACCESS_TOKEN is not set (trigger.dev personal access token)"
+            exit 1
+          fi
+
+      - name: Deploy tasks to Trigger.dev (prod)
+        env:
+          TRIGGER_ACCESS_TOKEN: ${{ secrets.TRIGGER_ACCESS_TOKEN }}
+          SDK_VERSION: ${{ steps.sdk.outputs.version }}
+        run: npx --yes "trigger.dev@${SDK_VERSION}" deploy
