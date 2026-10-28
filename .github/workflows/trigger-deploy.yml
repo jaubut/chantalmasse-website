@@ -9,6 +9,7 @@ on:
     paths:
       - 'trigger/**'
       - 'server/utils/**'
+      - 'utils/**'
       - 'trigger.config.ts'
       - 'package.json'
       - 'bun.lock'
