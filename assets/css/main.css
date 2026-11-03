@@ -314,7 +314,7 @@ html.cm-intro .blur-up {
 
 @keyframes blur-up {
   from { filter: blur(16px); transform: scale(1.06); }
-  to { filter: blur(0); transform: scale(1); }
+  to { filter: none; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

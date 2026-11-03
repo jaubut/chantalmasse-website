@@ -48,7 +48,7 @@
       leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
       leave-to-class="opacity-0 -translate-y-2"
     >
-    <div v-if="menuOpen && !minimalNav" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
+    <div v-if="menuOpen && !minimalNav" :class="['md:hidden absolute top-full inset-x-0 px-8 py-6 flex flex-col gap-6 border-t', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
       <NuxtLink v-for="link in navLinks" :key="link.label" :to="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</NuxtLink>
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
       <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500 min-h-[44px]" @click="contact.open(); menuOpen = false">Me contacter</button>
