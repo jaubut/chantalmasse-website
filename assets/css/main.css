@@ -232,11 +232,10 @@ html.has-js [data-animate].visible:nth-child(3) { transition-delay: 180ms; }
 html.has-js [data-animate].visible:nth-child(4) { transition-delay: 270ms; }
 html.has-js [data-animate].visible:nth-child(5) { transition-delay: 360ms; }
 
-/* Hero waits behind the intro loader, then enters as it lifts */
-html.cm-intro:not(.cm-intro-out) #hero [data-animate] {
-  opacity: 0;
-  transform: translateY(24px);
-  filter: blur(6px);
+/* Behind the loader panel, reveals land instantly: the page is already there when the panel lifts. */
+html.cm-intro [data-animate],
+html.cm-veiling [data-animate] {
+  transition: none;
 }
 
 /* Soft card lift — lives here (unlayered) because [data-animate] owns transform/translate */
@@ -323,31 +322,36 @@ html.cm-intro .blur-up {
   }
 }
 
-/* ── Intro loader (components/IntroLoader.vue) ──────────────────── */
+/* ── Loader panel: intro (components/IntroLoader.vue) + page veil (plugins/page-veil.client.ts) ── */
+/* Lavender panel on the cream page so the pull down / pull up reads as movement. */
 .cm-intro-overlay {
   display: none;
 }
 
-html.cm-intro .cm-intro-overlay {
+html.cm-intro .cm-intro-overlay,
+.cm-veil {
   position: fixed;
   inset: 0;
-  z-index: 100;
   display: grid;
   place-items: center;
-  background: var(--color-background);
-  transition: opacity 0.6s ease;
-  /* Safety net: fades on its own even if JS never hydrates */
-  animation: cm-intro-fallback 0.6s ease 3s forwards;
+  background: var(--color-secondary-container);
+  will-change: transform;
+}
+
+html.cm-intro .cm-intro-overlay {
+  z-index: 100;
+  /* Safety net: lifts on its own even if JS never hydrates */
+  animation: cm-intro-fallback 0.5s cubic-bezier(0.65, 0, 0.35, 1) 3s forwards;
 }
 
 html.cm-intro-out .cm-intro-overlay {
-  opacity: 0;
+  transform: translateY(-100%);
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
   pointer-events: none;
 }
 
-html.cm-intro-out .cm-intro-overlay > div {
-  transform: scale(1.03);
-  transition: transform 0.6s ease;
+@keyframes cm-intro-fallback {
+  to { transform: translateY(-100%); visibility: hidden; }
 }
 
 .cm-intro-outline {
@@ -358,39 +362,34 @@ html.cm-intro-out .cm-intro-overlay > div {
   clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
 }
 
-/* ── Page veil (plugins/page-veil.client.ts) ────────────────────── */
 .cm-veil {
-  position: fixed;
-  inset: 0;
   z-index: 90;
-  display: grid;
-  place-items: center;
-  background: var(--color-background);
   pointer-events: none;
-  clip-path: inset(100% 0 0 0);
+  visibility: hidden;
+  transform: translateY(-100%);
+}
+
+.cm-veil.is-in,
+.cm-veil.is-out {
+  visibility: visible;
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 .cm-veil.is-in {
-  clip-path: inset(0 0 0 0);
-  transition: clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.cm-veil.is-out {
-  clip-path: inset(0 0 100% 0);
-  transition: clip-path 0.4s cubic-bezier(0.7, 0, 0.3, 1);
-}
-
-.cm-veil > span {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.cm-veil.is-in > span {
-  opacity: 1;
   transform: none;
+  pointer-events: auto;
 }
 
-@keyframes cm-intro-fallback {
-  to { opacity: 0; visibility: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .cm-veil,
+  .cm-veil.is-in,
+  .cm-veil.is-out {
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .cm-veil.is-in {
+    opacity: 1;
+  }
 }

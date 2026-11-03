@@ -14,7 +14,7 @@ const fillEl = ref<HTMLElement | null>(null)
 
 const FILL_MS = 1400
 const HOLD_MS = 300
-const FADE_MS = 600
+const LIFT_MS = 500
 const POINTS = 16
 const AMP = 3
 
@@ -47,7 +47,7 @@ onMounted(() => {
   const doneTimer = setTimeout(() => {
     cancelAnimationFrame(raf)
     html.classList.remove('cm-intro', 'cm-intro-out')
-  }, fillMs + HOLD_MS + FADE_MS)
+  }, fillMs + HOLD_MS + LIFT_MS)
 
   onBeforeUnmount(() => {
     cancelAnimationFrame(raf)
