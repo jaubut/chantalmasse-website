@@ -4,7 +4,7 @@
   <div class="cm-intro-overlay" aria-hidden="true">
     <div class="relative font-headline italic text-5xl sm:text-7xl leading-none whitespace-nowrap">
       <span class="cm-intro-outline block">Chantal Massé</span>
-      <span ref="fillEl" class="cm-intro-fill absolute inset-0 block text-primary">Chantal Massé</span>
+      <span ref="fillEl" class="cm-intro-fill absolute inset-0 block text-secondary">Chantal Massé</span>
     </div>
   </div>
 </template>

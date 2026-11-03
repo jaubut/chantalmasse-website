@@ -352,7 +352,7 @@ html.cm-intro-out .cm-intro-overlay > div {
 
 .cm-intro-outline {
   color: transparent;
-  -webkit-text-stroke: 1px rgba(23, 48, 40, 0.3);
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--color-secondary) 40%, transparent);
 }
 
 .cm-intro-fill {
