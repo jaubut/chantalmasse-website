@@ -138,6 +138,12 @@ export default defineNuxtConfig({
       titleTemplate: '%s',
       script: [
         {
+          // Intro loader: first visit of the session only, never with reduced motion. Runs pre-paint
+          // so the overlay (components/IntroLoader.vue) never flashes on repeat visits.
+          innerHTML: "try{if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('cm-intro');sessionStorage.setItem('cm-intro','1')}}catch(e){}",
+          tagPosition: 'head',
+        },
+        {
           src: 'https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W',
           async: true,
         },

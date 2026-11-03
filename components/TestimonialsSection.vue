@@ -11,7 +11,7 @@
         <div
           v-for="(t, i) in testimonials"
           :key="t.name"
-          class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow"
+          class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow soft-lift"
           :class="i === 1 || i === 2 ? 'lg:translate-y-8' : ''"
           data-animate
         >

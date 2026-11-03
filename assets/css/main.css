@@ -216,12 +216,149 @@ html.has-js [data-animate].visible {
   translate: unset;
 }
 
+/* Soft blur on reveal (BYQ gem scroll-blur-reveal-01, adapted: no scrub, one-shot) */
+html.has-js [data-animate] {
+  filter: blur(6px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s ease;
+}
+
+html.has-js [data-animate].visible {
+  filter: none;
+}
+
+/* Gentle stagger between siblings that reveal together (hero column, card rows) */
+html.has-js [data-animate].visible:nth-child(2) { transition-delay: 90ms; }
+html.has-js [data-animate].visible:nth-child(3) { transition-delay: 180ms; }
+html.has-js [data-animate].visible:nth-child(4) { transition-delay: 270ms; }
+html.has-js [data-animate].visible:nth-child(5) { transition-delay: 360ms; }
+
+/* Hero waits behind the intro loader, then enters as it lifts */
+html.cm-intro:not(.cm-intro-out) #hero [data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  filter: blur(6px);
+}
+
+/* Soft card lift — lives here (unlayered) because [data-animate] owns transform/translate */
+.soft-lift,
+html.has-js [data-animate].soft-lift {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s ease, box-shadow 0.5s ease;
+}
+
+@media (hover: hover) {
+  .soft-lift:hover,
+  html.has-js [data-animate].visible.soft-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 32px 56px -20px rgba(23, 48, 40, 0.18);
+    transition-delay: 0s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.has-js [data-animate],
   html.has-js [data-animate].visible {
     opacity: 1;
     transform: none;
     translate: unset;
+    filter: none;
     transition: none;
   }
+
+  .soft-lift:hover,
+  html.has-js [data-animate].visible.soft-lift:hover {
+    transform: none;
+  }
+}
+
+/* ── Soft liquid fill on CTAs (BYQ gem liquid-fill-button-02, CSS-only) ── */
+/* Set the fill colour with --fill; pair with a hover:text-* utility for contrast. */
+.liquid-fill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 0.5s ease;
+}
+
+.liquid-fill::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10% 0;
+  z-index: -1;
+  background: var(--fill, var(--color-secondary-container));
+  border-radius: 45% 55% 0 0 / 18px 22px 0 0;
+  transform: translateY(105%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.7s ease;
+}
+
+.liquid-fill:hover::before,
+.liquid-fill:focus-visible::before {
+  transform: translateY(0);
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-fill::before {
+    transition: none;
+  }
+}
+
+/* ── Hero photo blur-up (BYQ gem blur-up-image-reveal-01) ───────── */
+/* CSS keyframes so it starts at first paint, before hydration (keeps LCP intact). */
+.blur-up {
+  animation: blur-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.cm-intro .blur-up {
+  animation-delay: 1.5s;
+}
+
+@keyframes blur-up {
+  from { filter: blur(16px); transform: scale(1.06); }
+  to { filter: blur(0); transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blur-up {
+    animation: none;
+  }
+}
+
+/* ── Intro loader (components/IntroLoader.vue) ──────────────────── */
+.cm-intro-overlay {
+  display: none;
+}
+
+html.cm-intro .cm-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--color-background);
+  transition: opacity 0.6s ease;
+  /* Safety net: fades on its own even if JS never hydrates */
+  animation: cm-intro-fallback 0.6s ease 3s forwards;
+}
+
+html.cm-intro-out .cm-intro-overlay {
+  opacity: 0;
+  pointer-events: none;
+}
+
+html.cm-intro-out .cm-intro-overlay > div {
+  transform: scale(1.03);
+  transition: transform 0.6s ease;
+}
+
+.cm-intro-outline {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(23, 48, 40, 0.3);
+}
+
+.cm-intro-fill {
+  clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+}
+
+@keyframes cm-intro-fallback {
+  to { opacity: 0; visibility: hidden; }
 }

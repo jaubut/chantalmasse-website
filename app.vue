@@ -1,5 +1,6 @@
 <template>
   <div>
+    <IntroLoader />
     <TheNav />
     <main>
       <NuxtPage />

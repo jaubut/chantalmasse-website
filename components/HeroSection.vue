@@ -85,7 +85,7 @@
 
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
-            class="bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:bg-secondary-container transition-colors focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            class="liquid-fill bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:text-on-secondary-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             @click="booking.open()"
           >
             Prendre rendez-vous
@@ -104,12 +104,14 @@
       <div class="order-2 lg:order-2 relative">
         <div class="absolute -bottom-10 -left-10 w-64 h-64 rounded-full blur-3xl -z-10" style="background-color: rgba(219,225,255,0.3);"></div>
         <div class="aspect-[4/5] rounded-[2rem] overflow-hidden lg:translate-x-12 translate-y-4">
+          <div class="blur-up w-full h-full">
           <img
             src="/images/chantal-hero.jpg"
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"
           />
+          </div>
         </div>
       </div>
 

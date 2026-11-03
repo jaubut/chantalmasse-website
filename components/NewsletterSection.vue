@@ -66,7 +66,7 @@
           v-for="post in posts"
           :key="post.slug"
           :to="`/blog/${post.slug}`"
-          class="bg-tertiary-container rounded-2xl overflow-hidden group"
+          class="bg-tertiary-container rounded-2xl overflow-hidden group soft-lift"
         >
           <div class="aspect-[4/3] overflow-hidden">
             <img
