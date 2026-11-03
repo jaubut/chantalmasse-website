@@ -358,6 +358,39 @@ html.cm-intro-out .cm-intro-overlay > div {
   clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
 }
 
+/* ── Page veil (plugins/page-veil.client.ts) ────────────────────── */
+.cm-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  background: var(--color-background);
+  pointer-events: none;
+  clip-path: inset(100% 0 0 0);
+}
+
+.cm-veil.is-in {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cm-veil.is-out {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 0.4s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.cm-veil > span {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.cm-veil.is-in > span {
+  opacity: 1;
+  transform: none;
+}
+
 @keyframes cm-intro-fallback {
   to { opacity: 0; visibility: hidden; }
 }
