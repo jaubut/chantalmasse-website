@@ -37,7 +37,7 @@
         <h3 class="font-headline text-3xl text-primary italic text-center mb-10" data-animate>Approches thérapeutiques</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center hover:bg-surface-container-highest transition-colors duration-300" data-animate>
+          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:psychology" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
             <h4 class="font-headline text-2xl text-primary mb-4">Relations humaines</h4>
             <p class="text-on-surface-variant font-light leading-relaxed">
@@ -45,7 +45,7 @@
             </p>
           </div>
 
-          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center hover:bg-surface-container-highest transition-colors duration-300" data-animate>
+          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:diversity-2" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
             <h4 class="font-headline text-2xl text-primary mb-4">Imago & Couple</h4>
             <p class="text-on-surface-variant font-light leading-relaxed">
@@ -53,7 +53,7 @@
             </p>
           </div>
 
-          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center hover:bg-surface-container-highest transition-colors duration-300" data-animate>
+          <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:neurology" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
             <h4 class="font-headline text-2xl text-primary mb-4">Neurosciences</h4>
             <p class="text-on-surface-variant font-light leading-relaxed">

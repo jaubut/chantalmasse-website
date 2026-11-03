@@ -216,12 +216,180 @@ html.has-js [data-animate].visible {
   translate: unset;
 }
 
+/* Soft blur on reveal (BYQ gem scroll-blur-reveal-01, adapted: no scrub, one-shot) */
+html.has-js [data-animate] {
+  filter: blur(6px);
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.9s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s ease;
+}
+
+html.has-js [data-animate].visible {
+  filter: none;
+}
+
+/* Gentle stagger between siblings that reveal together (hero column, card rows) */
+html.has-js [data-animate].visible:nth-child(2) { transition-delay: 90ms; }
+html.has-js [data-animate].visible:nth-child(3) { transition-delay: 180ms; }
+html.has-js [data-animate].visible:nth-child(4) { transition-delay: 270ms; }
+html.has-js [data-animate].visible:nth-child(5) { transition-delay: 360ms; }
+
+/* Behind the loader panel, reveals land instantly: the page is already there when the panel lifts. */
+html.cm-intro [data-animate],
+html.cm-veiling [data-animate] {
+  transition: none;
+}
+
+/* Soft card lift — lives here (unlayered) because [data-animate] owns transform/translate */
+.soft-lift,
+html.has-js [data-animate].soft-lift {
+  transition: opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), filter 0.9s ease, box-shadow 0.5s ease;
+}
+
+@media (hover: hover) {
+  .soft-lift:hover,
+  html.has-js [data-animate].visible.soft-lift:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 32px 56px -20px rgba(23, 48, 40, 0.18);
+    transition-delay: 0s;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html.has-js [data-animate],
   html.has-js [data-animate].visible {
     opacity: 1;
     transform: none;
     translate: unset;
+    filter: none;
     transition: none;
+  }
+
+  .soft-lift:hover,
+  html.has-js [data-animate].visible.soft-lift:hover {
+    transform: none;
+  }
+}
+
+/* ── Soft liquid fill on CTAs (BYQ gem liquid-fill-button-02, CSS-only) ── */
+/* Set the fill colour with --fill; pair with a hover:text-* utility for contrast. */
+.liquid-fill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  transition: color 0.5s ease;
+}
+
+.liquid-fill::before {
+  content: '';
+  position: absolute;
+  inset: -20% -10% 0;
+  z-index: -1;
+  background: var(--fill, var(--color-secondary-container));
+  border-radius: 45% 55% 0 0 / 18px 22px 0 0;
+  transform: translateY(105%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), border-radius 0.7s ease;
+}
+
+.liquid-fill:hover::before,
+.liquid-fill:focus-visible::before {
+  transform: translateY(0);
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-fill::before {
+    transition: none;
+  }
+}
+
+/* ── Hero photo blur-up (BYQ gem blur-up-image-reveal-01) ───────── */
+/* CSS keyframes so it starts at first paint, before hydration (keeps LCP intact). */
+.blur-up {
+  animation: blur-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+html.cm-intro .blur-up {
+  animation-delay: 1.5s;
+}
+
+@keyframes blur-up {
+  from { filter: blur(16px); transform: scale(1.06); }
+  to { filter: none; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blur-up {
+    animation: none;
+  }
+}
+
+/* ── Loader panel: intro (components/IntroLoader.vue) + page veil (plugins/page-veil.client.ts) ── */
+/* Lavender panel on the cream page so the pull down / pull up reads as movement. */
+.cm-intro-overlay {
+  display: none;
+}
+
+html.cm-intro .cm-intro-overlay,
+.cm-veil {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--color-secondary-container);
+  will-change: transform;
+}
+
+html.cm-intro .cm-intro-overlay {
+  z-index: 100;
+  /* Safety net: lifts on its own even if JS never hydrates */
+  animation: cm-intro-fallback 0.5s cubic-bezier(0.65, 0, 0.35, 1) 3s forwards;
+}
+
+html.cm-intro-out .cm-intro-overlay {
+  transform: translateY(-100%);
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  pointer-events: none;
+}
+
+@keyframes cm-intro-fallback {
+  to { transform: translateY(-100%); visibility: hidden; }
+}
+
+.cm-intro-outline {
+  color: color-mix(in srgb, var(--color-secondary) 12%, transparent);
+}
+
+.cm-intro-fill {
+  clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+}
+
+.cm-veil {
+  z-index: 90;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(-100%);
+}
+
+.cm-veil.is-in,
+.cm-veil.is-out {
+  visibility: visible;
+  transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.cm-veil.is-in {
+  transform: none;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cm-veil,
+  .cm-veil.is-in,
+  .cm-veil.is-out {
+    transform: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .cm-veil.is-in {
+    opacity: 1;
   }
 }

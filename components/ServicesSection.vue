@@ -16,7 +16,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
         <!-- Couple Coaching -->
-        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
+        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
           <div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
           </div>
@@ -37,7 +37,7 @@
           </ul>
           <div class="flex flex-col gap-3">
             <button
-              class="w-full bg-secondary text-on-secondary py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              class="liquid-fill w-full bg-secondary text-on-secondary py-4 rounded-xl font-semibold hover:text-on-secondary-container"
               @click="booking.open('couple')"
             >
               Prendre rendez-vous
@@ -52,7 +52,7 @@
         </div>
 
         <!-- Individual Therapy -->
-        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow hover:-translate-y-2 transition-transform duration-300" data-animate>
+        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
           <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:person" class="text-2xl text-primary" />
           </div>
@@ -73,7 +73,7 @@
           </ul>
           <div class="flex flex-col gap-3">
             <button
-              class="w-full bg-surface text-primary py-4 rounded-xl font-semibold hover:bg-primary-fixed transition-colors duration-300"
+              class="liquid-fill [--fill:var(--color-primary-fixed)] w-full bg-surface text-primary py-4 rounded-xl font-semibold"
               @click="booking.open('individual')"
             >
               Prendre rendez-vous

@@ -14,7 +14,7 @@
 
       <!-- Desktop links -->
       <div v-if="!minimalNav" class="hidden md:flex items-center gap-10">
-        <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="linkClass">{{ link.label }}</a>
+        <NuxtLink v-for="link in navLinks" :key="link.label" :to="link.href" :class="linkClass">{{ link.label }}</NuxtLink>
         <NuxtLink to="/blog" :class="linkClass">Blog</NuxtLink>
       </div>
 
@@ -42,8 +42,14 @@
     </div>
 
     <!-- Mobile drawer -->
-    <div v-if="menuOpen && !minimalNav" :class="['md:hidden px-8 py-6 flex flex-col gap-6 border-t transition-colors duration-500', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
-      <a v-for="link in navLinks" :key="link.label" :href="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</a>
+    <Transition
+      enter-active-class="transition duration-300 ease-out motion-reduce:transition-none"
+      enter-from-class="opacity-0 -translate-y-2"
+      leave-active-class="transition duration-200 ease-in motion-reduce:transition-none"
+      leave-to-class="opacity-0 -translate-y-2"
+    >
+    <div v-if="menuOpen && !minimalNav" :class="['md:hidden absolute top-full inset-x-0 px-8 py-6 flex flex-col gap-6 border-t', isJourney ? 'border-white/10' : 'border-outline-variant/30']" :style="drawerStyle">
+      <NuxtLink v-for="link in navLinks" :key="link.label" :to="link.href" :class="mobileLinkClass" @click="menuOpen = false">{{ link.label }}</NuxtLink>
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
       <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500 min-h-[44px]" @click="contact.open(); menuOpen = false">Me contacter</button>
       <div class="flex items-center gap-3">
@@ -59,6 +65,7 @@
         </a>
       </div>
     </div>
+    </Transition>
   </nav>
 </template>
 

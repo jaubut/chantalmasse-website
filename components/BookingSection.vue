@@ -35,7 +35,7 @@
             </ul>
 
             <button
-              class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl hover:scale-105 transition-transform"
+              class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl liquid-fill [--fill:var(--color-primary-container)]"
               @click="booking.open()"
             >
               Réserver une séance
