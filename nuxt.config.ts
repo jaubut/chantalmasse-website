@@ -8,6 +8,8 @@ export default defineNuxtConfig({
     // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
     // Page routes are pre-rendered at build time via routeRules below.
     preset: 'vercel',
+    // Written to .vc-config.json; `vercel.regions` only applies to edge functions.
+    vercel: { functions: { regions: ['yul1'] } },
     prerender: {
       crawlLinks: true,
     },
