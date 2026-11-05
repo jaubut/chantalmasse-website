@@ -13,7 +13,7 @@
           <div class="aspect-[4/5] max-w-md mx-auto md:mx-0 rounded-[2rem] overflow-hidden">
             <NuxtImg
               src="/images/chantal-hero.jpg"
-              sizes="xs:137vw sm:615px"
+              sizes="sm:137vw md:615px"
               quality="75"
               alt="Chantal Massé, thérapeute en relation d'aide"
               class="w-full h-full object-cover"

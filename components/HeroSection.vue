@@ -107,7 +107,7 @@
           <div class="blur-up w-full h-full">
           <NuxtImg
             src="/images/chantal-hero.jpg"
-            sizes="xs:137vw lg:690px"
+            sizes="sm:137vw lg:690px"
             quality="75"
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
