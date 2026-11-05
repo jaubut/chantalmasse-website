@@ -11,8 +11,10 @@
         <!-- Portrait — order-2 on mobile, order-1 (left) on md+ -->
         <div class="order-2 md:order-1">
           <div class="aspect-[4/5] max-w-md mx-auto md:mx-0 rounded-[2rem] overflow-hidden">
-            <img
+            <NuxtImg
               src="/images/chantal-hero.jpg"
+              sizes="xs:137vw sm:615px"
+              quality="75"
               alt="Chantal Massé, thérapeute en relation d'aide"
               class="w-full h-full object-cover"
               style="filter: grayscale(8%);"
