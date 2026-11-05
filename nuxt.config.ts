@@ -146,14 +146,15 @@ export default defineNuxtConfig({
           tagPosition: 'head',
         },
         {
-          src: 'https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W',
-          async: true,
-        },
-        {
           innerHTML: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-CTE3NV511W')",
         },
         {
-          innerHTML: "!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','948606391153047');fbq('track','PageView')",
+          innerHTML: "!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);fbq('init','948606391153047');fbq('track','PageView')",
+        },
+        {
+          // GA and Meta queue their calls above; the libraries start after the stylesheet (see server/plugins/css-first.ts).
+          type: 'module',
+          innerHTML: "for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}",
         },
       ],
       noscript: [

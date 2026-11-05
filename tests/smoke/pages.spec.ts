@@ -28,6 +28,12 @@ function routesFromPagesDir(): string[] {
     .map((f) => `/${relative(root, f).replace(/\.vue$/, '').replace(/(^|\/)index$/, '')}`.replace(/\/$/, '') || '/')
 }
 
+test('no JS download is declared in the HTML, so it cannot compete with the stylesheet', async ({ request }) => {
+  const html = await (await request.get('/')).text()
+  expect(html).toContain('rel="stylesheet"')
+  expect(html).not.toMatch(/<script[^>]* src=|<link rel="(?:modulepreload|prefetch)"/)
+})
+
 test('inventory: every static page in pages/ is covered by the smoke suite', () => {
   expect(routesFromPagesDir().sort()).toEqual(Object.keys(PAGES).sort())
 })
