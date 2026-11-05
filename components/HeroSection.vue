@@ -105,8 +105,10 @@
         <div class="absolute -bottom-10 -left-10 w-64 h-64 rounded-full blur-3xl -z-10" style="background-color: rgba(219,225,255,0.3);"></div>
         <div class="aspect-[4/5] rounded-[2rem] overflow-hidden lg:translate-x-12 translate-y-4">
           <div class="blur-up w-full h-full">
-          <img
+          <NuxtImg
             src="/images/chantal-hero.jpg"
+            sizes="sm:137vw lg:690px"
+            quality="75"
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"
