@@ -1,13 +1,29 @@
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2025-05-05',
   devtools: { enabled: true },
   nitro: {
     // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
     // Page routes are pre-rendered at build time via routeRules below.
-    preset: 'vercel',
+    preset: process.env.NITRO_PRESET || 'cloudflare_module',
+    cloudflare: {
+      deployConfig: true,
+      nodeCompat: true,
+      wrangler: {
+        name: 'chantalmasse-website',
+        compatibility_date: '2025-05-05',
+        compatibility_flags: ['nodejs_compat'],
+        observability: { enabled: true },
+      },
+    },
+    alias: {
+      googleapis: fileURLToPath(new URL('./server/shims/googleapis-calendar.ts', import.meta.url)),
+      twilio: fileURLToPath(new URL('./server/shims/twilio.ts', import.meta.url)),
+      '@react-email/render': fileURLToPath(new URL('./server/shims/empty.ts', import.meta.url)),
+    },
     // Written to .vc-config.json; `vercel.regions` only applies to edge functions.
     vercel: { functions: { regions: ['yul1'] } },
     prerender: {
