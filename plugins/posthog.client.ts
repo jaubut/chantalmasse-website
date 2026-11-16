@@ -9,6 +9,9 @@ import posthog from 'posthog-js'
 // (local dev), init is silently skipped and every `posthog.capture(...)` is
 // a no-op, so existing tracking code never errors.
 export default defineNuxtPlugin((nuxtApp) => {
+  // Email confirmation fragments contain a private token. Do not initialize
+  // analytics here, before Nuxt has finished restoring/clearing the fragment.
+  if (/^\/confirmer-inscription\/?$/.test(window.location.pathname)) return
   const config = useRuntimeConfig()
   const key = config.public.posthogKey as string
   const host = config.public.posthogHost as string
@@ -24,6 +27,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     autocapture: true,
     capture_pageview: false, // we fire $pageview manually below
     capture_pageleave: true,
+    before_send: (event) => /^\/confirmer-inscription\/?$/.test(window.location.pathname) ? null : event,
     session_recording: {
       maskAllInputs: true,
       maskTextSelector: "[data-posthog-mask], a[href^='tel:'], a[href^='mailto:']",
@@ -34,6 +38,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   // route is resolved + DOM updated, so window.location.pathname is correct.
   const router = useRouter()
   router.afterEach((to) => {
+    if (/^\/confirmer-inscription\/?$/.test(to.path)) return
     // First load already triggers afterEach in Nuxt 3, no need for an
     // explicit onMounted capture.
     posthog.capture('$pageview', {

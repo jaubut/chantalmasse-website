@@ -50,11 +50,15 @@
 // never reaches a server log. Nothing is sent until the button is clicked: link
 // scanners that open the page can't confirm on the subscriber's behalf.
 const token = ref('')
+const router = useRouter()
 const state = ref<'pending' | 'idle' | 'loading' | 'opted_out' | 'invalid'>('pending')
 const error = ref('')
 
-onMounted(() => {
-  token.value = new URLSearchParams(location.hash.slice(1)).get('t') ?? ''
+onNuxtReady(async () => {
+  // Prerender hydration temporarily replaces the URL with the hashless payload
+  // path. Read only after Nuxt restores the incoming route.
+  token.value = new URLSearchParams(router.currentRoute.value.hash.slice(1)).get('t') ?? ''
+  if (token.value) await router.replace({ hash: '' })
   state.value = token.value ? 'idle' : 'invalid'
 })
 
@@ -65,9 +69,9 @@ async function confirm() {
     const { result } = await $fetch<{ result: string }>('/api/newsletter/confirm', { method: 'POST', body: { token: token.value } })
     if (result === 'confirmed') return navigateTo('/inscription-confirmee')
     state.value = result === 'opted_out' ? 'opted_out' : 'invalid'
-  } catch (e: any) {
+  } catch {
     state.value = 'idle'
-    error.value = e?.data?.statusMessage ?? 'Une erreur est survenue. Réessayez.'
+    error.value = 'Une erreur est survenue. Réessayez.'
   }
 }
 

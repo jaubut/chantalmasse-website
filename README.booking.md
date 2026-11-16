@@ -114,6 +114,12 @@ The site is a Cloudflare Worker (`chantalmasse-website`). Set each variable from
 
 The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (paste as a single line).
 
+Build with `bun run build`, then deploy the generated Worker with `bunx wrangler deploy --config .output/server/wrangler.json`. Nitro's `cloudflare_module` preset and `nodejs_compat` keep `/api/**` running in Workers; `.output/public` contains prerendered pages and assets, not the complete deployment. `bun run build:smoke` is only for the Node-based browser test server; rebuild with `bun run build` before deploying.
+
+Newsletter production secrets are **already configured** on `chantalmasse-website`: `NEWSLETTER_SITE_KEY`, `NEWSLETTER_API_BASE`, `NUXT_NEWSLETTER_SITE_KEY`, and `NUXT_NEWSLETTER_API_BASE`. The API base is `https://dashboard.apies.dev`. Both newsletter routes use `useRuntimeConfig(event)`, which reads the `NUXT_` bindings per request; plain names are local/build-time aliases. No secret values belong in Wrangler config or the repository. See [Nuxt runtime config](https://nuxt.com/docs/4.x/guide/going-further/runtime-config) and [Nitro Workers deployment](https://nitro.build/deploy/providers/cloudflare).
+
+Chantal approved the consent wording (`2026-11-v1`) and `/confidentialite-infolettre`; neither is a draft. After deployment, verify the real inbox → confirmation button → `/inscription-confirmee` → dashboard contact flow on `chantalmasse.com` (preview origins are deliberately refused).
+
 ---
 
 ## Step 9 — Trigger.dev (24h Reminder Cron)

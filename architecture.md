@@ -30,7 +30,7 @@ chantalmasse.com — French-language marketing and booking site for Chantal Mass
 | `pages/blog/[slug].vue` | 249 | page | 0 | route: PAGE /blog/:slug · calls: /api/newsletter/subscribe |
 | `components/ServicesSection.vue` | 241 | component | 1 |  |
 | `components/booking/ConfirmationView.vue` | 191 | component | 1 |  |
-| `nuxt.config.ts` | 186 | config | 0 |  |
+| `nuxt.config.ts` | 187 | config | 0 |  |
 | `utils/metaApi.ts` | 180 | util | 7 | state: let insightsCache |
 | `components/ContactModal.vue` | 179 | component | 1 | calls: /api/contact |
 | `server/utils/googleCalendar.ts` | 179 | server-lib | 8 |  |
@@ -65,7 +65,7 @@ chantalmasse.com — French-language marketing and booking site for Chantal Mass
 | `components/journey/CursorSoul.vue` | 89 | component | 1 | state: let target, let raf · listens: onMounted, onUnmounted |
 | `server/api/booking/availability.get.ts` | 86 | server-api | 0 | state: cache: Map · route: GET /api/booking/availability |
 | `pages/confidentialite-infolettre.vue` | 85 | page | 0 | route: PAGE /confidentialite-infolettre |
-| `pages/confirmer-inscription.vue` | 81 | page | 0 | route: PAGE /confirmer-inscription · calls: /api/newsletter/confirm · listens: onMounted |
+| `pages/confirmer-inscription.vue` | 83 | page | 0 | route: PAGE /confirmer-inscription · calls: /api/newsletter/confirm · listens: onNuxtReady |
 | `scripts/ads-cleanup-conversions.ts` | 81 | script | 0 | state: KEEP_IDS: Set |
 | `components/BookingSection.vue` | 80 | component | 1 |  |
 | `scripts/ga4-audit-part2.ts` | 78 | script | 0 |  |
@@ -74,9 +74,9 @@ chantalmasse.com — French-language marketing and booking site for Chantal Mass
 | `components/TestimonialsSection.vue` | 70 | component | 1 |  |
 | `trigger/weekly-brief.ts` | 67 | trigger | 1 |  |
 | `components/IntroLoader.vue` | 60 | component | 1 | listens: onMounted |
+| `plugins/posthog.client.ts` | 59 | plugin | 0 |  |
 | `server/api/contact.post.ts` | 59 | server-api | 0 | route: POST /api/contact |
 | `server/api/booking/cancel-info.get.ts` | 56 | server-api | 0 | route: GET /api/booking/cancel-info |
-| `plugins/posthog.client.ts` | 54 | plugin | 0 |  |
 | `pages/mentions-legales.vue` | 53 | page | 0 | route: PAGE /mentions-legales |
 | `server/api/img-proxy.get.ts` | 51 | server-api | 0 | route: GET /api/img-proxy |
 | `plugins/page-veil.client.ts` | 48 | plugin | 0 |  |

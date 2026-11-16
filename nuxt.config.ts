@@ -68,10 +68,10 @@ export default defineNuxtConfig({
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
     siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
-    // Newsletter double opt-in lives on the dashboard (tls-dashboard-v2 #433). Default = its Cloud Run origin.
-    // On Cloudflare, set the runtime secret NUXT_NEWSLETTER_SITE_KEY (and optionally NUXT_NEWSLETTER_API_BASE).
-    newsletterApiBase: process.env.NEWSLETTER_API_BASE || 'https://tls-dashboard-v2-1016439101738.northamerica-northeast1.run.app',
-    newsletterSiteKey: process.env.NEWSLETTER_SITE_KEY,
+    // Newsletter secrets are already bound on Worker chantalmasse-website.
+    // NUXT_NEWSLETTER_* overrides these defaults at runtime via useRuntimeConfig(event).
+    newsletterApiBase: process.env.NEWSLETTER_API_BASE || 'https://dashboard.apies.dev',
+    newsletterSiteKey: process.env.NEWSLETTER_SITE_KEY || '',
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
@@ -164,15 +164,16 @@ export default defineNuxtConfig({
           tagPosition: 'head',
         },
         {
-          innerHTML: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-CTE3NV511W')",
+          innerHTML: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname)){gtag('js',new Date());gtag('config','G-CTE3NV511W')}",
         },
         {
-          innerHTML: "!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);fbq('init','948606391153047');fbq('track','PageView')",
+          innerHTML: "!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname)){fbq('init','948606391153047');fbq('track','PageView')}",
         },
         {
           // GA and Meta queue their calls above; the libraries start after the stylesheet (see server/plugins/css-first.ts).
+          // Confirmation links contain a private token: exclude this page before analytics can read the URL.
           type: 'module',
-          innerHTML: "for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}",
+          innerHTML: "if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname))for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}",
         },
       ],
       noscript: [

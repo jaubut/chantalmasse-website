@@ -665,7 +665,7 @@
         },
         {
           "path": "nuxt.config.ts",
-          "lines": 186,
+          "lines": 187,
           "kind": "config",
           "exports": [],
           "state": [],
@@ -824,7 +824,7 @@
         },
         {
           "path": "pages/confirmer-inscription.vue",
-          "lines": 81,
+          "lines": 83,
           "kind": "page",
           "exports": [],
           "state": [],
@@ -842,7 +842,7 @@
           ],
           "imports": [],
           "listeners": [
-            "onMounted"
+            "onNuxtReady"
           ],
           "sheets": 0,
           "externals": []
@@ -1001,7 +1001,7 @@
         },
         {
           "path": "plugins/posthog.client.ts",
-          "lines": 54,
+          "lines": 59,
           "kind": "plugin",
           "exports": [],
           "state": [],

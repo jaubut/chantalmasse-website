@@ -34,6 +34,7 @@ First time: `bun install`, then `bunx playwright install chromium`.
 - booking flow: service → date → time → validation errors → submit (API mocked at the network layer) → confirmation, plus the 409 message
 - contact form: required-field validation, mocked submit, failure fallback
 - cancellation page (`/annuler`): confirm → cancelled, plus the expired link
+- newsletter confirmation: fragment token survives prerender hydration, is removed from the address bar, and is only sent after a click; confirmed/opted-out/invalid results and mobile retry after failure
 - legacy Wix 301s, client-side navigation, 404 page, sitemap/robots
 - design system: Tailwind theme colours, spacing and fonts are actually applied (catches a CSS pipeline that builds but emits nothing)
 - axe on the home page: fails on any serious/critical violation except the pre-existing `color-contrast`
@@ -41,6 +42,8 @@ First time: `bun install`, then `bunx playwright install chromium`.
 Every smoke test also fails on any console error or uncaught exception, and on any same-origin asset returning ≥ 400. Third-party requests (GA4, Meta Pixel, PostHog, Wix/Unsplash images) are answered locally, so CI never pollutes Chantal's analytics. Images from a host not in `ALLOWED_IMAGE_HOSTS` fail the suite.
 
 The smoke build and server run in UTC (like Cloudflare Workers); the browser runs in `America/Toronto` (like Chantal's visitors).
+
+The Node smoke build does not exercise Workers bindings. For runtime verification, first run `bun run build`, then run the generated `.output/server/wrangler.json` locally with Wrangler/Miniflare. Supply only dummy `NUXT_NEWSLETTER_SITE_KEY` and `NUXT_NEWSLETTER_API_BASE` bindings at runtime, with the API base pointing to an isolated test upstream. Exercise both `/api/newsletter/subscribe` and `/api/newsletter/confirm` with `Origin: https://chantalmasse.com`; assert the forwarded key, Origin, Cloudflare subscriber IP and JSON, and rejection of a foreign Origin. Never use production credentials for these checks. Production already has all four newsletter secrets; the API base there is `https://dashboard.apies.dev`.
 
 Known production bugs, pinned by `test.fixme` (un-fixme once fixed):
 - the Google Ads deep link `/prendre-rendez-vous?book=open&service=couple` doesn't open the modal or preselect the service;

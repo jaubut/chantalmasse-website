@@ -22,7 +22,9 @@ server/api/newsletter/*  — proxies to the dashboard's /api/public/newsletter/*
 
 **Deployment**
 - `nuxt build` writes the Worker and its `wrangler.json` (`nitro.cloudflare.deployConfig`); Node-only libs are shimmed in `server/shims/`
-- Runtime config comes from Worker vars/secrets with the `NUXT_` prefix (e.g. `NUXT_NEWSLETTER_SITE_KEY`)
+- Runtime config comes from Worker vars/secrets with the `NUXT_` prefix. `NEWSLETTER_SITE_KEY`, `NEWSLETTER_API_BASE` and both `NUXT_` equivalents are already production secrets on `chantalmasse-website`; the newsletter API base is `https://dashboard.apies.dev`.
+- Deploy the complete Worker: `bun run build`, then `bunx wrangler deploy --config .output/server/wrangler.json`. The newsletter proxies execute in Workers via per-request `useRuntimeConfig(event)`; uploading `.output/public` alone omits them.
+- Consent wording `2026-11-v1` and the newsletter privacy notice are approved by Chantal.
 - Language: `fr` (set in `nuxt.config.ts` → `app.head.htmlAttrs`)
 
 ---

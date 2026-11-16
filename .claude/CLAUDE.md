@@ -11,7 +11,7 @@ Therapy & coaching website for Chantal Massé (Shefford, QC). French-first, sing
 - Google Fonts: Newsreader (serif headlines) + Manrope (sans body)
 - GSAP (scroll animations) — preferred over CSS-only for scroll-linked timelines
 - Cloudflare Workers deployment (SSR via Nitro `cloudflare_module`)
-- Google Calendar API (booking), Resend (email), Brevo (newsletter)
+- Google Calendar API (booking), Resend (email), TLS dashboard at `https://dashboard.apies.dev` (newsletter double opt-in)
 
 ## Architecture
 

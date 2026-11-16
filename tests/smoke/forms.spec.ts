@@ -90,20 +90,51 @@ test.describe('cancellation page', () => {
 })
 
 test.describe('newsletter confirmation page', () => {
-  test('never confirms without a click, then routes by result', async ({ page }) => {
+  for (const result of ['confirmed', 'opted_out', 'invalid']) {
+    test(`keeps the token through hydration, confirms only on click: ${result}`, async ({ page }) => {
+      const bodies: unknown[] = []
+      await page.route('**/api/newsletter/confirm', async (route) => {
+        bodies.push(route.request().postDataJSON())
+        await route.fulfill({ json: { result } })
+      })
+      await page.goto('/confirmer-inscription#t=abc.def')
+      await waitForHydration(page)
+      const confirm = page.getByRole('button', { name: 'Confirmer mon inscription' })
+      await expect(confirm).toBeEnabled()
+      await expect(page).toHaveURL(/\/confirmer-inscription$/)
+      await expect(page.locator('script[src*="googletagmanager.com"], script[src*="connect.facebook.net"]')).toHaveCount(0)
+      expect(await page.evaluate(() => {
+        const analytics = window as unknown as { dataLayer: unknown[]; fbq: { queue: unknown[] } }
+        return [analytics.dataLayer.length, analytics.fbq.queue.length]
+      })).toEqual([0, 0])
+      expect(bodies).toEqual([])
+
+      await confirm.click()
+      if (result === 'confirmed') await expect(page).toHaveURL(/\/inscription-confirmee$/)
+      else await expect(page.getByText(result === 'opted_out' ? /Vous vous étiez désabonné·e/ : /invalide ou expiré/)).toBeVisible()
+      expect(bodies).toEqual([{ token: 'abc.def' }])
+    })
+  }
+
+  test('retains the token for a retry after a network failure on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 })
     const bodies: unknown[] = []
     await page.route('**/api/newsletter/confirm', async (route) => {
       bodies.push(route.request().postDataJSON())
-      await route.fulfill({ json: { result: 'opted_out' } })
+      if (bodies.length === 1) await route.fulfill({ status: 503, json: { message: 'indisponible' } })
+      else await route.fulfill({ json: { result: 'confirmed' } })
     })
     await page.goto('/confirmer-inscription#t=abc.def')
-    await waitForHydration(page)
-    await expect(page.getByRole('button', { name: 'Confirmer mon inscription' })).toBeEnabled()
+    const confirm = page.getByRole('button', { name: 'Confirmer mon inscription' })
+    await expect(confirm).toBeEnabled()
+    await expect(page).toHaveURL(/\/confirmer-inscription$/)
     expect(bodies).toEqual([])
-
-    await page.getByRole('button', { name: 'Confirmer mon inscription' }).click()
-    await expect(page.getByText(/Vous vous étiez désabonné·e/)).toBeVisible()
-    expect(bodies).toEqual([{ token: 'abc.def' }])
+    await confirm.focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('alert')).toHaveText('Une erreur est survenue. Réessayez.')
+    await confirm.click()
+    await expect(page).toHaveURL(/\/inscription-confirmee$/)
+    expect(bodies).toEqual([{ token: 'abc.def' }, { token: 'abc.def' }])
   })
 
   test('a link without a token shows the invalid state', async ({ page }) => {
