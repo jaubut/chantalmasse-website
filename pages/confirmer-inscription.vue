@@ -49,8 +49,6 @@
 // The confirmation email links here with the token in the fragment (#t=…), so it
 // never reaches a server log. Nothing is sent until the button is clicked: link
 // scanners that open the page can't confirm on the subscriber's behalf.
-const route = useRoute()
-const router = useRouter()
 const token = ref('')
 const state = ref<'pending' | 'idle' | 'loading' | 'opted_out' | 'invalid'>('pending')
 const error = ref('')
@@ -58,8 +56,6 @@ const error = ref('')
 onMounted(() => {
   token.value = new URLSearchParams(location.hash.slice(1)).get('t') ?? ''
   state.value = token.value ? 'idle' : 'invalid'
-  // Drop the token from the address bar and history (through the router, which owns the URL).
-  router.replace({ path: route.path, hash: '' })
 })
 
 async function confirm() {

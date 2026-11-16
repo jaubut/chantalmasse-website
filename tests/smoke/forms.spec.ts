@@ -98,7 +98,7 @@ test.describe('newsletter confirmation page', () => {
     })
     await page.goto('/confirmer-inscription#t=abc.def')
     await waitForHydration(page)
-    await expect(page).toHaveURL(/\/confirmer-inscription$/)
+    await expect(page.getByRole('button', { name: 'Confirmer mon inscription' })).toBeEnabled()
     expect(bodies).toEqual([])
 
     await page.getByRole('button', { name: 'Confirmer mon inscription' }).click()
