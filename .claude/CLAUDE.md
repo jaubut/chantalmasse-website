@@ -10,8 +10,8 @@ Therapy & coaching website for Chantal Massé (Shefford, QC). French-first, sing
 - Tailwind CSS (Material Design 3 color roles)
 - Google Fonts: Newsreader (serif headlines) + Manrope (sans body)
 - GSAP (scroll animations) — preferred over CSS-only for scroll-linked timelines
-- Vercel deployment (SSR via Nitro)
-- Google Calendar API (booking), Resend (email), Brevo (newsletter)
+- Cloudflare Workers deployment (SSR via Nitro `cloudflare_module`)
+- Google Calendar API (booking), Resend (email), TLS dashboard at `https://dashboard.apies.dev` (newsletter double opt-in)
 
 ## Architecture
 

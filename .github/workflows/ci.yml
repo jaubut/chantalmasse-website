@@ -21,7 +21,7 @@ jobs:
     env:
       CI: 'true'
       NUXT_TELEMETRY_DISABLED: '1'
-      # Non-secret configuration only. No Google / Resend / Brevo / Twilio /
+      # Non-secret configuration only. No Google / Resend / dashboard / Twilio /
       # Anthropic / Turso / Meta credentials exist in CI on purpose: the build
       # doesn't need them, and without them the API routes answer 400/503
       # instead of ever reaching a real service.
@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # Node 24 = the Vercel project's runtime; bun 1.3.11 = the version that writes bun.lock.
+      # Node 24 for the build (the site runs on Cloudflare Workers); bun 1.3.11 = the version that writes bun.lock.
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
@@ -60,7 +60,7 @@ jobs:
       - name: Unit & server tests
         run: bun run test
 
-      - name: Build (Vercel preset, as deployed)
+      - name: Build (Cloudflare preset, as deployed)
         run: bun run build
 
       - name: Playwright version

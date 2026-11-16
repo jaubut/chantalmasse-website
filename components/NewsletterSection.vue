@@ -27,36 +27,18 @@
               :disabled="loading || success"
               class="bg-secondary-fixed text-on-secondary-container px-8 py-4 rounded-xl font-semibold hover:scale-105 transition-transform whitespace-nowrap disabled:opacity-50 disabled:scale-100"
             >
-              {{ success ? 'Inscrit ✓' : loading ? '...' : "S'abonner" }}
+              {{ success ? 'Envoyé ✓' : loading ? '...' : "S'abonner" }}
             </button>
           </div>
-          <Transition
-            enter-active-class="transition-all duration-300 ease-out"
-            enter-from-class="opacity-0 -translate-y-2"
-            enter-to-class="opacity-100 translate-y-0"
-            leave-active-class="transition-all duration-200 ease-in"
-            leave-from-class="opacity-100 translate-y-0"
-            leave-to-class="opacity-0 -translate-y-2"
-          >
-            <div
-              v-if="email.length > 0"
-              class="w-full sm:w-auto sm:self-start"
-            >
-              <label for="newsletter-phone" class="sr-only">Téléphone optionnel</label>
-              <input
-                id="newsletter-phone"
-                v-model="phone"
-                type="tel"
-                autocomplete="tel"
-                maxlength="32"
-                placeholder="Téléphone (optionnel)"
-                :disabled="loading || success"
-                class="bg-tertiary-container text-on-tertiary rounded-xl px-6 py-4 outline-hidden placeholder-on-tertiary-container/60 focus:ring-2 focus:ring-secondary-fixed/50 disabled:opacity-50 w-full"
-              />
-            </div>
-          </Transition>
+          <!-- Honeypot: bots fill it, the dashboard then sends nothing -->
+          <input v-model="website" type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
+          <p class="text-sm text-on-tertiary-container font-light max-w-md">
+            {{ NEWSLETTER_CONSENT_TEXT }}
+            <NuxtLink to="/confidentialite-infolettre" class="inline-block py-2 underline underline-offset-2">Confidentialité</NuxtLink>
+          </p>
         </form>
-        <p v-if="error" class="mt-3 text-sm text-red-400">{{ error }}</p>
+        <p role="status" aria-live="polite" class="mt-3 text-sm text-secondary-fixed">{{ success ? NEWSLETTER_SUCCESS : '' }}</p>
+        <p v-if="error" role="alert" class="mt-3 text-sm text-red-400">{{ error }}</p>
       </div>
 
       <!-- Right: blog cards -->
@@ -87,12 +69,14 @@
 </template>
 
 <script setup lang="ts">
+import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
+
 defineProps<{
   posts: { slug: string; title: string; image: string; readTime: number }[]
 }>()
 
 const email = ref('')
-const phone = ref('')
+const website = ref('')
 const loading = ref(false)
 const success = ref(false)
 const error = ref('')
@@ -105,12 +89,11 @@ async function subscribe() {
       method: 'POST',
       body: {
         email: email.value.trim(),
-        phone: phone.value.trim() || undefined,
+        website: website.value,
       },
     })
     success.value = true
     email.value = ''
-    phone.value = ''
   } catch (e: any) {
     error.value = e?.data?.statusMessage ?? 'Une erreur est survenue. Réessayez.'
   } finally {

@@ -5,7 +5,7 @@
 Single-page marketing website for **Chantal Massé**, a French-language therapist based in Shefford, Québec.
 
 **Stack**
-- Nuxt 3 (SSR, `compat date: 2024-11-01`) — deployed to Vercel via `nitro preset: 'vercel'`
+- Nuxt 3 (SSR, `compat date: 2024-11-01`) — deployed to Cloudflare Workers via `nitro preset: 'cloudflare_module'`
 - Vue 3 (Composition API, `<script setup>`)
 - Tailwind CSS via `@nuxtjs/tailwindcss`
 - Google Fonts via `@nuxtjs/google-fonts`
@@ -15,10 +15,16 @@ Single-page marketing website for **Chantal Massé**, a French-language therapis
 ```
 app.vue           — root shell: <TheNav /> + <NuxtPage /> + <TheFooter />
 pages/index.vue   — single page, composes all sections in order + calls useScrollAnimation()
+pages/confirmer-inscription.vue — newsletter double opt-in: reads #t=<token>, confirms on click via /api/newsletter/confirm
+pages/confidentialite-infolettre.vue — newsletter privacy notice (Law 25)
+server/api/newsletter/*  — proxies to the dashboard's /api/public/newsletter/* (server/utils/newsletterApi.ts); consent text in utils/newsletterConsent.ts
 ```
 
 **Deployment**
-- `vercel.json` sets `buildCommand: npm run build`, `outputDirectory: .output/public`, `framework: nuxtjs`
+- `nuxt build` writes the Worker and its `wrangler.json` (`nitro.cloudflare.deployConfig`); Node-only libs are shimmed in `server/shims/`
+- Runtime config comes from Worker vars/secrets with the `NUXT_` prefix. `NEWSLETTER_SITE_KEY`, `NEWSLETTER_API_BASE` and both `NUXT_` equivalents are already production secrets on `chantalmasse-website`; the newsletter API base is `https://dashboard.apies.dev`.
+- Deploy the complete Worker: `bun run build`, then `bunx wrangler deploy --config .output/server/wrangler.json`. The newsletter proxies execute in Workers via per-request `useRuntimeConfig(event)`; uploading `.output/public` alone omits them.
+- Consent wording `2026-11-v1` and the newsletter privacy notice are approved by Chantal.
 - Language: `fr` (set in `nuxt.config.ts` → `app.head.htmlAttrs`)
 
 ---
@@ -41,7 +47,7 @@ Owns section order and initialises scroll animation. No local state.
 | `PhilosophySection.vue` | `#approche` | Left image + floating quote, right prose |
 | `MethodsSection.vue` | — | Three methodology cards: ANDC, Imago, Neurosciences |
 | `TestimonialsSection.vue` | — | Three testimonial cards (staggered vertical offset on lg) |
-| `NewsletterSection.vue` | — | Email subscribe form + two blog preview cards |
+| `NewsletterSection.vue` | — | Email subscribe form (consent sentence, honeypot) + two blog preview cards |
 | `BookingSection.vue` | `#booking` | Contact CTA + location/accreditation info + schedule card |
 | `TheFooter.vue` | — | Logo, legal links (stubs), copyright |
 
@@ -90,7 +96,6 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 ## Known Fragile Areas
 
 - **Hero image & blog images are Unsplash URLs** — not local assets. They will break if Unsplash changes URLs or rate-limits. Real production images should be placed in `public/images/` (a `.gitkeep` exists).
-- **Newsletter form does nothing** — `@submit.prevent` with no handler. Needs backend integration (e.g. Mailchimp, Kit, or a Nuxt server route).
 - **Booking CTA is a self-anchor** (`href="#booking"`) — there is no actual calendar or booking integration yet.
 - **Footer links are stubs** (`href="#"`) — Mentions Légales, Confidentialité, and FR/EN toggle are not implemented.
 - **Blog section is static** — the two cards in `NewsletterSection.vue` are hardcoded. There is no CMS, no `pages/blog/` route, and no content collection.
@@ -102,7 +107,7 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 ## Decisions Made
 
 - **Nuxt SSR over SPA** — `ssr: true` ensures SEO is handled server-side, important for a therapist's discoverability.
-- **Vercel + Nitro preset** — zero-config deployment; `vercel.json` is minimal by design.
+- **Cloudflare Workers + Nitro `cloudflare_module` preset** — config generated from `nuxt.config.ts`, no hand-written wrangler file.
 - **Material Design 3 color roles** — provides a systematic, accessible palette rather than ad-hoc hex values. Allows future dark mode via role swapping.
 - **Newsreader italic for headlines** — editorial, warm aesthetic aligned with the therapeutic brand. Manrope provides readable, neutral body copy.
 - **`useScrollAnimation` as a composable** — keeps animation logic out of individual components and ensures a single observer instance per page.
@@ -123,7 +128,6 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 **What is missing / next steps**:
 - Real photography (replace Unsplash placeholders with `public/images/`)
 - Booking system integration (Calendly embed, or custom form → email)
-- Newsletter backend (Mailchimp / Kit API or Nuxt server route)
 - Blog: create `pages/blog/` + content collections or CMS
 - Legal pages: Mentions Légales, Politique de confidentialité
 - EN language toggle / i18n (`@nuxtjs/i18n`)

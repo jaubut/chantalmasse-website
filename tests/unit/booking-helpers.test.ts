@@ -5,7 +5,7 @@ import {
 } from '~/utils/bookingHelpers'
 import { BOOKING_SERVICES, getBookingService } from '~/utils/bookingServices'
 
-// Monday 2026-10-05, 08:00 EDT (TZ=UTC like Vercel, see vitest.config.ts).
+// Monday 2026-10-05, 08:00 EDT (TZ=UTC like Cloudflare Workers, see vitest.config.ts).
 beforeEach(() => { vi.useFakeTimers({ now: new Date('2026-10-05T12:00:00Z'), toFake: ['Date'] }) })
 afterEach(() => { vi.useRealTimers() })
 

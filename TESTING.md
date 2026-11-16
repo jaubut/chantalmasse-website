@@ -1,12 +1,12 @@
 # Testing
 
-Three layers, all runnable offline from secrets: no Google, Resend, Brevo, Twilio, Anthropic, Turso or Meta credential is needed or used.
+Three layers, all runnable offline from secrets: no Google, Resend, dashboard, Twilio, Anthropic, Turso or Meta credential is needed or used.
 
 | Command | What | Time (M-series Mac) |
 |---|---|---|
 | `bun run typecheck` | `nuxt typecheck` (vue-tsc, strict) gated against `tests/typecheck-baseline.json` | ~10 s |
 | `bun run test` | Vitest: unit + server-route tests, network blocked | ~2 s |
-| `bun run build` | Production build (Vercel preset) | ~25 s |
+| `bun run build` | Production build (Cloudflare preset) | ~25 s |
 | `bun run test:smoke` | Builds with the `node-server` preset, serves it, runs Playwright (Chromium, headless) | ~45 s |
 
 First time: `bun install`, then `bunx playwright install chromium`.
@@ -17,11 +17,12 @@ First time: `bun install`, then `bunx playwright install chromium`.
 
 ## What's covered
 
-**Server routes** (`tests/server/`): each handler runs through a real h3 app, with `useRuntimeConfig`/`$fetch` doubles and Google Calendar, Twilio and Brevo mocked:
+**Server routes** (`tests/server/`): each handler runs through a real h3 app, with `useRuntimeConfig`/`$fetch` doubles and Google Calendar and Twilio mocked, and the dashboard faked at `fetch`:
 - `booking/availability`: param validation, booking window, working hours, 24 h notice, 15 min buffer, 60/90 min services, 5 min cache, Google failure → 503
 - `booking/create`: all 400 paths, 409 (taken slot / closed day / notice), 503 paths, happy path (one event, client + therapist emails, SMS only with consent, Meet link for video), notification failures don't fail a booking, Meta CAPI skipped when unconfigured
 - `booking/cancel-info`, `booking/cancel`: 400/404/503, single-use behaviour, notifications, SMS consent
-- `contact`, `newsletter/subscribe`: validation, honeypot, 503 when unconfigured, HTML escaping, Brevo double opt-in
+- `contact`: validation, honeypot, 503 when unconfigured, HTML escaping
+- `newsletter/subscribe`, `newsletter/confirm`: proxies to the dashboard (key, Origin and subscriber IP forwarded, Origin refused off-site, status mapping, timeout → 503)
 - `img-proxy`: SSRF host allowlist, protocol checks, non-image refusal
 - trigger.dev tasks `review-request` (Turso dedupe, opt-out, 180-day repeat, failure isolation) and `booking-reminder` (email + SMS, manual calendar bookings, failure isolation)
 
@@ -33,20 +34,23 @@ First time: `bun install`, then `bunx playwright install chromium`.
 - booking flow: service → date → time → validation errors → submit (API mocked at the network layer) → confirmation, plus the 409 message
 - contact form: required-field validation, mocked submit, failure fallback
 - cancellation page (`/annuler`): confirm → cancelled, plus the expired link
+- newsletter confirmation: fragment token survives prerender hydration, is removed from the address bar, and is only sent after a click; confirmed/opted-out/invalid results and mobile retry after failure
 - legacy Wix 301s, client-side navigation, 404 page, sitemap/robots
 - design system: Tailwind theme colours, spacing and fonts are actually applied (catches a CSS pipeline that builds but emits nothing)
 - axe on the home page: fails on any serious/critical violation except the pre-existing `color-contrast`
 
 Every smoke test also fails on any console error or uncaught exception, and on any same-origin asset returning ≥ 400. Third-party requests (GA4, Meta Pixel, PostHog, Wix/Unsplash images) are answered locally, so CI never pollutes Chantal's analytics. Images from a host not in `ALLOWED_IMAGE_HOSTS` fail the suite.
 
-The smoke build and server run in UTC (like Vercel); the browser runs in `America/Toronto` (like Chantal's visitors).
+The smoke build and server run in UTC (like Cloudflare Workers); the browser runs in `America/Toronto` (like Chantal's visitors).
+
+The Node smoke build does not exercise Workers bindings. For runtime verification, first run `bun run build`, then run the generated `.output/server/wrangler.json` locally with Wrangler/Miniflare. Supply only dummy `NUXT_NEWSLETTER_SITE_KEY` and `NUXT_NEWSLETTER_API_BASE` bindings at runtime, with the API base pointing to an isolated test upstream. Exercise both `/api/newsletter/subscribe` and `/api/newsletter/confirm` with `Origin: https://chantalmasse.com`; assert the forwarded key, Origin, Cloudflare subscriber IP and JSON, and rejection of a foreign Origin. Never use production credentials for these checks. Production already has all four newsletter secrets; the API base there is `https://dashboard.apies.dev`.
 
 Known production bugs, pinned by `test.fixme` (un-fixme once fixed):
 - the Google Ads deep link `/prendre-rendez-vous?book=open&service=couple` doesn't open the modal or preselect the service;
 - blog dates: `new Date('YYYY-MM-DD')` is UTC midnight, so the server renders "15 février" and Quebec browsers hydrate to "14 février", with a hydration mismatch. That one console error is tolerated on `/blog` pages only (`KNOWN_CONSOLE_ERRORS` in `tests/smoke/fixtures.ts`).
 
 Known gaps:
-- Real deliverability of Resend/Brevo/Twilio/Google and the external image CDNs is out of scope by design.
+- Real deliverability of Resend/Twilio/Google/the dashboard and the external image CDNs is out of scope by design.
 
 ## CI and the dependency autopilot
 

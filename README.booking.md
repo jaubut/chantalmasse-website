@@ -108,23 +108,29 @@ BOOKING_MIN_NOTICE_HOURS=24
 
 ---
 
-## Step 8 — Vercel Deployment
+## Step 8 — Cloudflare Deployment
 
-In the Vercel project settings, add all environment variables from `.env` under **Settings → Environment Variables**.
+The site is a Cloudflare Worker (`chantalmasse-website`). Set each variable from `.env` as a Worker secret, with the `NUXT_` prefix and the runtime-config name in SCREAMING_SNAKE_CASE so Nuxt picks it up at runtime, e.g. `wrangler secret put NUXT_RESEND_API_KEY` (or **Workers → Settings → Variables and Secrets**).
 
-The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (do NOT use the Vercel multiline editor for this key — paste as a single line).
+The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (paste as a single line).
+
+Build with `bun run build`, then deploy the generated Worker with `bunx wrangler deploy --config .output/server/wrangler.json`. Nitro's `cloudflare_module` preset and `nodejs_compat` keep `/api/**` running in Workers; `.output/public` contains prerendered pages and assets, not the complete deployment. `bun run build:smoke` is only for the Node-based browser test server; rebuild with `bun run build` before deploying.
+
+Newsletter production secrets are **already configured** on `chantalmasse-website`: `NEWSLETTER_SITE_KEY`, `NEWSLETTER_API_BASE`, `NUXT_NEWSLETTER_SITE_KEY`, and `NUXT_NEWSLETTER_API_BASE`. The API base is `https://dashboard.apies.dev`. Both newsletter routes use `useRuntimeConfig(event)`, which reads the `NUXT_` bindings per request; plain names are local/build-time aliases. No secret values belong in Wrangler config or the repository. See [Nuxt runtime config](https://nuxt.com/docs/4.x/guide/going-further/runtime-config) and [Nitro Workers deployment](https://nitro.build/deploy/providers/cloudflare).
+
+Chantal approved the consent wording (`2026-11-v1`) and `/confidentialite-infolettre`; neither is a draft. After deployment, verify the real inbox → confirmation button → `/inscription-confirmee` → dashboard contact flow on `chantalmasse.com` (preview origins are deliberately refused).
 
 ---
 
 ## Step 9 — Trigger.dev (24h Reminder Cron)
 
-The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs its own copy of the credentials.
+The hourly reminder scan runs in Trigger.dev, independently of Cloudflare. It needs its own copy of the credentials.
 
 1. Open your project at https://cloud.trigger.dev
 2. **Environments → Production → Environment Variables**
 3. Add every variable that the `trigger/booking-reminder.ts` task reads:
    - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-   - `GOOGLE_PRIVATE_KEY` (same `\n`-escaped format as Vercel)
+   - `GOOGLE_PRIVATE_KEY` (same `\n`-escaped format as on Cloudflare)
    - `GOOGLE_CALENDAR_ID`
    - `RESEND_API_KEY`
    - `EMAIL_FROM`
@@ -138,7 +144,7 @@ The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs 
 
 ## Deployment Notes
 
-- The site uses the `vercel` preset (not `vercel-static`) because API routes are required for booking functionality. Page routes are pre-rendered statically at build time.
+- The site uses the `cloudflare_module` preset because API routes are required for booking functionality. Page routes are pre-rendered statically at build time.
 - The `/api/booking/availability` response is cached in-memory for 5 minutes per month/service to reduce Google API calls.
 - Cancellation (phase 2) generates a unique `cancelToken` per booking that can be used to cancel via `/api/booking/cancel`.
 

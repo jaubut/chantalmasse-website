@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-09-09",
+  "generatedAt": "2026-11-16",
   "repo": "chantalmasse-website",
-  "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Vercel): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
+  "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Cloudflare Workers): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
   "targets": [
     {
       "name": "site",
@@ -11,7 +11,7 @@
       "modules": [
         {
           "path": "app.vue",
-          "lines": 19,
+          "lines": 20,
           "kind": "app",
           "exports": [],
           "state": [],
@@ -28,7 +28,7 @@
         },
         {
           "path": "components/BookingSection.vue",
-          "lines": 79,
+          "lines": 80,
           "kind": "component",
           "exports": [
             "BookingSection"
@@ -111,7 +111,7 @@
         },
         {
           "path": "components/HeroSection.vue",
-          "lines": 153,
+          "lines": 157,
           "kind": "component",
           "exports": [
             "HeroSection"
@@ -127,6 +127,25 @@
           "listeners": [
             "onMounted",
             "onBeforeUnmount"
+          ],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "components/IntroLoader.vue",
+          "lines": 60,
+          "kind": "component",
+          "exports": [
+            "IntroLoader"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [
+            "onMounted"
           ],
           "sheets": 0,
           "externals": []
@@ -152,7 +171,7 @@
         },
         {
           "path": "components/NewsletterSection.vue",
-          "lines": 121,
+          "lines": 104,
           "kind": "component",
           "exports": [
             "NewsletterSection"
@@ -164,7 +183,9 @@
           "apiCalls": [
             "/api/newsletter/subscribe"
           ],
-          "imports": [],
+          "imports": [
+            "utils/newsletterConsent.ts"
+          ],
           "listeners": [],
           "sheets": 0,
           "externals": []
@@ -242,7 +263,7 @@
         },
         {
           "path": "components/TheNav.vue",
-          "lines": 164,
+          "lines": 171,
           "kind": "component",
           "exports": [
             "TheNav"
@@ -516,26 +537,6 @@
           "externals": []
         },
         {
-          "path": "components/journey/JourneyText.vue",
-          "lines": 54,
-          "kind": "component",
-          "exports": [
-            "JourneyText"
-          ],
-          "state": [],
-          "emits": [],
-          "consumes": [],
-          "endpoints": [],
-          "apiCalls": [],
-          "imports": [
-            "composables/useScrollJourney.ts",
-            "lib/journey-data.ts"
-          ],
-          "listeners": [],
-          "sheets": 0,
-          "externals": []
-        },
-        {
           "path": "composables/useBooking.ts",
           "lines": 24,
           "kind": "composable",
@@ -664,7 +665,7 @@
         },
         {
           "path": "nuxt.config.ts",
-          "lines": 152,
+          "lines": 187,
           "kind": "config",
           "exports": [],
           "state": [],
@@ -675,7 +676,9 @@
           "imports": [],
           "listeners": [],
           "sheets": 0,
-          "externals": []
+          "externals": [
+            "@tailwindcss/vite"
+          ]
         },
         {
           "path": "pages/annuler.vue",
@@ -708,7 +711,7 @@
         },
         {
           "path": "pages/blog/[slug].vue",
-          "lines": 233,
+          "lines": 249,
           "kind": "page",
           "exports": [],
           "state": [],
@@ -724,14 +727,16 @@
           "apiCalls": [
             "/api/newsletter/subscribe"
           ],
-          "imports": [],
+          "imports": [
+            "utils/newsletterConsent.ts"
+          ],
           "listeners": [],
           "sheets": 0,
           "externals": []
         },
         {
           "path": "pages/blog/index.vue",
-          "lines": 160,
+          "lines": 163,
           "kind": "page",
           "exports": [],
           "state": [],
@@ -774,8 +779,31 @@
           ]
         },
         {
+          "path": "pages/confidentialite-infolettre.vue",
+          "lines": 85,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/confidentialite-infolettre",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "utils/newsletterConsent.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "pages/confidentialite.vue",
-          "lines": 59,
+          "lines": 76,
           "kind": "page",
           "exports": [],
           "state": [],
@@ -791,6 +819,31 @@
           "apiCalls": [],
           "imports": [],
           "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "pages/confirmer-inscription.vue",
+          "lines": 83,
+          "kind": "page",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "PAGE",
+              "path": "/confirmer-inscription",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [
+            "/api/newsletter/confirm"
+          ],
+          "imports": [],
+          "listeners": [
+            "onNuxtReady"
+          ],
           "sheets": 0,
           "externals": []
         },
@@ -882,7 +935,7 @@
         },
         {
           "path": "pages/prendre-rendez-vous.vue",
-          "lines": 456,
+          "lines": 466,
           "kind": "page",
           "exports": [],
           "state": [
@@ -932,8 +985,23 @@
           ]
         },
         {
+          "path": "plugins/page-veil.client.ts",
+          "lines": 48,
+          "kind": "plugin",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "plugins/posthog.client.ts",
-          "lines": 54,
+          "lines": 59,
           "kind": "plugin",
           "exports": [],
           "state": [],
@@ -1071,6 +1139,26 @@
           ]
         },
         {
+          "path": "scripts/audit-booking-reminders.ts",
+          "lines": 113,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googlePrivateKey.ts",
+            "server/utils/chantalSessionRules.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": [
+            "googleapis"
+          ]
+        },
+        {
           "path": "scripts/ga4-audit-part2.ts",
           "lines": 78,
           "kind": "script",
@@ -1161,6 +1249,21 @@
             "@google-analytics/data",
             "google-ads-api"
           ]
+        },
+        {
+          "path": "scripts/typecheck-baseline.ts",
+          "lines": 100,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/api/booking/availability.get.ts",
@@ -1323,8 +1426,31 @@
           "externals": []
         },
         {
+          "path": "server/api/newsletter/confirm.post.ts",
+          "lines": 16,
+          "kind": "server-api",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [
+            {
+              "method": "POST",
+              "path": "/api/newsletter/confirm",
+              "prefix": false
+            }
+          ],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/newsletterApi.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "server/api/newsletter/subscribe.post.ts",
-          "lines": 35,
+          "lines": 23,
           "kind": "server-api",
           "exports": [],
           "state": [],
@@ -1339,13 +1465,85 @@
           ],
           "apiCalls": [],
           "imports": [
-            "server/utils/input.ts"
+            "server/utils/input.ts",
+            "server/utils/newsletterApi.ts",
+            "utils/newsletterConsent.ts"
           ],
           "listeners": [],
           "sheets": 0,
-          "externals": [
-            "@getbrevo/brevo"
-          ]
+          "externals": []
+        },
+        {
+          "path": "server/plugins/css-first.ts",
+          "lines": 17,
+          "kind": "server-lib",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "server/shims/empty.ts",
+          "lines": 3,
+          "kind": "server-lib",
+          "exports": [
+            "render"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "server/shims/googleapis-calendar.ts",
+          "lines": 144,
+          "kind": "server-lib",
+          "exports": [
+            "JWT",
+            "calendar",
+            "auth",
+            "calendar_v3",
+            "google"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googlePrivateKey.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "server/shims/twilio.ts",
+          "lines": 30,
+          "kind": "server-lib",
+          "exports": [
+            "twilio"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
         },
         {
           "path": "server/utils/briefService.ts",
@@ -1373,8 +1571,33 @@
           ]
         },
         {
+          "path": "server/utils/chantalSessionRules.ts",
+          "lines": 157,
+          "kind": "server-lib",
+          "exports": [
+            "SKIP_TITLE_PATTERNS",
+            "MIN_SESSION_MINUTES",
+            "SessionGateInput",
+            "SessionVerdict",
+            "classifySession",
+            "extractPatientName",
+            "greetingName",
+            "CalendarAttendee",
+            "resolveGuestEmails"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "server/utils/emailTemplates.ts",
-          "lines": 467,
+          "lines": 470,
           "kind": "server-lib",
           "exports": [
             "clientConfirmationEmail",
@@ -1482,6 +1705,27 @@
           "externals": []
         },
         {
+          "path": "server/utils/newsletterApi.ts",
+          "lines": 40,
+          "kind": "server-lib",
+          "exports": [
+            "NEWSLETTER_ORIGINS",
+            "newsletterError",
+            "callNewsletterApi"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": [
+            "h3"
+          ]
+        },
+        {
           "path": "server/utils/sms.ts",
           "lines": 100,
           "kind": "server-lib",
@@ -1509,7 +1753,7 @@
         },
         {
           "path": "trigger/booking-reminder.ts",
-          "lines": 283,
+          "lines": 341,
           "kind": "trigger",
           "exports": [
             "bookingReminder"
@@ -1522,7 +1766,8 @@
           "imports": [
             "server/utils/emailTemplates.ts",
             "server/utils/sms.ts",
-            "server/utils/googlePrivateKey.ts"
+            "server/utils/googlePrivateKey.ts",
+            "server/utils/chantalSessionRules.ts"
           ],
           "listeners": [],
           "sheets": 0,
@@ -1536,7 +1781,7 @@
         },
         {
           "path": "trigger/review-request.ts",
-          "lines": 386,
+          "lines": 411,
           "kind": "trigger",
           "exports": [
             "reviewRequest"
@@ -1547,7 +1792,8 @@
           "endpoints": [],
           "apiCalls": [],
           "imports": [
-            "server/utils/googlePrivateKey.ts"
+            "server/utils/googlePrivateKey.ts",
+            "server/utils/chantalSessionRules.ts"
           ],
           "listeners": [],
           "sheets": 0,
@@ -1690,9 +1936,34 @@
           "listeners": [],
           "sheets": 0,
           "externals": []
+        },
+        {
+          "path": "utils/newsletterConsent.ts",
+          "lines": 10,
+          "kind": "util",
+          "exports": [
+            "NEWSLETTER_CONSENT_VERSION",
+            "NEWSLETTER_CONSENT_TEXT",
+            "NEWSLETTER_SUCCESS"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
         }
       ],
       "fanIn": {
+        "IntroLoader": {
+          "module": "components/IntroLoader.vue",
+          "callers": [
+            "app.vue"
+          ]
+        },
         "TheNav": {
           "module": "components/TheNav.vue",
           "callers": [
@@ -1761,8 +2032,7 @@
           "callers": [
             "components/ContactModal.vue",
             "components/booking/BookingModal.vue",
-            "pages/prendre-rendez-vous.vue",
-            "plugins/posthog.client.ts"
+            "pages/prendre-rendez-vous.vue"
           ]
         },
         "journeyHero": {
@@ -1794,8 +2064,15 @@
           "module": "composables/useScrollJourney.ts",
           "callers": [
             "components/EmotionalJourney.vue",
-            "components/journey/CSSFallbackObject.vue",
-            "components/journey/JourneyText.vue"
+            "components/journey/CSSFallbackObject.vue"
+          ]
+        },
+        "NEWSLETTER_CONSENT_TEXT": {
+          "module": "utils/newsletterConsent.ts",
+          "callers": [
+            "components/NewsletterSection.vue",
+            "pages/blog/[slug].vue",
+            "pages/confidentialite-infolettre.vue"
           ]
         },
         "BookingService": {
@@ -1900,6 +2177,39 @@
           "module": "components/EmotionalJourney.vue",
           "callers": [
             "pages/journey.vue"
+          ]
+        },
+        "classifySession": {
+          "module": "server/utils/chantalSessionRules.ts",
+          "callers": [
+            "scripts/audit-booking-reminders.ts",
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
+          ]
+        },
+        "greetingName": {
+          "module": "server/utils/chantalSessionRules.ts",
+          "callers": [
+            "scripts/audit-booking-reminders.ts",
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
+          ]
+        },
+        "resolveGuestEmails": {
+          "module": "server/utils/chantalSessionRules.ts",
+          "callers": [
+            "scripts/audit-booking-reminders.ts",
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
+          ]
+        },
+        "normalizeGooglePrivateKey": {
+          "module": "server/utils/googlePrivateKey.ts",
+          "callers": [
+            "scripts/audit-booking-reminders.ts",
+            "server/shims/googleapis-calendar.ts",
+            "trigger/booking-reminder.ts",
+            "trigger/review-request.ts"
           ]
         },
         "getEventsForMonth": {
@@ -2040,6 +2350,26 @@
             "server/utils/emailTemplates.ts"
           ]
         },
+        "callNewsletterApi": {
+          "module": "server/utils/newsletterApi.ts",
+          "callers": [
+            "server/api/newsletter/confirm.post.ts",
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
+        "newsletterError": {
+          "module": "server/utils/newsletterApi.ts",
+          "callers": [
+            "server/api/newsletter/confirm.post.ts",
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
+        "NEWSLETTER_CONSENT_VERSION": {
+          "module": "utils/newsletterConsent.ts",
+          "callers": [
+            "server/api/newsletter/subscribe.post.ts"
+          ]
+        },
         "buildWeeklyPrompt": {
           "module": "utils/agentPrompt.ts",
           "callers": [
@@ -2062,13 +2392,6 @@
           "module": "server/utils/input.ts",
           "callers": [
             "server/utils/emailTemplates.ts"
-          ]
-        },
-        "normalizeGooglePrivateKey": {
-          "module": "server/utils/googlePrivateKey.ts",
-          "callers": [
-            "trigger/booking-reminder.ts",
-            "trigger/review-request.ts"
           ]
         },
         "clientReminderEmail": {
@@ -2116,19 +2439,13 @@
           ]
         },
         "@anthropic-ai/sdk": {
-          "version": "0.80.0",
+          "version": "0.133.0",
           "modules": [
             "server/utils/briefService.ts"
           ]
         },
-        "@getbrevo/brevo": {
-          "version": "5.0.3",
-          "modules": [
-            "server/api/newsletter/subscribe.post.ts"
-          ]
-        },
         "@google-analytics/data": {
-          "version": "5.2.1",
+          "version": "7.2.1",
           "modules": [
             "scripts/ga4-audit-part2.ts",
             "scripts/ga4-audit.ts",
@@ -2136,7 +2453,7 @@
           ]
         },
         "@iconify/vue": {
-          "version": "5.0.0",
+          "version": "5.0.3",
           "modules": [
             "components/BookingSection.vue",
             "components/ContactModal.vue",
@@ -2155,8 +2472,14 @@
             "pages/therapie-individuelle.vue"
           ]
         },
+        "@tailwindcss/vite": {
+          "version": "4.3.3",
+          "modules": [
+            "nuxt.config.ts"
+          ]
+        },
         "@trigger.dev/sdk": {
-          "version": "4.4.4",
+          "version": "4.7.3",
           "modules": [
             "trigger/booking-reminder.ts",
             "trigger/review-request.ts",
@@ -2164,7 +2487,7 @@
           ]
         },
         "date-fns": {
-          "version": "4.1.0",
+          "version": "4.4.0",
           "modules": [
             "components/booking/BookingModal.vue",
             "components/booking/IntakeForm.vue",
@@ -2189,7 +2512,7 @@
           ]
         },
         "google-ads-api": {
-          "version": "23.0.0",
+          "version": "25.1.0",
           "modules": [
             "scripts/ads-add-sitelinks.ts",
             "scripts/ads-audit.ts",
@@ -2202,8 +2525,9 @@
           ]
         },
         "googleapis": {
-          "version": "171.4.0",
+          "version": "185.0.0",
           "modules": [
+            "scripts/audit-booking-reminders.ts",
             "scripts/investigate-recent-bookings.ts",
             "server/utils/googleCalendar.ts",
             "trigger/booking-reminder.ts",
@@ -2211,32 +2535,38 @@
           ]
         },
         "gsap": {
-          "version": "3.14.2",
+          "version": "3.15.0",
           "modules": [
             "composables/useScrollJourney.ts"
           ]
         },
+        "h3": {
+          "version": "1.15.11",
+          "modules": [
+            "server/utils/newsletterApi.ts"
+          ]
+        },
         "posthog-js": {
-          "version": "1.373.4",
+          "version": "1.438.7",
           "modules": [
             "composables/useTracking.ts",
             "plugins/posthog.client.ts"
           ]
         },
         "resend": {
-          "version": "6.9.4",
+          "version": "6.32.1",
           "modules": [
             "server/utils/briefService.ts"
           ]
         },
         "twilio": {
-          "version": "6.0.0",
+          "version": "6.1.2",
           "modules": [
             "server/utils/sms.ts"
           ]
         },
         "vue": {
-          "version": "3.5.30",
+          "version": "3.5.43",
           "modules": [
             "components/ServicesSection.vue",
             "components/booking/BookingModal.vue",

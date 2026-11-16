@@ -1,6 +1,6 @@
 // Normalizes GOOGLE_PRIVATE_KEY however the env UI mangled it. OpenSSL 3
 // (Node 18+) hard-fails with "error:1E08010C:DECODER routines::unsupported"
-// on anything that isn't clean PEM, and each dashboard (Vercel, Trigger.dev)
+// on anything that isn't clean PEM, and each dashboard (Cloudflare, Trigger.dev)
 // stores pasted multiline secrets differently. Accepts:
 //   - raw multiline PEM
 //   - single-line with literal \n escapes

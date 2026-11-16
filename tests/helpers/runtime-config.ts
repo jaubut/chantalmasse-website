@@ -15,9 +15,8 @@ const defaults = (): TestRuntimeConfig => ({
   chantalMeetLink: 'https://meet.google.com/abc-defg-hij',
   bookingMinNoticeHours: '24',
   siteBaseUrl: 'https://chantalmasse.com',
-  brevoApiKey: 'xkeysib-dummy',
-  brevoListId: '7',
-  brevoDoiTemplateId: '12',
+  newsletterApiBase: 'https://dashboard.test',
+  newsletterSiteKey: 'site-key-dummy-0123456789abcdef0123',
   public: {
     bookingTimezone: 'America/Toronto',
     bookingAdvanceDays: '60',

@@ -6,8 +6,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-05',
   devtools: { enabled: true },
   nitro: {
-    // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
-    // Page routes are pre-rendered at build time via routeRules below.
+    // Cloudflare Workers (module syntax): API routes run in the Worker, pages are
+    // pre-rendered at build time via routeRules below.
     preset: process.env.NITRO_PRESET || 'cloudflare_module',
     cloudflare: {
       deployConfig: true,
@@ -24,8 +24,6 @@ export default defineNuxtConfig({
       twilio: fileURLToPath(new URL('./server/shims/twilio.ts', import.meta.url)),
       '@react-email/render': fileURLToPath(new URL('./server/shims/empty.ts', import.meta.url)),
     },
-    // Written to .vc-config.json; `vercel.regions` only applies to edge functions.
-    vercel: { functions: { regions: ['yul1'] } },
     prerender: {
       crawlLinks: true,
     },
@@ -39,6 +37,9 @@ export default defineNuxtConfig({
     '/mentions-legales': { prerender: true },
     '/confidentialite': { prerender: true },
     '/inscription-confirmee': { prerender: true },
+    '/confidentialite-infolettre': { prerender: true },
+    // The token is in the URL fragment, read in the browser: the page itself is static.
+    '/confirmer-inscription': { prerender: true, robots: false },
     '/coaching-de-couple': { prerender: true },
     '/therapie-individuelle': { prerender: true },
     '/prendre-rendez-vous': { prerender: true },
@@ -67,9 +68,10 @@ export default defineNuxtConfig({
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
     siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
-    brevoApiKey: process.env.BREVO_API_KEY,
-    brevoListId: process.env.BREVO_LIST_ID,
-    brevoDoiTemplateId: process.env.BREVO_DOI_TEMPLATE_ID,
+    // Newsletter secrets are already bound on Worker chantalmasse-website.
+    // NUXT_NEWSLETTER_* overrides these defaults at runtime via useRuntimeConfig(event).
+    newsletterApiBase: process.env.NEWSLETTER_API_BASE || 'https://dashboard.apies.dev',
+    newsletterSiteKey: process.env.NEWSLETTER_SITE_KEY || '',
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
@@ -99,7 +101,7 @@ export default defineNuxtConfig({
   // ─── Sitemap ───────────────────────────────────────────────────────────────
   // crawlLinks: true in nitro means all prerendered routes are auto-discovered
   sitemap: {
-    exclude: ['/inscription-confirmee'],
+    exclude: ['/inscription-confirmee', '/confirmer-inscription'],
   },
 
   // ─── OG Image ──────────────────────────────────────────────────────────────
@@ -162,15 +164,16 @@ export default defineNuxtConfig({
           tagPosition: 'head',
         },
         {
-          innerHTML: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-CTE3NV511W')",
+          innerHTML: "window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname)){gtag('js',new Date());gtag('config','G-CTE3NV511W')}",
         },
         {
-          innerHTML: "!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);fbq('init','948606391153047');fbq('track','PageView')",
+          innerHTML: "!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname)){fbq('init','948606391153047');fbq('track','PageView')}",
         },
         {
           // GA and Meta queue their calls above; the libraries start after the stylesheet (see server/plugins/css-first.ts).
+          // Confirmation links contain a private token: exclude this page before analytics can read the URL.
           type: 'module',
-          innerHTML: "for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}",
+          innerHTML: "if(!/^\\/confirmer-inscription\\/?$/.test(location.pathname))for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}",
         },
       ],
       noscript: [
