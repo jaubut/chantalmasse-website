@@ -1,4 +1,4 @@
-// Unit/server tests must never reach Brevo, Google, Resend, Twilio, Meta,
+// Unit/server tests must never reach the dashboard, Google, Resend, Twilio, Meta,
 // Anthropic or Turso. Any un-mocked fetch fails loudly instead.
 import { beforeEach, vi } from 'vitest'
 
@@ -6,7 +6,7 @@ const SECRET_ENV = [
   'GOOGLE_SERVICE_ACCOUNT_EMAIL', 'GOOGLE_PRIVATE_KEY', 'GOOGLE_CALENDAR_ID',
   'RESEND_API_KEY', 'EMAIL_FROM', 'EMAIL_TO',
   'TWILIO_ACCOUNT_SID', 'TWILIO_AUTH_TOKEN', 'TWILIO_FROM_NUMBER',
-  'BREVO_API_KEY', 'BREVO_LIST_ID', 'BREVO_DOI_TEMPLATE_ID',
+  'NEWSLETTER_API_BASE', 'NEWSLETTER_SITE_KEY',
   'META_PIXEL_ID', 'META_CAPI_ACCESS_TOKEN', 'META_CAPI_TEST_EVENT_CODE',
   'ANTHROPIC_API_KEY', 'APIFY_API_TOKEN', 'TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN',
 ]

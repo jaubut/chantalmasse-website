@@ -12,7 +12,7 @@
     <section class="mb-10">
       <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Utilisation des données</h2>
       <p class="text-on-surface-variant leading-relaxed">
-        Les données collectées sont utilisées uniquement pour répondre à vos demandes de renseignements, confirmer vos rendez-vous, et vous envoyer l'infolettre si vous y avez souscrit. Les données de navigation servent à mesurer la fréquentation du site et l'efficacité de nos publicités. Vos données ne sont jamais vendues. Elles sont toutefois communiquées aux fournisseurs de services décrits ci-dessous (notamment Google et Meta), dont les serveurs peuvent être situés à l'extérieur du Québec, notamment aux États-Unis.
+        Les données collectées sont utilisées uniquement pour répondre à vos demandes de renseignements, confirmer vos rendez-vous, et vous envoyer l'infolettre si vous y avez souscrit (détails : <NuxtLink to="/confidentialite-infolettre" class="text-primary hover:underline">Infolettre et confidentialité</NuxtLink>). Les données de navigation servent à mesurer la fréquentation du site et l'efficacité de nos publicités. Vos données ne sont jamais vendues. Elles sont toutefois communiquées aux fournisseurs de services décrits ci-dessous (notamment Google et Meta), dont les serveurs peuvent être situés à l'extérieur du Québec, notamment aux États-Unis.
       </p>
     </section>
 

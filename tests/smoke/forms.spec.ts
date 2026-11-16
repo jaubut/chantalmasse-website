@@ -88,3 +88,27 @@ test.describe('cancellation page', () => {
     await expect(page.getByText(/déjà été annulé ou est passé/)).toBeVisible()
   })
 })
+
+test.describe('newsletter confirmation page', () => {
+  test('never confirms without a click, then routes by result', async ({ page }) => {
+    const bodies: unknown[] = []
+    await page.route('**/api/newsletter/confirm', async (route) => {
+      bodies.push(route.request().postDataJSON())
+      await route.fulfill({ json: { result: 'opted_out' } })
+    })
+    await page.goto('/confirmer-inscription#t=abc.def')
+    await waitForHydration(page)
+    await expect(page).toHaveURL(/\/confirmer-inscription$/)
+    expect(bodies).toEqual([])
+
+    await page.getByRole('button', { name: 'Confirmer mon inscription' }).click()
+    await expect(page.getByText(/Vous vous étiez désabonné·e/)).toBeVisible()
+    expect(bodies).toEqual([{ token: 'abc.def' }])
+  })
+
+  test('a link without a token shows the invalid state', async ({ page }) => {
+    await page.goto('/confirmer-inscription')
+    await waitForHydration(page)
+    await expect(page.getByText(/invalide ou expiré/)).toBeVisible()
+  })
+})

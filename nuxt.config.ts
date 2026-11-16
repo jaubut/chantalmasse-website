@@ -39,6 +39,9 @@ export default defineNuxtConfig({
     '/mentions-legales': { prerender: true },
     '/confidentialite': { prerender: true },
     '/inscription-confirmee': { prerender: true },
+    '/confidentialite-infolettre': { prerender: true },
+    // The token is in the URL fragment, read in the browser: the page itself is static.
+    '/confirmer-inscription': { prerender: true, robots: false },
     '/coaching-de-couple': { prerender: true },
     '/therapie-individuelle': { prerender: true },
     '/prendre-rendez-vous': { prerender: true },
@@ -67,9 +70,9 @@ export default defineNuxtConfig({
     twilioAuthToken: process.env.TWILIO_AUTH_TOKEN,
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
     siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
-    brevoApiKey: process.env.BREVO_API_KEY,
-    brevoListId: process.env.BREVO_LIST_ID,
-    brevoDoiTemplateId: process.env.BREVO_DOI_TEMPLATE_ID,
+    // Newsletter double opt-in lives on the dashboard (tls-dashboard-v2 #433). Default = its Cloud Run origin.
+    newsletterApiBase: process.env.NEWSLETTER_API_BASE || 'https://tls-dashboard-v2-1016439101738.northamerica-northeast1.run.app',
+    newsletterSiteKey: process.env.NEWSLETTER_SITE_KEY,
     // Exposed to client
     public: {
       bookingTimezone: process.env.BOOKING_TIMEZONE || 'America/Toronto',
@@ -99,7 +102,7 @@ export default defineNuxtConfig({
   // ─── Sitemap ───────────────────────────────────────────────────────────────
   // crawlLinks: true in nitro means all prerendered routes are auto-discovered
   sitemap: {
-    exclude: ['/inscription-confirmee'],
+    exclude: ['/inscription-confirmee', '/confirmer-inscription'],
   },
 
   // ─── OG Image ──────────────────────────────────────────────────────────────

@@ -6,7 +6,6 @@
       "name": "chantalmasse-website",
       "dependencies": {
         "@anthropic-ai/sdk": "^0.133.0",
-        "@getbrevo/brevo": "^6.0.3",
         "@google-analytics/data": "^7.2.1",
         "@nuxt/content": "^3.16.1",
         "@nuxt/image": "^2.1.0",
@@ -184,8 +183,6 @@
     "@esbuild/win32-x64": ["@esbuild/win32-x64@0.28.2", "", { "os": "win32", "cpu": "x64" }, "sha512-5ebpxr3nWMzrL/rnUI755Jkuee0bHL/Gq0WTF9lvcpv73wAp5eu8MfBUgWK9bhWvZjj7yX8etf/8tI8Ney695g=="],
 
     "@fingerprintjs/botd": ["@fingerprintjs/botd@2.0.0", "", {}, "sha512-yhuz23NKEcBDTHmGz/ULrXlGnbHenO+xZmVwuBkuqHUkqvaZ5TAA0kAgcRy4Wyo5dIBdkIf57UXX8/c9UlMLJg=="],
-
-    "@getbrevo/brevo": ["@getbrevo/brevo@6.0.3", "", {}, "sha512-yWBLKoHC8P5HLZ8z6iRuqDYLpCRKPTUETnZOLZzNDWGFYL78y4SHOTxQVrKH5ROX7f4q+SQ19LD3GWtJlIuNXA=="],
 
     "@google-analytics/data": ["@google-analytics/data@7.2.1", "", { "dependencies": { "google-gax": "^6.0.0" } }, "sha512-8B77oWryizGeV2DbK135TbBaWwkww154+XNEw7QbEa0UKtWqefOherFCvBAp4yOGtpPQG7ka00ESHPFg/DT28Q=="],
 

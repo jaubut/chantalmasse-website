@@ -14,6 +14,8 @@ const PAGES: Record<string, { heading: RegExp; level?: 'h1' | 'h2' }> = {
   '/mentions-legales': { heading: /^Mentions Légales$/ },
   '/confidentialite': { heading: /^Politique de confidentialité$/ },
   '/inscription-confirmee': { heading: /Merci pour votre inscription/ },
+  '/confidentialite-infolettre': { heading: /^Infolettre et confidentialité$/ },
+  '/confirmer-inscription': { heading: /^Confirmer votre inscription$/ },
   '/annuler': { heading: /^Lien invalide$/ },
 }
 
@@ -136,6 +138,7 @@ test('SEO files are generated', async ({ request }) => {
     expect(xml).toContain(`<loc>https://chantalmasse.com${path}</loc>`)
   }
   expect(xml).not.toContain('/inscription-confirmee')
+  expect(xml).not.toContain('/confirmer-inscription')
 })
 
 test('sitemap lists every blog article with its frontmatter date as lastmod', async ({ request }) => {

@@ -21,7 +21,7 @@ jobs:
     env:
       CI: 'true'
       NUXT_TELEMETRY_DISABLED: '1'
-      # Non-secret configuration only. No Google / Resend / Brevo / Twilio /
+      # Non-secret configuration only. No Google / Resend / dashboard / Twilio /
       # Anthropic / Turso / Meta credentials exist in CI on purpose: the build
       # doesn't need them, and without them the API routes answer 400/503
       # instead of ever reaching a real service.

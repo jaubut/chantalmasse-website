@@ -15,6 +15,9 @@ Single-page marketing website for **Chantal Massé**, a French-language therapis
 ```
 app.vue           — root shell: <TheNav /> + <NuxtPage /> + <TheFooter />
 pages/index.vue   — single page, composes all sections in order + calls useScrollAnimation()
+pages/confirmer-inscription.vue — newsletter double opt-in: reads #t=<token>, confirms on click via /api/newsletter/confirm
+pages/confidentialite-infolettre.vue — newsletter privacy notice (Law 25)
+server/api/newsletter/*  — proxies to the dashboard's /api/public/newsletter/* (server/utils/newsletterApi.ts); consent text in utils/newsletterConsent.ts
 ```
 
 **Deployment**
@@ -41,7 +44,7 @@ Owns section order and initialises scroll animation. No local state.
 | `PhilosophySection.vue` | `#approche` | Left image + floating quote, right prose |
 | `MethodsSection.vue` | — | Three methodology cards: ANDC, Imago, Neurosciences |
 | `TestimonialsSection.vue` | — | Three testimonial cards (staggered vertical offset on lg) |
-| `NewsletterSection.vue` | — | Email subscribe form + two blog preview cards |
+| `NewsletterSection.vue` | — | Email subscribe form (consent sentence, honeypot) + two blog preview cards |
 | `BookingSection.vue` | `#booking` | Contact CTA + location/accreditation info + schedule card |
 | `TheFooter.vue` | — | Logo, legal links (stubs), copyright |
 
@@ -90,7 +93,6 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 ## Known Fragile Areas
 
 - **Hero image & blog images are Unsplash URLs** — not local assets. They will break if Unsplash changes URLs or rate-limits. Real production images should be placed in `public/images/` (a `.gitkeep` exists).
-- **Newsletter form does nothing** — `@submit.prevent` with no handler. Needs backend integration (e.g. Mailchimp, Kit, or a Nuxt server route).
 - **Booking CTA is a self-anchor** (`href="#booking"`) — there is no actual calendar or booking integration yet.
 - **Footer links are stubs** (`href="#"`) — Mentions Légales, Confidentialité, and FR/EN toggle are not implemented.
 - **Blog section is static** — the two cards in `NewsletterSection.vue` are hardcoded. There is no CMS, no `pages/blog/` route, and no content collection.
@@ -123,7 +125,6 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 **What is missing / next steps**:
 - Real photography (replace Unsplash placeholders with `public/images/`)
 - Booking system integration (Calendly embed, or custom form → email)
-- Newsletter backend (Mailchimp / Kit API or Nuxt server route)
 - Blog: create `pages/blog/` + content collections or CMS
 - Legal pages: Mentions Légales, Politique de confidentialité
 - EN language toggle / i18n (`@nuxtjs/i18n`)

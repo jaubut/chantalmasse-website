@@ -1,6 +1,6 @@
 # Testing
 
-Three layers, all runnable offline from secrets: no Google, Resend, Brevo, Twilio, Anthropic, Turso or Meta credential is needed or used.
+Three layers, all runnable offline from secrets: no Google, Resend, dashboard, Twilio, Anthropic, Turso or Meta credential is needed or used.
 
 | Command | What | Time (M-series Mac) |
 |---|---|---|
@@ -17,11 +17,12 @@ First time: `bun install`, then `bunx playwright install chromium`.
 
 ## What's covered
 
-**Server routes** (`tests/server/`): each handler runs through a real h3 app, with `useRuntimeConfig`/`$fetch` doubles and Google Calendar, Twilio and Brevo mocked:
+**Server routes** (`tests/server/`): each handler runs through a real h3 app, with `useRuntimeConfig`/`$fetch` doubles and Google Calendar and Twilio mocked, and the dashboard faked at `fetch`:
 - `booking/availability`: param validation, booking window, working hours, 24 h notice, 15 min buffer, 60/90 min services, 5 min cache, Google failure → 503
 - `booking/create`: all 400 paths, 409 (taken slot / closed day / notice), 503 paths, happy path (one event, client + therapist emails, SMS only with consent, Meet link for video), notification failures don't fail a booking, Meta CAPI skipped when unconfigured
 - `booking/cancel-info`, `booking/cancel`: 400/404/503, single-use behaviour, notifications, SMS consent
-- `contact`, `newsletter/subscribe`: validation, honeypot, 503 when unconfigured, HTML escaping, Brevo double opt-in
+- `contact`: validation, honeypot, 503 when unconfigured, HTML escaping
+- `newsletter/subscribe`, `newsletter/confirm`: proxies to the dashboard (key, Origin and subscriber IP forwarded, Origin refused off-site, status mapping, timeout → 503)
 - `img-proxy`: SSRF host allowlist, protocol checks, non-image refusal
 - trigger.dev tasks `review-request` (Turso dedupe, opt-out, 180-day repeat, failure isolation) and `booking-reminder` (email + SMS, manual calendar bookings, failure isolation)
 
@@ -46,7 +47,7 @@ Known production bugs, pinned by `test.fixme` (un-fixme once fixed):
 - blog dates: `new Date('YYYY-MM-DD')` is UTC midnight, so the server renders "15 février" and Quebec browsers hydrate to "14 février", with a hydration mismatch. That one console error is tolerated on `/blog` pages only (`KNOWN_CONSOLE_ERRORS` in `tests/smoke/fixtures.ts`).
 
 Known gaps:
-- Real deliverability of Resend/Brevo/Twilio/Google and the external image CDNs is out of scope by design.
+- Real deliverability of Resend/Twilio/Google/the dashboard and the external image CDNs is out of scope by design.
 
 ## CI and the dependency autopilot
 

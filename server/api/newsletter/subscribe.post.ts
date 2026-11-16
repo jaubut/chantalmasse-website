@@ -1,34 +1,22 @@
-import { BrevoClient } from '@getbrevo/brevo'
 import { cleanText, isEmail } from '~/server/utils/input'
+import { callNewsletterApi, newsletterError } from '~/server/utils/newsletterApi'
+import { NEWSLETTER_CONSENT_VERSION } from '~/utils/newsletterConsent'
 
+// The dashboard answers 202 for every valid address (new, subscribed, opted out,
+// throttled or honeypot), so the form shows one neutral message.
 export default defineEventHandler(async (event) => {
-  const config = useRuntimeConfig()
-  const { email: rawEmail, phone: rawPhone } = await readBody(event)
-  const email = cleanText(rawEmail, 254).toLowerCase()
-  const phone = cleanText(rawPhone, 32)
-
+  const body = await readBody(event)
+  const email = cleanText(body?.email, 254).toLowerCase()
   if (!email || !isEmail(email)) {
     throw createError({ statusCode: 400, statusMessage: 'Adresse courriel invalide.' })
   }
 
-  const listId = Number(config.brevoListId)
-  const templateId = Number(config.brevoDoiTemplateId)
-  if (!config.brevoApiKey || !Number.isInteger(listId) || !Number.isInteger(templateId)) {
-    throw createError({
-      statusCode: 503,
-      statusMessage: 'L’inscription à l’infolettre est temporairement indisponible.',
-    })
-  }
-
-  const client = new BrevoClient({ apiKey: config.brevoApiKey as string })
-
-  await client.contacts.createDoiContact({
+  const res = await callNewsletterApi(event, 'subscribe', {
     email,
-    includeListIds: [listId],
-    templateId,
-    redirectionUrl: `${config.siteBaseUrl}/inscription-confirmee`,
-    ...(phone ? { attributes: { SMS: phone } } : {}),
+    consent_version: NEWSLETTER_CONSENT_VERSION,
+    website: cleanText(body?.website, 200),
   })
-
-  return { success: true }
+  if (res.status === 202) return { success: true }
+  if (res.status === 400) throw createError({ statusCode: 400, statusMessage: 'Adresse courriel invalide.' })
+  newsletterError(res.status)
 })
