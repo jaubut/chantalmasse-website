@@ -8,8 +8,8 @@
     </section>
 
     <p class="text-on-surface-variant leading-relaxed">
-      Pour toute question ou pour exercer vos droits : <a href="mailto:chantal.gmasse@gmail.com" class="text-primary hover:underline">chantal.gmasse@gmail.com</a>.
-      Voir aussi la <NuxtLink to="/confidentialite" class="text-primary hover:underline">politique de confidentialité</NuxtLink> du site.
+      Pour toute question ou pour exercer vos droits : <a href="mailto:chantal.gmasse@gmail.com" class="text-primary underline underline-offset-2">chantal.gmasse@gmail.com</a>.
+      Voir aussi la <NuxtLink to="/confidentialite" class="text-primary underline underline-offset-2">politique de confidentialité</NuxtLink> du site.
     </p>
   </div>
 </template>

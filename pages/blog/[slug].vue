@@ -100,7 +100,7 @@
           </div>
 
           <!-- Newsletter -->
-          <div class="bg-white/10 rounded-[2rem] p-10">
+          <div class="bg-white/10 rounded-[2rem] p-6 md:p-10">
             <p class="text-primary-fixed-dim text-sm uppercase tracking-widest font-light mb-3">Infolettre</p>
             <h3 class="font-headline text-3xl italic text-white mb-3 leading-snug">Pensées & Réflexions</h3>
             <p class="text-primary-fixed-dim font-light mb-8">
@@ -129,11 +129,11 @@
               <input v-model="website" type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
               <p class="text-sm text-primary-fixed-dim font-light">
                 {{ NEWSLETTER_CONSENT_TEXT }}
-                <NuxtLink to="/confidentialite-infolettre" class="underline underline-offset-2">Confidentialité</NuxtLink>
+                <NuxtLink to="/confidentialite-infolettre" class="inline-block py-2 underline underline-offset-2">Confidentialité</NuxtLink>
               </p>
             </form>
-            <p v-if="success" role="status" class="mt-3 text-sm text-primary-fixed">{{ NEWSLETTER_SUCCESS }}</p>
-            <p v-if="error" class="mt-3 text-sm text-red-300">{{ error }}</p>
+            <p role="status" aria-live="polite" class="mt-3 text-sm text-primary-fixed">{{ success ? NEWSLETTER_SUCCESS : '' }}</p>
+            <p v-if="error" role="alert" class="mt-3 text-sm text-red-300">{{ error }}</p>
           </div>
 
         </div>

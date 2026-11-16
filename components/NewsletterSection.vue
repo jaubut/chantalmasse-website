@@ -34,11 +34,11 @@
           <input v-model="website" type="text" name="website" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <p class="text-sm text-on-tertiary-container font-light max-w-md">
             {{ NEWSLETTER_CONSENT_TEXT }}
-            <NuxtLink to="/confidentialite-infolettre" class="underline underline-offset-2">Confidentialité</NuxtLink>
+            <NuxtLink to="/confidentialite-infolettre" class="inline-block py-2 underline underline-offset-2">Confidentialité</NuxtLink>
           </p>
         </form>
-        <p v-if="success" role="status" class="mt-3 text-sm text-secondary-fixed">{{ NEWSLETTER_SUCCESS }}</p>
-        <p v-if="error" class="mt-3 text-sm text-red-400">{{ error }}</p>
+        <p role="status" aria-live="polite" class="mt-3 text-sm text-secondary-fixed">{{ success ? NEWSLETTER_SUCCESS : '' }}</p>
+        <p v-if="error" role="alert" class="mt-3 text-sm text-red-400">{{ error }}</p>
       </div>
 
       <!-- Right: blog cards -->
