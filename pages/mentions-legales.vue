@@ -14,7 +14,7 @@
     <section class="mb-10">
       <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Hébergement</h2>
       <p class="text-on-surface-variant leading-relaxed">
-        Ce site est hébergé par Vercel Inc., 340 Pine Street, Suite 701, San Francisco, CA 94104, États-Unis.
+        Ce site est hébergé par Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, États-Unis.
       </p>
     </section>
 

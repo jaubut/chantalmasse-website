@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import { NEWSLETTER_CONSENT_TEXT } from '~/utils/newsletterConsent'
 
-// DRAFT pending Chantal's approval (TASK f8fa4fb5): Law 25 notice for the newsletter.
+// Law 25 notice for the newsletter, approved by Chantal (TASK f8fa4fb5).
 const sections = [
   {
     title: 'Responsable',

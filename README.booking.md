@@ -108,23 +108,23 @@ BOOKING_MIN_NOTICE_HOURS=24
 
 ---
 
-## Step 8 — Vercel Deployment
+## Step 8 — Cloudflare Deployment
 
-In the Vercel project settings, add all environment variables from `.env` under **Settings → Environment Variables**.
+The site is a Cloudflare Worker (`chantalmasse-website`). Set each variable from `.env` as a Worker secret, with the `NUXT_` prefix and the runtime-config name in SCREAMING_SNAKE_CASE so Nuxt picks it up at runtime, e.g. `wrangler secret put NUXT_RESEND_API_KEY` (or **Workers → Settings → Variables and Secrets**).
 
-The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (do NOT use the Vercel multiline editor for this key — paste as a single line).
+The `GOOGLE_PRIVATE_KEY` value must be pasted with the `\n` escape sequences intact (paste as a single line).
 
 ---
 
 ## Step 9 — Trigger.dev (24h Reminder Cron)
 
-The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs its own copy of the credentials.
+The hourly reminder scan runs in Trigger.dev, independently of Cloudflare. It needs its own copy of the credentials.
 
 1. Open your project at https://cloud.trigger.dev
 2. **Environments → Production → Environment Variables**
 3. Add every variable that the `trigger/booking-reminder.ts` task reads:
    - `GOOGLE_SERVICE_ACCOUNT_EMAIL`
-   - `GOOGLE_PRIVATE_KEY` (same `\n`-escaped format as Vercel)
+   - `GOOGLE_PRIVATE_KEY` (same `\n`-escaped format as on Cloudflare)
    - `GOOGLE_CALENDAR_ID`
    - `RESEND_API_KEY`
    - `EMAIL_FROM`
@@ -138,7 +138,7 @@ The hourly reminder scan runs in Trigger.dev, independently of Vercel. It needs 
 
 ## Deployment Notes
 
-- The site uses the `vercel` preset (not `vercel-static`) because API routes are required for booking functionality. Page routes are pre-rendered statically at build time.
+- The site uses the `cloudflare_module` preset because API routes are required for booking functionality. Page routes are pre-rendered statically at build time.
 - The `/api/booking/availability` response is cached in-memory for 5 minutes per month/service to reduce Google API calls.
 - Cancellation (phase 2) generates a unique `cancelToken` per booking that can be used to cancel via `/api/booking/cancel`.
 

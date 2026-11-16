@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitest/config'
 
-// Vercel functions run in UTC; the booking math depends on the server's local
+// Cloudflare Workers run in UTC; the booking math depends on the server's local
 // zone, so tests pin it too (set before the forked workers start).
 process.env.TZ = 'UTC'
 

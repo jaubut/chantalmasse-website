@@ -48,6 +48,15 @@ describe('POST /api/newsletter/subscribe', () => {
     expect(call.body).toEqual({ email: 'marie@example.com', consent_version: '2026-11-v1', website: '' })
   })
 
+  it('takes the subscriber IP from cf-connecting-ip over x-forwarded-for (Cloudflare)', async () => {
+    dashboard.mockReturnValue(json(202, { ok: true }))
+    await callHandler(await load(), {
+      body: { email: 'marie@example.com' },
+      headers: { ...SITE, 'x-forwarded-for': '6.6.6.6, 198.51.100.9', 'cf-connecting-ip': '198.51.100.9' },
+    })
+    expect(sent().headers.get('x-subscriber-ip')).toBe('198.51.100.9')
+  })
+
   it('passes a filled honeypot through (the dashboard answers a decoy 202)', async () => {
     dashboard.mockReturnValue(json(202, { ok: true }))
     const res = await callHandler(await load(), { body: { email: 'bot@example.com', website: 'http://spam' }, headers: SITE })
@@ -55,7 +64,7 @@ describe('POST /api/newsletter/subscribe', () => {
     expect(sent().body.website).toBe('http://spam')
   })
 
-  it.each([undefined, 'https://evil.example', 'https://preview.vercel.app'])('refuses Origin %j without calling the dashboard', async (origin) => {
+  it.each([undefined, 'https://evil.example', 'https://chantalmasse-website.workers.dev'])('refuses Origin %j without calling the dashboard', async (origin) => {
     const res = await callHandler(await load(), { body: { email: 'marie@example.com' }, headers: origin ? { origin } : {} })
     expect(res.status).toBe(403)
     expect(dashboard).not.toHaveBeenCalled()

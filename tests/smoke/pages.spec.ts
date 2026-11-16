@@ -145,7 +145,9 @@ test('sitemap lists every blog article with its frontmatter date as lastmod', as
   const dir = join(process.cwd(), 'content/blog')
   const articles = readdirSync(dir).filter((f) => f.endsWith('.md')).map((f) => {
     const fm = readFileSync(join(dir, f), 'utf8')
-    return { slug: fm.match(/^slug:\s*(\S+)/m)![1], date: fm.match(/^date:\s*(\S+)/m)![1] }
+    // YAML scalars may be quoted ('slug' or "slug").
+    const field = (k: string) => fm.match(new RegExp(`^${k}:\\s*(\\S+)`, 'm'))![1]!.replace(/^['"]|['"]$/g, '')
+    return { slug: field('slug'), date: field('date') }
   })
   expect(articles.length).toBeGreaterThan(0)
   const xml = await (await request.get('/sitemap.xml')).text()

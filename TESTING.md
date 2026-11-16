@@ -6,7 +6,7 @@ Three layers, all runnable offline from secrets: no Google, Resend, dashboard, T
 |---|---|---|
 | `bun run typecheck` | `nuxt typecheck` (vue-tsc, strict) gated against `tests/typecheck-baseline.json` | ~10 s |
 | `bun run test` | Vitest: unit + server-route tests, network blocked | ~2 s |
-| `bun run build` | Production build (Vercel preset) | ~25 s |
+| `bun run build` | Production build (Cloudflare preset) | ~25 s |
 | `bun run test:smoke` | Builds with the `node-server` preset, serves it, runs Playwright (Chromium, headless) | ~45 s |
 
 First time: `bun install`, then `bunx playwright install chromium`.
@@ -40,7 +40,7 @@ First time: `bun install`, then `bunx playwright install chromium`.
 
 Every smoke test also fails on any console error or uncaught exception, and on any same-origin asset returning ≥ 400. Third-party requests (GA4, Meta Pixel, PostHog, Wix/Unsplash images) are answered locally, so CI never pollutes Chantal's analytics. Images from a host not in `ALLOWED_IMAGE_HOSTS` fail the suite.
 
-The smoke build and server run in UTC (like Vercel); the browser runs in `America/Toronto` (like Chantal's visitors).
+The smoke build and server run in UTC (like Cloudflare Workers); the browser runs in `America/Toronto` (like Chantal's visitors).
 
 Known production bugs, pinned by `test.fixme` (un-fixme once fixed):
 - the Google Ads deep link `/prendre-rendez-vous?book=open&service=couple` doesn't open the modal or preselect the service;

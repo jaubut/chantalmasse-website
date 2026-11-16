@@ -6,8 +6,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-05',
   devtools: { enabled: true },
   nitro: {
-    // Using 'vercel' preset (not 'vercel-static') to support API routes for booking.
-    // Page routes are pre-rendered at build time via routeRules below.
+    // Cloudflare Workers (module syntax): API routes run in the Worker, pages are
+    // pre-rendered at build time via routeRules below.
     preset: process.env.NITRO_PRESET || 'cloudflare_module',
     cloudflare: {
       deployConfig: true,
@@ -24,8 +24,6 @@ export default defineNuxtConfig({
       twilio: fileURLToPath(new URL('./server/shims/twilio.ts', import.meta.url)),
       '@react-email/render': fileURLToPath(new URL('./server/shims/empty.ts', import.meta.url)),
     },
-    // Written to .vc-config.json; `vercel.regions` only applies to edge functions.
-    vercel: { functions: { regions: ['yul1'] } },
     prerender: {
       crawlLinks: true,
     },
@@ -71,6 +69,7 @@ export default defineNuxtConfig({
     twilioFromNumber: process.env.TWILIO_FROM_NUMBER,
     siteBaseUrl: process.env.SITE_BASE_URL || 'https://chantalmasse.com',
     // Newsletter double opt-in lives on the dashboard (tls-dashboard-v2 #433). Default = its Cloud Run origin.
+    // On Cloudflare, set the runtime secret NUXT_NEWSLETTER_SITE_KEY (and optionally NUXT_NEWSLETTER_API_BASE).
     newsletterApiBase: process.env.NEWSLETTER_API_BASE || 'https://tls-dashboard-v2-1016439101738.northamerica-northeast1.run.app',
     newsletterSiteKey: process.env.NEWSLETTER_SITE_KEY,
     // Exposed to client

@@ -12,7 +12,8 @@ export function newsletterError(status: number): never {
 }
 
 export async function callNewsletterApi(event: H3Event, path: 'subscribe' | 'confirm', body: Record<string, string>) {
-  const { newsletterApiBase, newsletterSiteKey } = useRuntimeConfig()
+  // Per request, so Cloudflare runtime bindings (NUXT_NEWSLETTER_*) apply.
+  const { newsletterApiBase, newsletterSiteKey } = useRuntimeConfig(event)
   if (!newsletterApiBase || !newsletterSiteKey) newsletterError(503)
 
   const origin = getRequestHeader(event, 'origin') ?? ''
@@ -25,7 +26,8 @@ export async function callNewsletterApi(event: H3Event, path: 'subscribe' | 'con
       headers: {
         'X-Site-Key': String(newsletterSiteKey),
         Origin: origin,
-        'X-Subscriber-IP': getRequestIP(event, { xForwardedFor: true }) ?? '',
+        // Cloudflare sets cf-connecting-ip; x-forwarded-for can carry a client-supplied first entry.
+        'X-Subscriber-IP': getRequestHeader(event, 'cf-connecting-ip') ?? getRequestIP(event, { xForwardedFor: true }) ?? '',
       },
       timeout: 10_000,
       ignoreResponseError: true,

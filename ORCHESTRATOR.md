@@ -5,7 +5,7 @@
 Single-page marketing website for **Chantal Massé**, a French-language therapist based in Shefford, Québec.
 
 **Stack**
-- Nuxt 3 (SSR, `compat date: 2024-11-01`) — deployed to Vercel via `nitro preset: 'vercel'`
+- Nuxt 3 (SSR, `compat date: 2024-11-01`) — deployed to Cloudflare Workers via `nitro preset: 'cloudflare_module'`
 - Vue 3 (Composition API, `<script setup>`)
 - Tailwind CSS via `@nuxtjs/tailwindcss`
 - Google Fonts via `@nuxtjs/google-fonts`
@@ -21,7 +21,8 @@ server/api/newsletter/*  — proxies to the dashboard's /api/public/newsletter/*
 ```
 
 **Deployment**
-- `vercel.json` sets `buildCommand: npm run build`, `outputDirectory: .output/public`, `framework: nuxtjs`
+- `nuxt build` writes the Worker and its `wrangler.json` (`nitro.cloudflare.deployConfig`); Node-only libs are shimmed in `server/shims/`
+- Runtime config comes from Worker vars/secrets with the `NUXT_` prefix (e.g. `NUXT_NEWSLETTER_SITE_KEY`)
 - Language: `fr` (set in `nuxt.config.ts` → `app.head.htmlAttrs`)
 
 ---
@@ -104,7 +105,7 @@ Border-radius scale is intentionally tighter than Tailwind defaults (sm `2px`, l
 ## Decisions Made
 
 - **Nuxt SSR over SPA** — `ssr: true` ensures SEO is handled server-side, important for a therapist's discoverability.
-- **Vercel + Nitro preset** — zero-config deployment; `vercel.json` is minimal by design.
+- **Cloudflare Workers + Nitro `cloudflare_module` preset** — config generated from `nuxt.config.ts`, no hand-written wrangler file.
 - **Material Design 3 color roles** — provides a systematic, accessible palette rather than ad-hoc hex values. Allows future dark mode via role swapping.
 - **Newsreader italic for headlines** — editorial, warm aesthetic aligned with the therapeutic brand. Manrope provides readable, neutral body copy.
 - **`useScrollAnimation` as a composable** — keeps animation logic out of individual components and ensures a single observer instance per page.

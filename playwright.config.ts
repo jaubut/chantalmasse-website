@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 // Smoke suite: runs against the real production build (node-server preset,
 // `bun run build:smoke`) served by Nitro. Server and build run in UTC like
-// Vercel; the browser runs in Shefford's timezone like real visitors.
+// Cloudflare Workers; the browser runs in Shefford's timezone like real visitors.
 // No secrets are configured, so even an un-mocked call can't reach
 // Google/Resend/the dashboard — the API answers 400/503.
 const PORT = Number(process.env.SMOKE_PORT ?? 3100)
