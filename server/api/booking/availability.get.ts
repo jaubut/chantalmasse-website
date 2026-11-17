@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
     console.error('[booking/availability] Google Calendar error:', err)
     throw createError({
       statusCode: 503,
-      message: 'Le système de réservation est temporairement indisponible. Contactez-nous directement à chantal@chantalmasse.com',
+      message: 'Le système de réservation est temporairement indisponible. Contactez-nous directement à chantal.gmasse@gmail.com',
     })
   }
 
