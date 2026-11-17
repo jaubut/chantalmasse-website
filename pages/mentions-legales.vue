@@ -5,9 +5,9 @@
     <section class="mb-10">
       <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Éditeur du site</h2>
       <p class="text-on-surface-variant leading-relaxed">
-        Chantal Massé, thérapeute<br>
-        Montréal, Québec, Canada<br>
-        Courriel : <a href="mailto:contact@chantalmasse.com" class="text-primary hover:underline">contact@chantalmasse.com</a>
+        Chantal Massé, thérapeute en relation d'aide, travailleuse autonome<br>
+        245 rue Colette, Shefford (Québec) J2M 2B7, Canada<br>
+        Courriel : <a href="mailto:chantal.gmasse@gmail.com" class="text-primary hover:underline">chantal.gmasse@gmail.com</a>
       </p>
     </section>
 

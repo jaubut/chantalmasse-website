@@ -26,7 +26,7 @@
     <section class="mb-10">
       <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Vos droits</h2>
       <p class="text-on-surface-variant leading-relaxed">
-        Conformément à la Loi 25 (Québec) et au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits, contactez-nous à : <a href="mailto:contact@chantalmasse.com" class="text-primary hover:underline">contact@chantalmasse.com</a>.
+        Conformément à la Loi 25 (Québec) et au RGPD, vous disposez d'un droit d'accès, de rectification, de suppression et de portabilité de vos données. Pour exercer ces droits, contactez-nous à : <a href="mailto:chantal.gmasse@gmail.com" class="text-primary hover:underline">chantal.gmasse@gmail.com</a>.
       </p>
     </section>
 

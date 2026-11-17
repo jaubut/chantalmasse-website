@@ -53,7 +53,7 @@
       <NuxtLink to="/blog" :class="mobileLinkClass" @click="menuOpen = false">Blog</NuxtLink>
       <button :class="ctaClass" class="px-8 py-3 rounded-xl font-semibold text-center transition-all duration-500 min-h-[44px]" @click="contact.open(); menuOpen = false">Me contacter</button>
       <div class="flex items-center gap-3">
-        <a href="https://www.facebook.com/chantalmassetherapeutecoach" target="_blank" rel="noopener" aria-label="Facebook" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
+        <a href="https://www.facebook.com/chantalmassetherapeute" target="_blank" rel="noopener" aria-label="Facebook" class="inline-flex items-center justify-center min-h-[44px] min-w-[44px]">
           <span class="flex items-center justify-center w-9 h-9 rounded-lg" :style="socialBgStyle">
             <Icon icon="mdi:facebook" class="text-lg transition-colors duration-500" :style="{ color: isJourney ? 'rgba(255,255,255,0.6)' : 'rgba(23,48,40,0.3)' }" />
           </span>
