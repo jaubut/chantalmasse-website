@@ -33,6 +33,14 @@ test.describe('contact form', () => {
     await expect(dialog.getByText('Message envoyé! Je te reviens bientôt.')).toBeVisible()
     expect(calls).toBe(1)
     expect(body).toEqual({ name: 'Marie Tremblay', contact: 'marie@example.com', message: "J'aimerais un premier rendez-vous.", website: '' })
+    const conversions = await page.evaluate(() => {
+      const layer = (window as Window & { dataLayer?: ArrayLike<unknown>[] }).dataLayer ?? []
+      return Array.from(layer, (entry) => Array.from(entry))
+        .filter((entry) => ['booking_confirmed', 'generate_lead', 'conversion'].includes(String(entry[1])))
+    })
+    expect(conversions).toEqual([
+      ['event', 'generate_lead', { event_category: 'contact', event_label: 'contact_form' }],
+    ])
   })
 
   test('shows the fallback email when sending fails', async ({ page }) => {

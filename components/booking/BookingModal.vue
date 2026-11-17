@@ -293,6 +293,10 @@ async function onFormSubmit(formData: {
       },
     })
 
+    if (result?.success !== true || typeof result.eventId !== 'string' || !result.eventId.trim()) {
+      throw new Error('Une erreur est survenue. Veuillez réessayer.')
+    }
+
     confirmedFirstName.value = formData.firstName
     bookingResult.value = {
       service: selectedService.value.name,
@@ -305,15 +309,14 @@ async function onFormSubmit(formData: {
       eventId: result.eventId,
     }
 
-    trackBookingComplete(selectedService.value.name, selectedService.value.price, metaEventId)
+    trackBookingComplete(selectedService.value.name, selectedService.value.price, metaEventId, result.eventId)
     advance('confirmation')
-  } catch (err: any) {
-    const msg = err?.data?.message || err?.message || 'Une erreur est survenue. Veuillez réessayer.'
-    if (err?.status === 409) {
-      submitError.value = msg
-    } else {
-      submitError.value = msg
-    }
+  } catch (err: unknown) {
+    const data = err && typeof err === 'object' && 'data' in err ? err.data : undefined
+    const message = data && typeof data === 'object' && 'message' in data ? data.message : undefined
+    submitError.value = typeof message === 'string' && message
+      ? message
+      : err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.'
   } finally {
     isSubmitting.value = false
   }

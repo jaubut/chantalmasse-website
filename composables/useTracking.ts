@@ -11,7 +11,7 @@ declare global {
 // (missing key, SSR context, before plugin init). Kept as a thin wrapper so
 // the existing GA4/Meta call sites don't have to know PostHog exists.
 function capturePosthog(eventName: string, props?: Record<string, unknown>): void {
-  if (import.meta.server) return
+  if (import.meta.server || typeof window === 'undefined') return
   try {
     posthog.capture(eventName, props)
   } catch {
@@ -33,7 +33,7 @@ function newEventId(): string {
 
 export function useTracking() {
   function trackEvent(eventName: string, params?: Record<string, unknown>) {
-    if (import.meta.server) return
+    if (import.meta.server || typeof window === 'undefined') return
 
     // GA4
     if (window.gtag) {
@@ -50,32 +50,31 @@ export function useTracking() {
     capturePosthog(eventName, params)
   }
 
-  // Returns the event_id used for the Pixel 'Schedule' call so the booking
-  // POST can pass it to the server for CAPI dedup. Always returns a string,
-  // even when fbq isn't loaded — caller still ships it to the server.
-  //
-  // GA4 event is `generate_lead` (not `purchase`) — this is a lead-gen
-  // business, not e-commerce. The active Google Ads conversion action
-  // ("Envoi de formulaire pour prospects", category SUBMIT_LEAD_FORM) is
-  // imported from GA4's `generate_lead` event, so firing `purchase` here
-  // means Smart Bidding gets zero signal even when bookings complete.
-  function trackBookingComplete(service: string, value: number, eventId?: string): string {
+  // Called only after the calendar confirms creation. Keep the Meta request
+  // ID separate from the confirmed booking ID used for Google Ads dedup.
+  function trackBookingComplete(service: string, value: number, eventId?: string, bookingId?: string): string {
     const id = eventId ?? newEventId()
-    trackEvent('generate_lead', {
+    trackEvent('booking_confirmed', {
       currency: 'CAD',
       value,
       event_category: 'booking',
       event_label: service,
     })
+    if (typeof window !== 'undefined' && window.gtag && bookingId?.trim()) {
+      window.gtag('event', 'conversion', {
+        send_to: 'AW-16485477025/IFK1CJuhqrodEKHV8bQ9',
+        transaction_id: bookingId,
+        currency: 'CAD',
+        value,
+      })
+    }
     // Meta uses 'Schedule' for appointment bookings. The third arg is the
     // dedup envelope — Pixel sends `event_id` to Meta so it can pair this
     // call with the matching server-side CAPI event.
     if (typeof window !== 'undefined' && window.fbq) {
       window.fbq('track', 'Schedule', { content_name: service, value, currency: 'CAD' }, { eventID: id })
     }
-    // PostHog — dedicated funnel-friendly event name. trackEvent above also
-    // fires `generate_lead` into PostHog; this gives a cleaner, business-named
-    // event to anchor funnels on.
+    // Preserve the existing PostHog booking funnel.
     capturePosthog('booking_completed', {
       service,
       value,

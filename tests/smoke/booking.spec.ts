@@ -15,6 +15,14 @@ function nextBookableDate(): Date {
 const ymd = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 const ym = (d: Date) => ymd(d).slice(0, 7)
 
+async function conversionEvents(page: Page): Promise<unknown[][]> {
+  return page.evaluate(() => {
+    const layer = (window as Window & { dataLayer?: ArrayLike<unknown>[] }).dataLayer ?? []
+    return Array.from(layer, (entry) => Array.from(entry))
+      .filter((entry) => ['booking_confirmed', 'generate_lead', 'conversion'].includes(String(entry[1])))
+  })
+}
+
 async function mockAvailability(page: Page, date: Date) {
   const key = ymd(date)
   const slot = {
@@ -52,53 +60,75 @@ async function openModalAtCalendar(page: Page, date: Date) {
   return dialog
 }
 
-test('booking: service → date → time → form validation → mocked submit → confirmation', async ({ page }) => {
-  const date = nextBookableDate()
-  const slot = await mockAvailability(page, date)
-  let submitted: Record<string, any> | null = null
-  await page.route('**/api/booking/create', async (route) => {
-    submitted = route.request().postDataJSON()
-    await route.fulfill({
-      json: {
-        success: true, eventId: 'smoke-evt', meetLink: null, cancelToken: 'smoke-token',
-        dateFormatted: 'mardi', timeFormatted: '09h00 — 10h00',
-      },
+for (const width of [1440, 390]) {
+  test(`booking: service → date → time → form validation → mocked submit → confirmation (${width}px)`, async ({ page }, testInfo) => {
+    await page.setViewportSize({ width, height: 844 })
+    const date = nextBookableDate()
+    const slot = await mockAvailability(page, date)
+    let submitted: Record<string, unknown> | null = null
+    await page.route('**/api/booking/create', async (route) => {
+      submitted = route.request().postDataJSON()
+      await route.fulfill({
+        json: {
+          success: true, eventId: 'smoke-evt', meetLink: null, cancelToken: 'smoke-token',
+          dateFormatted: 'mardi', timeFormatted: '09h00 — 10h00',
+        },
+      })
     })
+
+    const dialog = await openModalAtCalendar(page, date)
+    expect(await conversionEvents(page)).toEqual([])
+    const day = dialog.getByRole('button', { name: new RegExp(`^${date.getDate()} `) })
+    await expect(day).toBeEnabled()
+    await day.click()
+
+    await dialog.getByRole('button', { name: /09h00 — 10h00/ }).click()
+    const submit = dialog.getByRole('button', { name: /Confirmer ma réservation/ })
+    await expect(submit).toBeVisible()
+
+    // Client-side validation: empty form never reaches the API.
+    await dialog.locator('input[autocomplete="given-name"]').fill('Marie')
+    await dialog.locator('input[autocomplete="family-name"]').fill('Tremblay')
+    await dialog.locator('input[type="email"]').fill('pas-un-courriel@x')
+    await dialog.getByRole('checkbox').nth(1).check() // privacy
+    await dialog.getByRole('checkbox').first().check() // SMS consent without phone
+    await dialog.locator('form').evaluate((f: HTMLFormElement) => f.requestSubmit())
+    await expect(dialog.getByText('Adresse courriel invalide')).toBeVisible()
+    await expect(dialog.getByText('Un numéro est requis pour les rappels SMS')).toBeVisible()
+    expect(submitted).toBeNull()
+    expect(await conversionEvents(page)).toEqual([])
+
+    await dialog.locator('input[type="email"]').fill('marie@example.com')
+    await dialog.locator('input[type="tel"]').fill('450 555-1234')
+    const layout = await dialog.evaluate((element) => ({
+      overflow: document.documentElement.scrollWidth > innerWidth,
+      bounds: { top: element.getBoundingClientRect().top, bottom: element.getBoundingClientRect().bottom },
+      inputFontSizes: Array.from(element.querySelectorAll('input:not([type="checkbox"])'), (input) => getComputedStyle(input).fontSize),
+      controls: Array.from(element.querySelectorAll('button'), (button) => ({
+        label: button.getAttribute('aria-label') || button.textContent?.trim(),
+        width: button.getBoundingClientRect().width,
+        height: button.getBoundingClientRect().height,
+      })),
+    }))
+    await testInfo.attach('booking-layout', { body: JSON.stringify(layout, null, 2), contentType: 'application/json' })
+    expect(layout.overflow).toBe(false)
+    await submit.focus()
+    await page.keyboard.press('Enter')
+
+    await expect(page.getByRole('dialog')).toHaveAttribute('aria-label', 'Réservation confirmée')
+    expect(submitted).toMatchObject({
+      serviceId: 'individual',
+      isoStart: slot.isoStart,
+      isoEnd: slot.isoEnd,
+      sessionType: 'in-person',
+      client: { firstName: 'Marie', lastName: 'Tremblay', email: 'marie@example.com', phone: '450 555-1234', smsConsent: true },
+    })
+    expect(await conversionEvents(page)).toEqual([
+      ['event', 'booking_confirmed', { currency: 'CAD', value: 105, event_category: 'booking', event_label: 'Thérapie Individuelle' }],
+      ['event', 'conversion', { send_to: 'AW-16485477025/IFK1CJuhqrodEKHV8bQ9', transaction_id: 'smoke-evt', currency: 'CAD', value: 105 }],
+    ])
   })
-
-  const dialog = await openModalAtCalendar(page, date)
-  const day = dialog.getByRole('button', { name: new RegExp(`^${date.getDate()} `) })
-  await expect(day).toBeEnabled()
-  await day.click()
-
-  await dialog.getByRole('button', { name: /09h00 — 10h00/ }).click()
-  const submit = dialog.getByRole('button', { name: /Confirmer ma réservation/ })
-  await expect(submit).toBeVisible()
-
-  // Client-side validation: empty form never reaches the API.
-  await dialog.locator('input[autocomplete="given-name"]').fill('Marie')
-  await dialog.locator('input[autocomplete="family-name"]').fill('Tremblay')
-  await dialog.locator('input[type="email"]').fill('pas-un-courriel@x')
-  await dialog.getByRole('checkbox').nth(1).check() // privacy
-  await dialog.getByRole('checkbox').first().check() // SMS consent without phone
-  await dialog.locator('form').evaluate((f: HTMLFormElement) => f.requestSubmit())
-  await expect(dialog.getByText('Adresse courriel invalide')).toBeVisible()
-  await expect(dialog.getByText('Un numéro est requis pour les rappels SMS')).toBeVisible()
-  expect(submitted).toBeNull()
-
-  await dialog.locator('input[type="email"]').fill('marie@example.com')
-  await dialog.locator('input[type="tel"]').fill('450 555-1234')
-  await submit.click()
-
-  await expect(page.getByRole('dialog')).toHaveAttribute('aria-label', 'Réservation confirmée')
-  expect(submitted).toMatchObject({
-    serviceId: 'individual',
-    isoStart: slot.isoStart,
-    isoEnd: slot.isoEnd,
-    sessionType: 'in-person',
-    client: { firstName: 'Marie', lastName: 'Tremblay', email: 'marie@example.com', phone: '450 555-1234', smsConsent: true },
-  })
-})
+}
 
 test('booking: a server-side refusal (409) is shown to the client', async ({ page }) => {
   const date = nextBookableDate()
@@ -116,7 +146,31 @@ test('booking: a server-side refusal (409) is shown to the client', async ({ pag
   await dialog.getByRole('checkbox').nth(1).check()
   await dialog.getByRole('button', { name: /Confirmer ma réservation/ }).click()
   await expect(dialog.getByText("Ce créneau n'est plus disponible")).toBeVisible()
+  expect(await conversionEvents(page)).toEqual([])
 })
+
+for (const response of [
+  { name: 'unsuccessful response', body: { success: false, eventId: 'not-created' } },
+  { name: 'missing booking ID', body: { success: true } },
+  { name: 'empty booking ID', body: { success: true, eventId: '' } },
+]) {
+  test(`booking: a 2xx ${response.name} cannot confirm or convert`, async ({ page }) => {
+    const date = nextBookableDate()
+    await mockAvailability(page, date)
+    await page.route('**/api/booking/create', (route) => route.fulfill({ json: response.body }))
+    const dialog = await openModalAtCalendar(page, date)
+    await dialog.getByRole('button', { name: new RegExp(`^${date.getDate()} `) }).click()
+    await dialog.getByRole('button', { name: /09h00 — 10h00/ }).click()
+    await dialog.locator('input[autocomplete="given-name"]').fill('Marie')
+    await dialog.locator('input[autocomplete="family-name"]').fill('Tremblay')
+    await dialog.locator('input[type="email"]').fill('marie@example.com')
+    await dialog.getByRole('checkbox').nth(1).check()
+    await dialog.getByRole('button', { name: /Confirmer ma réservation/ }).click()
+    await expect(dialog.getByText('Une erreur est survenue. Veuillez réessayer.')).toBeVisible()
+    await expect(dialog).not.toHaveAttribute('aria-label', 'Réservation confirmée')
+    expect(await conversionEvents(page)).toEqual([])
+  })
+}
 
 // Google Ads deep link: the prerendered page must read the query client-side,
 // open the modal and skip straight to the calendar for the requested service.
@@ -131,6 +185,7 @@ for (const service of ['individual', 'couple'] as const) {
     await expect(dialog).toHaveAttribute('aria-label', 'Choisir une date')
     await expect(dialog.getByText("Les disponibilités sont affichées en heure de l'Est (ET)")).toBeVisible()
     await availability
+    expect(await conversionEvents(page)).toEqual([])
   })
 }
 

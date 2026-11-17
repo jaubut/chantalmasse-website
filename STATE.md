@@ -1,8 +1,87 @@
 # STATE — Chantal Massé website
 
-Last updated: 2026-11-16
+Last updated: 2026-11-17
 
 ## Change Plans
+
+### Change Plan — ads-relaunch-booking-conversion (2026-11-17)
+**Request:** Apply Jeremie's approved Ads relaunch repairs with campaigns paused; separate successful calendar bookings from contact leads, deliver a tracking PR, report billing status and provide one send-day enable command. Ad copy and negatives stay unchanged.
+**Authorization:** User explicitly approved the implementation, account mutations and PR. Campaign activation and production deployment are not authorized today.
+**Done when:** Fresh Ads reads prove the approved settings and PAUSED state; successful booking emits `booking_confirmed` plus the primary Ads booking action, contact emits only its secondary lead signal; isolated browser tests prove success/error separation without real calendar or analytics writes; PR and mutation report contain evidence.
+
+**Target shape & drift**
+- Reference: [Google conversion measurement](https://developers.google.com/tag-platform/devguides/conversions) separates an Ads conversion action/destination from the GA4 event; [transaction IDs](https://support.google.com/google-ads/answer/6386790) deduplicate a confirmed business action. Here, calendar success → booking event + Ads destination; contact success → lead event.
+- Google Calendar remains the booking system of record. The server owns appointment creation; the browser observes the successful response and the tracking composable owns analytics side effects.
+- One business event maps to one primary Ads conversion. The GA4 event remains useful independently; it must not also be imported as a second primary booking conversion.
+- Current drift: booking and contact share `generate_lead`; the modal treats every resolved response as success; the existing Google tag already loads its linked Ads destination. Correct event separation and the success guard only. No server-side analytics, consent redesign, dependency upgrades or broader telemetry work in this scope.
+
+**State decisions**
+- `BookingModal` owns submission/result state. Require `result.success === true` and a nonempty calendar `eventId` before confirmation and conversion; no new persistent state.
+- Preserve the existing client `metaEventId` as the third tracking argument for Pixel/CAPI dedup. Add the server booking ID as a fourth argument for Ads `transaction_id`; it contains no contact details or cancellation token.
+- Keep the public, nonsecret booking destination `AW-16485477025/IFK1CJuhqrodEKHV8bQ9` in client source; action `customers/6902514931/conversionActions/7906955419` is WEBPAGE / BOOK_APPOINTMENT / primary / ONE_PER_CLICK. Existing GA4-linked configuration already loads this Ads destination; preserve head initialization and newsletter confirmation-page exclusion unchanged.
+- Booking sends `booking_confirmed` to GA4 and a direct `conversion` only to the returned `AW-…/label`. It no longer sends `generate_lead`. Contact keeps `generate_lead`, whose existing imported action `7579925411` becomes secondary `Contact` (existing SUBMIT_LEAD_FORM category; Google rejects changing the category of this newer GA4 lead type); removed legacy actions remain removed/secondary.
+- Existing Meta `Schedule` + event ID and PostHog `booking_completed` remain intact. Booking payloads, API endpoints, and appointment side effects stay unchanged.
+- Root owns account mutations through temporary scripts and an append-only before/operation/result log. The durable `scripts/ads-relaunch.py` defaults to read/dry-run; `--enable --commit` performs the single send-day activation only after preflight. It identifies customer 6902514931 and manager 6746327196 and constrains target campaign IDs.
+
+**Contracts touched** (map regenerated 2026-11-17; lint: 0 blocking, one unrelated legacy cap warning)
+| contract | kind | change | consumers / callers | compat |
+|---|---|---|---|---|
+| `useTracking().trackBookingComplete(service, value, eventId, bookingId?)` and caller success boundary | export / event | additive booking ID; replace booking `generate_lead` with `booking_confirmed`; direct Ads booking conversion only after `success === true` + confirmed event ID | `components/booking/BookingModal.vue:308`; external GA4/Ads; existing Meta and PostHog | JS API additive; intentional analytics semantic migration with old Ads lead action secondary |
+| `useTracking().trackContactSubmit()` | export / event | none; preserve contact-only `generate_lead` | `components/ContactModal.vue:137`; imported GA4 Ads action | unchanged client contract; Ads primary flag/name changes |
+| `POST /api/booking/create` | endpoint | none; client validates existing success/eventId fields before conversion | map: `components/booking/BookingModal.vue`; tests | unchanged wire contract |
+| `useTracking().trackEvent()` | export | none | map: `pages/prendre-rendez-vous.vue`; booking/contact helpers | unchanged; CTA and service-switch events remain |
+| Ads relaunch CLI | operational command | NEW: read/preflight and explicit `--enable --commit`, mutation log | root/operator; user’s send-day command | new operator-only CLI; not invoked to enable today |
+
+**Files — one owner each**
+| file | owner | change | cap check |
+|---|---|---|---|
+| `composables/useTracking.ts` | tracking worker | separate booking GA4 event, direct Ads tag with transaction ID, preserve Meta/PostHog | 124 → ~145, below 600 |
+| `components/booking/BookingModal.vue` | tracking worker | validate successful response; pass confirmed ID; use narrow error handling if touching catch | 406 → ~420, below 600 |
+| `tests/unit/tracking.test.ts` | tracking worker | NEW: no exports; GA4/Ads isolation, transaction ID, Meta dedup, browser-absent behavior | new, below 600 |
+| `tests/smoke/booking.spec.ts` | tracking worker | capture dataLayer for successful/failed/false-success booking, no premature event | 167 → ~235, below 600 |
+| `tests/smoke/forms.spec.ts` | tracking worker | assert contact success generates contact lead without booking conversion | existing, below 600 |
+| `scripts/ads-relaunch.py` | root | NEW: no library exports; audited API reads/mutations and guarded send-day enable command | new, target below 600 |
+| `docs/ads-relaunch-2026-11-17.md`, `docs/ads-relaunch-2026-11-17-changes.jsonl` | root | NEW: no exports; approved changes, sanitized mutation log, billing status, activation command, deploy verification | documentation/data |
+| `architecture.json`, `architecture.md` | root | regenerate after implementation | generated |
+| `STATE.md` | tracking_plan then root | this plan, analyst reconciliation, verification and PR handoff | plan below 120 lines |
+
+**Fan-in paths to guard**
+- `useTracking` is shared by BookingModal, ContactModal and the booking landing page. Do not change CTA/start/contact semantics while replacing only the successful-booking signal.
+- Ads conversion uses a direct `window.gtag` call, not the generic helper, so Ads-only `conversion`/`send_to` is not mirrored to Meta/PostHog.
+- Booking API success precedes all confirmation/tracking. Validation errors, HTTP errors, `success:false`, modal opening, service/date selection and contact submission emit no booking conversion.
+- Preserve Meta Pixel/CAPI identity: server request `metaEventId` equals Pixel Schedule `eventID`; Ads transaction identity uses confirmed booking ID independently.
+- Existing Google head configuration and the `/confirmer-inscription` exclusion remain unchanged. Browser smoke confirms tracking is still available on the booking page.
+
+**Risks**
+- Map blind spot: `useTracking` fan-in is mapped, but returned helper invocations and external analytics destinations are not separate edges. Their consumers above were source-confirmed; no shared adapter changes authorized here.
+- KB queries for posthog-js, Nuxt and google-ads-api completed. Nuxt shared module state is unsafe across SSR requests → add no module-level visitor/booking state (kb: `agent://senior-dev/vue-nuxt/2026-09-04`; no dependency advice relied on). Other hits do not require changes for this scope.
+- Old deployed code continues sending bookings as `generate_lead` until PR deployment. Keep campaigns paused; report deployment as outstanding and make the send-day prerequisite explicit.
+- Local intercepted tests prove browser behavior, not Google ingestion or an attributable Ads booking. After deployment observe the next genuine booking in GA4/Ads diagnostics; do not manufacture a calendar appointment or click an ad.
+- Billing API approval alone does not establish current payment-method validity or unpaid balance. Report only verified status; never payment instrument details.
+
+**Verify**
+1. Unit tests assert booking GA4 name, exact Ads `send_to`, CAD/value/transaction ID, no booking `generate_lead`, contact isolation and preserved Meta/PostHog signals; no real network.
+2. Browser smoke with external requests intercepted: before submit no booking event; confirmed success emits once with the returned ID; HTTP refusal and a 2xx unsuccessful response emit none; contact emits only `generate_lead` and no booking Ads conversion.
+3. Browser mobile/desktop check: booking dialog still usable, no overflow/console errors; keyboard focus, touch targets, safe-area layout and input zoom retain existing behavior. Run mobile audit.
+4. Run unit/server suite, typecheck against existing baseline, production build and relevant browser smoke; inspect diff, regenerate map and run lint.
+5. Root verifies every Ads mutation through fresh queries: budget split, URLs/sitelinks, excluded group, networks/language/bidding/time/geo/end date, conversion goals, two PAUSED campaigns and SMART REMOVED. Compare all ad copy and negatives to pre-change snapshots.
+6. Review and drift check against this plan; PR includes final tables and evidence. Test enable command in dry-run only; never execute enable today.
+7. Jeremie’s pre-launch manual pass after deployment: open booking flow and confirm unchanged usability; on the next genuine booking inspect `booking_confirmed` and the direct booking action (separate from Contact), then authorize/use the one send-day command. Account delivery and production ingestion are not claimed by local preview evidence.
+
+**Analyst findings — reconciled 2026-11-17**
+- Tracking analyst confirmed the sole completion caller and additive fourth argument. Analytics semantics deliberately change; contact migration and paused campaigns cover it. Require confirmed ID for the direct Ads conversion; keep Ads-only events out of the Meta/PostHog mirror and preserve server CAPI identity.
+- Operational analyst confirmed no existing CLI consumers. Missing campaigns fail closed; environment credentials override files; preflight checks campaign/custom goals; both status changes use one non-partial batch and are verified after. Default and `--enable` alone are read-only; `--commit` alone is invalid. Deployment and billing remain explicit prerequisites.
+- Live API diagnosis: current generate_lead action type is GOOGLE_ANALYTICS_4_GENERATE_LEAD in v26 (UNKNOWN in v23). Name and primary flag are mutable; category change returns request error 138. Retain its existing category while renaming Contact and making it secondary. The requested behavior is preserved.
+
+**Verification results — 2026-11-17**
+- 182/182 unit/server tests; 51/51 Chromium smoke tests; typecheck: zero new errors (39 baseline). Node-server and Cloudflare Worker production builds pass under Node 24, matching CI; local Node 22 stalled without source changes.
+- Success, HTTP failure, unsuccessful 2xx and missing/empty booking ID paths are browser-tested with intercepted APIs/analytics. Contact produces only its lead event. No calendar appointments or synthetic Google conversions were created.
+- Mobile/desktop 390/1440: no overflow/console errors, 16px inputs, 68px submit target, Enter submission; existing 36px back/close targets unchanged. Physical iOS keyboard/notch remains a manual check.
+- Fresh Ads reads and default/--enable dry runs pass: both campaigns PAUSED; budgets $5/$3.22; exact settings/URLs and booking-only biddable goals. Resource-keyed ad/sitelink-copy, keyword and negative comparisons pass; SMART unchanged. Log: 16 applied batches, four rejected validations, no enable operation.
+- Offline CLI verification: nine drift rejections, no-mutation flags, atomic fake activation/readback, explicit uncertain-submission warning. Delivery review: no remaining implementation blocker; mobile audit: no introduced regression; archmap: zero blockers, one legacy cap warning.
+- Payment method and unpaid balance unverified (invoice API Explorer restriction, no authenticated UI). Deployment, genuine booking ingestion and newsletter-day activation remain outside this PR's completed implementation.
+
+**Out of scope:** Ad-copy edits, new negatives, enabling campaigns now, SMART restoration, production deployment/merge, fake bookings, messages to clients, broader analytics or dependency refactoring.
 
 ### Change Plan — pr45-cloudflare-newsletter-continuation (2026-11-16)
 **Request:** Finish PR #45 from `b5dc2aac`: Cloudflare deployment/runtime bindings, `https://dashboard.apies.dev`, approved consent/privacy copy, fix the failed CI, commit/push and wait for the final CI result.
