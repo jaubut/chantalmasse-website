@@ -1,4 +1,10 @@
 import { escapeAttribute, escapeHtml, stripHeaderValue } from './input'
+import { brandEmail, button, details, headline, lead, link, paragraph } from './emailLayout'
+
+const SITE = 'https://chantalmasse.com'
+
+const locationLine = (sessionType: 'in-person' | 'video'): string =>
+  sessionType === 'video' ? 'En visioconférence (Google Meet)' : 'En personne — Shefford, QC'
 
 export function clientConfirmationEmail(params: {
   firstName: string
@@ -9,120 +15,31 @@ export function clientConfirmationEmail(params: {
   meetLink?: string
   cancelToken: string
 }): { subject: string; html: string } {
-  const subject = 'Confirmation — Ta séance avec Chantal Massé'
+  const subject = 'Ton rendez-vous avec Chantal Massé est confirmé'
   const firstName = escapeHtml(params.firstName)
-  const service = escapeHtml(params.service)
-  const date = escapeHtml(params.date)
-  const time = escapeHtml(params.time)
   const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
   const cancelToken = encodeURIComponent(params.cancelToken)
 
-  const locationLine =
-    params.sessionType === 'video'
-      ? 'En visioconférence (Google Meet)'
-      : 'En personne — Shefford, QC'
-
   const meetButton =
-    params.sessionType === 'video' && params.meetLink
-      ? `
-      <div style="text-align:center; margin: 32px 0;">
-        <a href="${meetLink}" style="
-          display:inline-block;
-          background:#173028;
-          color:#ffffff;
-          padding:16px 32px;
-          border-radius:8px;
-          font-family:sans-serif;
-          font-weight:600;
-          font-size:16px;
-          text-decoration:none;
-        ">Rejoindre la séance Google Meet →</a>
-      </div>`
-      : ''
+    params.sessionType === 'video' && params.meetLink ? button(meetLink, 'Rejoindre la séance Google Meet') : ''
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+  const body = [
+    headline('Ton rendez-vous est <em>confirmé</em>.'),
+    lead(`Bonjour ${firstName}, j’ai bien noté ton rendez-vous.`),
+    details([
+      ['Service', escapeHtml(params.service)],
+      ['Date', escapeHtml(params.date)],
+      ['Heure', escapeHtml(params.time)],
+      ['Format', locationLine(params.sessionType)],
+    ]),
+    meetButton,
+    paragraph('Je t’écris la veille pour te le rappeler.'),
+    paragraph(
+      `Un empêchement&nbsp;? ${link(`${SITE}/annuler?token=${cancelToken}`, 'Annule ton rendez-vous')}, puis choisis un autre moment.`,
+    ),
+  ].join('\n')
 
-        <!-- Header -->
-        <tr>
-          <td style="background:#173028;padding:40px;text-align:center;">
-            <div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Chantal Massé</div>
-            <div style="font-size:14px;color:#cce9dd;margin-top:6px;">Thérapeute en relation d'aide</div>
-          </td>
-        </tr>
-
-        <!-- Checkmark -->
-        <tr>
-          <td style="padding:48px 40px 24px;text-align:center;">
-            <div style="font-size:64px;color:#3D9970;">✓</div>
-            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">Ta séance est confirmée!</h1>
-            <p style="color:#424845;margin:0;">Bonjour ${firstName}, ton rendez-vous est bien enregistré.</p>
-          </td>
-        </tr>
-
-        <!-- Details -->
-        <tr>
-          <td style="padding:0 40px 32px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📋 Service :</strong> ${service}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📅 Date :</strong> ${date}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">🕐 Heure :</strong> ${time}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📍 Format :</strong> ${locationLine}
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-
-        ${meetButton}
-
-        <!-- Reminder -->
-        <tr>
-          <td style="padding:0 40px 32px;">
-            <div style="background:#cce9dd;border-radius:12px;padding:20px;text-align:center;font-size:14px;color:#173028;">
-              ⏰ Tu recevras un rappel 24h avant ta séance
-            </div>
-          </td>
-        </tr>
-
-        <!-- Cancel link -->
-        <tr>
-          <td style="padding:0 40px 40px;text-align:center;">
-            <p style="font-size:13px;color:#727975;">
-              Besoin d'annuler?
-              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annule ici</a>
-            </p>
-          </td>
-        </tr>
-
-        <!-- Footer -->
-        <tr>
-          <td style="background:#fef8f3;padding:24px 40px;text-align:center;border-top:1px solid #e6e2dd;">
-            <p style="font-size:13px;color:#727975;margin:0;">
-              <a href="https://chantalmasse.com" style="color:#173028;text-decoration:none;">chantalmasse.com</a>
-              &nbsp;·&nbsp; Membre RITMA &nbsp;·&nbsp; Shefford, QC
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`
-
-  return { subject, html }
+  return { subject, html: brandEmail({ subject, preheader: `${params.date}, ${params.time}`, eyebrow: 'Rendez-vous confirmé', body }) }
 }
 
 export function clientCancellationEmail(params: {
@@ -131,73 +48,22 @@ export function clientCancellationEmail(params: {
   date: string
   time: string
 }): { subject: string; html: string } {
-  const subject = 'Annulation confirmée — Séance avec Chantal Massé'
+  const subject = 'Ton rendez-vous avec Chantal Massé est annulé'
   const firstName = escapeHtml(params.firstName)
-  const service = escapeHtml(params.service)
-  const date = escapeHtml(params.date)
-  const time = escapeHtml(params.time)
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+  const body = [
+    headline('Ton rendez-vous est <em>annulé</em>.'),
+    lead(`${firstName}, j’ai retiré cette séance de mon calendrier. Tu n’as rien d’autre à faire.`),
+    details([
+      ['Service', escapeHtml(params.service)],
+      ['Date', escapeHtml(params.date)],
+      ['Heure', escapeHtml(params.time)],
+    ]),
+    paragraph('Quand tu seras prêt·e, tu peux choisir un autre moment.'),
+    button(`${SITE}/prendre-rendez-vous`, 'Choisir un autre moment'),
+  ].join('\n')
 
-        <tr>
-          <td style="background:#173028;padding:40px;text-align:center;">
-            <div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Chantal Massé</div>
-            <div style="font-size:14px;color:#cce9dd;margin-top:6px;">Thérapeute en relation d'aide</div>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:48px 40px 24px;text-align:center;">
-            <h1 style="font-size:26px;color:#173028;margin:0 0 12px;font-style:italic;">Rendez-vous annulé, ${firstName}.</h1>
-            <p style="color:#424845;margin:0;">La séance suivante a été retirée du calendrier. Rien d'autre à faire de ton côté.</p>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:0 40px 32px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Service :</strong> ${service}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Date :</strong> ${date}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">Heure :</strong> ${time}
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:0 40px 40px;text-align:center;">
-            <p style="font-size:14px;color:#424845;margin:0 0 20px;">Envie de reprendre un autre moment&nbsp;?</p>
-            <a href="https://chantalmasse.com/prendre-rendez-vous" style="display:inline-block;background:#173028;color:#ffffff;padding:14px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;">Réserver une nouvelle séance →</a>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="background:#fef8f3;padding:24px 40px;text-align:center;border-top:1px solid #e6e2dd;">
-            <p style="font-size:13px;color:#727975;margin:0;">
-              <a href="https://chantalmasse.com" style="color:#173028;text-decoration:none;">chantalmasse.com</a>
-              &nbsp;·&nbsp; Membre RITMA &nbsp;·&nbsp; Shefford, QC
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`
-
-  return { subject, html }
+  return { subject, html: brandEmail({ subject, preheader: 'Cette séance a été retirée du calendrier.', eyebrow: 'Rendez-vous annulé', body }) }
 }
 
 export function therapistCancellationEmail(params: {
@@ -212,39 +78,23 @@ export function therapistCancellationEmail(params: {
   const clientName = escapeHtml(params.clientName)
   const clientEmail = escapeHtml(params.clientEmail)
   const clientEmailAttr = escapeAttribute(params.clientEmail)
-  const clientPhone = params.clientPhone ? escapeHtml(params.clientPhone) : ''
-  const service = escapeHtml(params.service)
-  const date = escapeHtml(params.date)
-  const time = escapeHtml(params.time)
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:24px;background:#f5f5f5;font-family:sans-serif;">
-  <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:12px;overflow:hidden;">
-    <tr>
-      <td style="background:#8b1a1a;padding:24px 32px;">
-        <div style="font-size:18px;font-weight:700;color:#ffffff;">Annulation de rendez-vous</div>
-      </td>
-    </tr>
-    <tr>
-      <td style="padding:24px 32px;">
-        <p style="margin:0 0 16px;font-size:15px;color:#1d1b19;"><strong>${clientName}</strong> vient d'annuler sa séance.</p>
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:8px;padding:16px;">
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Service :</strong> ${service}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Date :</strong> ${date}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Heure :</strong> ${time}</td></tr>
-          <tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Courriel :</strong> <a href="mailto:${clientEmailAttr}" style="color:#173028;">${clientEmail}</a></td></tr>
-          ${clientPhone ? `<tr><td style="padding:4px 0;font-size:14px;color:#1d1b19;"><strong>Téléphone :</strong> ${clientPhone}</td></tr>` : ''}
-        </table>
-        <p style="margin:16px 0 0;font-size:13px;color:#727975;">L'événement a été retiré de ton Google Calendar.</p>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`
+  const rows: Array<[string, string]> = [
+    ['Service', escapeHtml(params.service)],
+    ['Date', escapeHtml(params.date)],
+    ['Heure', escapeHtml(params.time)],
+    ['Courriel', link(`mailto:${clientEmailAttr}`, clientEmail)],
+  ]
+  if (params.clientPhone) rows.push(['Téléphone', escapeHtml(params.clientPhone)])
 
-  return { subject, html }
+  const body = [
+    headline('Une séance <em>annulée</em>.'),
+    lead(`${clientName} vient d’annuler sa séance.`),
+    details(rows),
+    paragraph('L’événement a été retiré de ton Google Agenda.'),
+  ].join('\n')
+
+  return { subject, html: brandEmail({ subject, preheader: `${params.clientName}, ${params.date} ${params.time}`, eyebrow: 'Annulation', body }) }
 }
 
 export function clientReminderEmail(params: {
@@ -256,121 +106,40 @@ export function clientReminderEmail(params: {
   meetLink?: string
   cancelToken: string
 }): { subject: string; html: string } {
-  const subject = 'Rappel — Votre séance avec Chantal demain'
+  const subject = 'Rappel — Ton rendez-vous avec Chantal demain'
   // Manual Calendar bookings do not always yield a usable first name; greeting
   // someone by a placeholder is worse than greeting them by nothing.
   const firstName = escapeHtml(params.firstName || '')
-  const greeting = firstName ? `On se voit demain, ${firstName}.` : 'On se voit demain.'
-  const service = escapeHtml(params.service)
-  const date = escapeHtml(params.date)
-  const time = escapeHtml(params.time)
+  const greeting = firstName ? `Bonjour ${firstName}, je te rappelle ton rendez-vous.` : 'Je te rappelle ton rendez-vous.'
   const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
   const cancelToken = encodeURIComponent(params.cancelToken)
 
-  const locationLine =
-    params.sessionType === 'video'
-      ? 'En visioconférence (Google Meet)'
-      : 'En personne — Shefford, QC'
-
   const meetButton =
-    params.sessionType === 'video' && params.meetLink
-      ? `
-      <div style="text-align:center; margin: 32px 0;">
-        <a href="${meetLink}" style="
-          display:inline-block;
-          background:#173028;
-          color:#ffffff;
-          padding:16px 32px;
-          border-radius:8px;
-          font-family:sans-serif;
-          font-weight:600;
-          font-size:16px;
-          text-decoration:none;
-        ">Rejoindre la séance Google Meet →</a>
-      </div>`
-      : ''
+    params.sessionType === 'video' && params.meetLink ? button(meetLink, 'Rejoindre la séance Google Meet') : ''
 
   // Manual (Calendar-entered) bookings have no cancel token — only render the
   // self-serve cancel link when a real token exists, otherwise it points at
   // /annuler?token=undefined.
   const cancelBlock = params.cancelToken
-    ? `
-        <!-- Cancel link -->
-        <tr>
-          <td style="padding:0 40px 40px;text-align:center;">
-            <p style="font-size:13px;color:#727975;">
-              Un empêchement?
-              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annuler ou reporter</a>
-            </p>
-          </td>
-        </tr>`
+    ? paragraph(
+        `Un empêchement&nbsp;? ${link(`${SITE}/annuler?token=${cancelToken}`, 'Annule ton rendez-vous')}, puis choisis un autre moment.`,
+      )
     : ''
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
+  const body = [
+    headline('On se voit <em>demain</em>.'),
+    lead(greeting),
+    details([
+      ['Service', escapeHtml(params.service)],
+      ['Date', escapeHtml(params.date)],
+      ['Heure', escapeHtml(params.time)],
+      ['Format', locationLine(params.sessionType)],
+    ]),
+    meetButton,
+    cancelBlock,
+  ].join('\n')
 
-        <!-- Header -->
-        <tr>
-          <td style="background:#173028;padding:40px;text-align:center;">
-            <div style="font-size:24px;font-weight:700;color:#ffffff;letter-spacing:-0.5px;">Chantal Massé</div>
-            <div style="font-size:14px;color:#cce9dd;margin-top:6px;">Thérapeute en relation d'aide</div>
-          </td>
-        </tr>
-
-        <!-- Intro -->
-        <tr>
-          <td style="padding:48px 40px 24px;text-align:center;">
-            <div style="font-size:48px;">⏰</div>
-            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">${greeting}</h1>
-            <p style="color:#424845;margin:0;">Un petit rappel pour votre séance.</p>
-          </td>
-        </tr>
-
-        <!-- Details -->
-        <tr>
-          <td style="padding:0 40px 32px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📋 Service :</strong> ${service}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📅 Date :</strong> ${date}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">🕐 Heure :</strong> ${time}
-              </td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;">
-                <strong style="color:#173028;">📍 Format :</strong> ${locationLine}
-              </td></tr>
-            </table>
-          </td>
-        </tr>
-
-        ${meetButton}
-        ${cancelBlock}
-
-        <!-- Footer -->
-        <tr>
-          <td style="background:#fef8f3;padding:24px 40px;text-align:center;border-top:1px solid #e6e2dd;">
-            <p style="font-size:13px;color:#727975;margin:0;">
-              <a href="https://chantalmasse.com" style="color:#173028;text-decoration:none;">chantalmasse.com</a>
-              &nbsp;·&nbsp; Membre RITMA &nbsp;·&nbsp; Shefford, QC
-            </p>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`
-
-  return { subject, html }
+  return { subject, html: brandEmail({ subject, preheader: `${params.date}, ${params.time}`, eyebrow: 'Rappel', body }) }
 }
 
 export function therapistNotificationEmail(params: {
@@ -385,85 +154,32 @@ export function therapistNotificationEmail(params: {
   meetLink?: string
   eventId?: string
 }): { subject: string; html: string } {
-  const subject = stripHeaderValue(`🗓 Nouvelle réservation — ${params.clientName}`, 160)
+  const subject = stripHeaderValue(`Nouvelle réservation — ${params.clientName}`, 160)
   const clientName = escapeHtml(params.clientName)
   const clientEmail = escapeHtml(params.clientEmail)
   const clientEmailAttr = escapeAttribute(params.clientEmail)
-  const clientPhone = params.clientPhone ? escapeHtml(params.clientPhone) : ''
-  const service = escapeHtml(params.service)
-  const date = escapeHtml(params.date)
-  const time = escapeHtml(params.time)
-  const message = params.message ? escapeHtml(params.message).replace(/\n/g, '<br>') : ''
   const meetLink = params.meetLink ? escapeAttribute(params.meetLink) : ''
 
-  const sessionLabel =
-    params.sessionType === 'video'
-      ? 'En visioconférence (Google Meet)'
-      : 'En personne — Shefford, QC'
+  const rows: Array<[string, string]> = [
+    ['Client', clientName],
+    ['Courriel', link(`mailto:${clientEmailAttr}`, clientEmail)],
+  ]
+  if (params.clientPhone) rows.push(['Téléphone', escapeHtml(params.clientPhone)])
+  rows.push(
+    ['Service', escapeHtml(params.service)],
+    ['Date', escapeHtml(params.date)],
+    ['Heure', escapeHtml(params.time)],
+    ['Format', locationLine(params.sessionType)],
+  )
+  if (params.sessionType === 'video' && params.meetLink) rows.push(['Lien Meet', link(meetLink, meetLink)])
+  if (params.message) rows.push(['Message', escapeHtml(params.message).replace(/\n/g, '<br>')])
 
-  const meetRow =
-    params.sessionType === 'video' && params.meetLink
-      ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🔗 Lien Meet :</strong> <a href="${meetLink}" style="color:#173028;">${meetLink}</a></td></tr>`
-      : ''
+  const body = [
+    headline('Nouvelle <em>réservation</em>.'),
+    lead(`${clientName} a réservé une séance.`),
+    details(rows),
+    button('https://calendar.google.com', 'Voir dans Google Agenda'),
+  ].join('\n')
 
-  const messageRow = params.message
-    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">💬 Message :</strong> ${message}</td></tr>`
-    : ''
-
-  const phoneRow = params.clientPhone
-    ? `<tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📞 Téléphone :</strong> ${clientPhone}</td></tr>`
-    : ''
-
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head><meta charset="UTF-8"></head>
-<body style="margin:0;padding:0;background:#f5f5f5;font-family:sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 16px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:16px;overflow:hidden;">
-
-        <tr>
-          <td style="background:#173028;padding:32px 40px;">
-            <div style="font-size:18px;font-weight:700;color:#ffffff;">🗓 Nouvelle réservation reçue</div>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:32px 40px;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#f2ede8;border-radius:12px;padding:24px;">
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">👤 Client :</strong> ${clientName}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">✉️ Courriel :</strong> <a href="mailto:${clientEmailAttr}" style="color:#173028;">${clientEmail}</a></td></tr>
-              ${phoneRow}
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📋 Service :</strong> ${service}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📅 Date :</strong> ${date}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">🕐 Heure :</strong> ${time}</td></tr>
-              <tr><td style="padding:8px 0;font-size:15px;color:#1d1b19;"><strong style="color:#173028;">📍 Format :</strong> ${sessionLabel}</td></tr>
-              ${meetRow}
-              ${messageRow}
-            </table>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="padding:0 40px 40px;text-align:center;">
-            <a href="https://calendar.google.com" style="
-              display:inline-block;
-              background:#173028;
-              color:#ffffff;
-              padding:12px 24px;
-              border-radius:8px;
-              font-size:14px;
-              text-decoration:none;
-              font-weight:600;
-            ">Voir dans Google Agenda →</a>
-          </td>
-        </tr>
-
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`
-
-  return { subject, html }
+  return { subject, html: brandEmail({ subject, preheader: `${params.clientName}, ${params.date} ${params.time}`, eyebrow: 'Nouvelle réservation', body }) }
 }

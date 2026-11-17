@@ -101,6 +101,26 @@ describe('email templates', () => {
     expect(reminder.html).not.toContain('<script>')
     expect(reminder.html).toContain('annuler?token=tok')
   })
+
+  it('every booking mail is brand-locked: light only, no emoji, no exclamation, her footer', () => {
+    const p = { firstName: 'Marie', service: 'S', date: 'd', time: 't' }
+    const t = { clientName: 'Marie', clientEmail: 'm@e.com', service: 'S', date: 'd', time: 't' }
+    const mails = [
+      clientConfirmationEmail({ ...p, sessionType: 'video', meetLink: 'https://meet.google.com/x', cancelToken: 'tok' }),
+      clientReminderEmail({ ...p, sessionType: 'in-person', cancelToken: 'tok' }),
+      clientCancellationEmail(p),
+      therapistCancellationEmail(t),
+      therapistNotificationEmail({ ...t, sessionType: 'in-person' }),
+    ]
+    for (const { subject, html } of mails) {
+      expect(html).toContain('color-scheme" content="light only"')
+      expect(html).toContain('245 rue Colette, Shefford (Québec) J2M 2B7')
+      expect(html).not.toContain('exploité par')
+      expect(html).not.toMatch(/\p{Extended_Pictographic}|✓/u)
+      expect(subject).not.toMatch(/\p{Extended_Pictographic}/u)
+      expect(html.replace(/<style>[\s\S]*?<\/style>|<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g, '')).not.toContain('!')
+    }
+  })
 })
 
 describe('sms', async () => {

@@ -54,7 +54,7 @@ const privOf = (id: string) => globalThis.__EVENTS.find((e: any) => e.id === id)
     attendees: [{ email: 'chantal@gmail.com', self: true, organizer: true }, { email: 'anne@example.com' }] })])
   r = await run()
   check('reminder sent (old gate dropped this)', sentTo()[0] === 'anne@example.com')
-  check('greeted by real first name', globalThis.__SENT[0].html.includes('On se voit demain, Anne.'))
+  check('greeted by real first name', globalThis.__SENT[0].html.includes('Bonjour Anne,'))
 
   console.log('3) blocked time with a guest is never emailed')
   reset([ev({ id: 'b1', summary: 'Plage bloquée', colorId: '9', attendees: [{ email: 'someone@example.com' }] }),
@@ -68,7 +68,7 @@ const privOf = (id: string) => globalThis.__EVENTS.find((e: any) => e.id === id)
     priv: { clientEmail: 'tryciapothier@outlook.com', clientName: 'Trycia Pothier', cancelToken: 'tok123' } })])
   r = await run()
   check('form client emailed', sentTo()[0] === 'tryciapothier@outlook.com')
-  check('greeted by stored name', globalThis.__SENT[0].html.includes('On se voit demain, Trycia.'))
+  check('greeted by stored name', globalThis.__SENT[0].html.includes('Bonjour Trycia,'))
 
   console.log('5) partial failure retries only the address that failed')
   reset([ev({ id: 'p1', summary: 'Coaching de couple-Ines lawson', colorId: '9',
