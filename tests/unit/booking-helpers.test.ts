@@ -45,6 +45,36 @@ describe('generateSlotsForDate', () => {
   })
 })
 
+describe('busy calendar', () => {
+  const tuesday = day(2026, 10, 13)
+  const ev = (s: string, e: string) => ({ start: { dateTime: s }, end: { dateTime: e } })
+
+  it('keeps the 15-minute buffer around an event (10:00–11:00 EDT)', () => {
+    const labels = generateSlotsForDate(tuesday, 60, [ev('2026-10-13T10:00:00-04:00', '2026-10-13T11:00:00-04:00')]).map(s => s.label)
+    expect(labels).not.toContain('09h00 — 10h00')
+    expect(labels).not.toContain('11h00 — 12h00')
+    expect(labels).toContain('11h15 — 12h15')
+  })
+
+  it('blocks the whole ET day for an all-day event, not the neighbours', () => {
+    const allDay = [{ start: { date: '2026-10-13' }, end: { date: '2026-10-14' } }]
+    expect(generateSlotsForDate(tuesday, 60, allDay)).toEqual([])
+    expect(generateSlotsForDate(day(2026, 10, 14), 60, allDay)).toHaveLength(29)
+  })
+
+  it('computes a 120-event month well inside the Worker CPU budget', () => {
+    const events = []
+    for (let d = 1; d <= 30; d++) for (const h of [10, 12, 14, 16]) {
+      const start = new Date(Date.UTC(2026, 10, d, h + 5))
+      events.push(ev(start.toISOString(), new Date(+start + 3_600_000).toISOString()))
+    }
+    const t = performance.now()
+    getAvailableDatesInMonth(2026, 11, 60, events, 60, 24)
+    getAvailableDatesInMonth(2026, 11, 90, events, 60, 24)
+    expect(performance.now() - t).toBeLessThan(100)
+  })
+})
+
 describe('getAvailableDatesInMonth', () => {
   it('stops at the advance window', () => {
     const { availableDates } = getAvailableDatesInMonth(2026, 12, 60, [], 60, 24)

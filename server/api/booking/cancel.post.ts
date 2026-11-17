@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
     console.error('[booking/cancel] delete error:', err)
     throw createError({
       statusCode: 503,
-      message: 'Impossible de retirer le rendez-vous du calendrier. Veuillez contacter Chantal.',
+      message: 'Impossible de retirer le rendez-vous du calendrier. Écris à Chantal : chantal.gmasse@gmail.com.',
     })
   }
 
@@ -78,6 +78,7 @@ export default defineEventHandler(async (event) => {
         body: {
           from: config.emailFrom,
           to: clientEmail,
+          reply_to: 'chantal.gmasse@gmail.com',
           subject: mail.subject,
           html: mail.html,
         },
@@ -125,7 +126,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    message: 'Votre rendez-vous a été annulé.',
+    message: 'Ton rendez-vous a été annulé.',
     date: dateFormatted,
     time: timeFormatted,
   }

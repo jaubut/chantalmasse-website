@@ -39,7 +39,9 @@
           {{ slot.label }}
         </span>
         <div class="flex flex-wrap gap-2">
+          <!-- Coaching de couple is in-person only (see IntakeForm). -->
           <span
+            v-if="service.id !== 'couple'"
             class="inline-flex items-center gap-1.5 text-xs font-body px-2.5 py-1 rounded-full transition-colors"
             :class="isSelected(slot) ? 'bg-on-primary/10 text-on-primary' : 'bg-[#e0f5ed] text-[#1a6e4a]'"
           >
@@ -59,7 +61,7 @@
     <div v-else class="text-center py-12">
       <div class="text-4xl mb-4">📅</div>
       <p class="font-body text-on-surface-variant mb-6">
-        Aucune disponibilité ce jour. Veuillez choisir une autre date.
+        Aucune disponibilité ce jour. Choisis une autre date.
       </p>
       <button
         class="font-body font-semibold text-primary hover:opacity-70 transition-opacity flex items-center gap-2 mx-auto"

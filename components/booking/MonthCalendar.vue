@@ -60,6 +60,12 @@
       </template>
     </div>
 
+    <div v-if="loadError" role="alert" class="mt-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-center font-body text-sm text-red-700">
+      Impossible de charger les disponibilités.
+      <button type="button" class="ml-1 min-h-11 font-semibold underline underline-offset-4" @click="fetchAvailability(currentViewMonth)">Réessayer</button>
+      <span class="block mt-1">Ou écris à <a href="mailto:chantal.gmasse@gmail.com" class="underline">chantal.gmasse@gmail.com</a>.</span>
+    </div>
+
     <!-- Legend -->
     <div class="flex items-center justify-center gap-6 mt-6 font-body text-xs text-on-surface-variant">
       <div class="flex items-center gap-2">
@@ -129,6 +135,7 @@ const publicAdvanceDays = computed(() =>
 const today = new Date()
 const currentViewMonth = ref(new Date(today.getFullYear(), today.getMonth(), 1))
 const isLoading = ref(false)
+const loadError = ref(false)
 const availabilityCache = ref(new Map<string, string[]>())
 
 const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
@@ -217,6 +224,7 @@ async function fetchAvailability(monthDate: Date) {
   if (availabilityCache.value.has(key)) return
 
   isLoading.value = true
+  loadError.value = false
   try {
     const monthStr = format(monthDate, 'yyyy-MM')
     const data = await $fetch<{ availableDates: string[] }>('/api/booking/availability', {
@@ -228,6 +236,7 @@ async function fetchAvailability(monthDate: Date) {
     availabilityCache.value = newCache
   } catch (err) {
     console.error('[MonthCalendar] Failed to fetch availability:', err)
+    loadError.value = true
   } finally {
     isLoading.value = false
   }

@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
     console.error('[booking/cancel-info] calendar lookup error:', err)
     throw createError({
       statusCode: 503,
-      message: 'Le système est temporairement indisponible. Veuillez réessayer.',
+      message: 'Le système est temporairement indisponible. Réessaie dans un instant.',
     })
   }
 

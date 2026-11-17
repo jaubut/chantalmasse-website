@@ -1,7 +1,7 @@
 <template>
   <div class="px-2">
     <h2 class="font-headline text-3xl italic text-primary text-center mb-10">
-      Quel accompagnement souhaitez-vous?
+      Quel accompagnement souhaites-tu?
     </h2>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
