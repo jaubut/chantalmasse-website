@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16",
+  "generatedAt": "2026-11-17",
   "repo": "chantalmasse-website",
   "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Cloudflare Workers): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
   "targets": [
@@ -285,7 +285,7 @@
         },
         {
           "path": "components/booking/BookingModal.vue",
-          "lines": 406,
+          "lines": 409,
           "kind": "component",
           "exports": [
             "BookingModal"
@@ -612,7 +612,7 @@
         },
         {
           "path": "composables/useTracking.ts",
-          "lines": 124,
+          "lines": 123,
           "kind": "composable",
           "exports": [
             "useTracking"
