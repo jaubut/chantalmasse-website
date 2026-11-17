@@ -6,11 +6,11 @@
         v-if="firstAvailable"
         type="button"
         class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-xl border border-primary/20 bg-primary-fixed/60 px-5 py-4 text-left transition-colors duration-200 hover:border-primary focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
-        @click="emit('pick', firstAvailable.date, firstAvailable.slots, firstAvailable.slots[0])"
+        @click="emit('pick', firstAvailable.date, firstAvailable.slots, firstAvailable.slots[0]!)"
       >
         <span class="font-body text-sm text-on-surface">
           <span class="font-semibold text-primary">Première disponibilité&nbsp;:</span>
-          {{ formatSlotStart(firstAvailable.slots[0].isoStart) }}
+          {{ formatSlotStart(firstAvailable.slots[0]!.isoStart) }}
         </span>
         <span class="font-body text-sm font-semibold text-primary underline underline-offset-4 shrink-0">
           Choisir ce moment
@@ -192,8 +192,8 @@ const firstAvailable = computed<{ date: Date; slots: TimeSlot[] } | null | undef
     if (!data) return loadError.value || prefetchFailed.value ? null : undefined
     const day = data.availableDates.find(d => data.slotsByDate[d]?.length)
     if (day) {
-      const [y, m, d] = day.split('-').map(Number)
-      return { date: new Date(y, m - 1, d), slots: data.slotsByDate[day] }
+      const [y, m, d] = day.split('-').map(Number) as [number, number, number]
+      return { date: new Date(y, m - 1, d), slots: data.slotsByDate[day]! }
     }
   }
   return null
