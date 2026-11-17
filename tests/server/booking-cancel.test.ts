@@ -107,13 +107,14 @@ describe('POST /api/booking/cancel', () => {
     expect(res.status).toBe(200)
     expect(res.json).toEqual({
       success: true,
-      message: 'Votre rendez-vous a été annulé.',
+      message: 'Ton rendez-vous a été annulé.',
       date: 'mercredi 14 octobre 2026',
       time: '09h00 — 10h30',
     })
     expect(gcal.findEventByCancelToken).toHaveBeenCalledWith('abc')
     expect(gcal.cancelEventById).toHaveBeenCalledWith('gcal_evt_1')
     expect(fetchMock().mock.calls.map(([, init]) => init.body.to)).toEqual(['marie@example.com', 'chantal@example.com'])
+    expect(fetchMock().mock.calls[0]![1].body.reply_to).toBe('chantal.gmasse@gmail.com')
     expect(sms.sendSms).not.toHaveBeenCalled()
   })
 

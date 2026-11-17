@@ -35,7 +35,7 @@
     </div>
 
     <!-- Form -->
-    <form class="space-y-5" @submit.prevent="handleSubmit">
+    <form class="space-y-5" novalidate @submit.prevent="handleSubmit">
       <!-- Name row -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -163,7 +163,7 @@
           v-model="form.message"
           rows="3"
           maxlength="1200"
-          placeholder="Ce que vous souhaitez aborder..."
+          placeholder="Ce que tu souhaites aborder..."
           class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-4 font-body text-on-surface placeholder:text-on-surface-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-hidden transition-all duration-200 resize-none"
         />
       </div>
@@ -211,7 +211,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, nextTick } from 'vue'
 import { format } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { BookingService } from './ServiceSelector.vue'
@@ -309,14 +309,23 @@ function validate(): boolean {
       errors.phone = 'Numéro de téléphone invalide'
     }
   }
-  if (!form.sessionType) errors.sessionType = 'Veuillez choisir un type de séance'
-  if (!form.privacy) errors.privacy = 'Vous devez accepter la politique de confidentialité'
+  if (!form.sessionType) errors.sessionType = 'Choisis un type de séance'
+  if (!form.privacy) errors.privacy = 'Tu dois accepter la politique de confidentialité'
 
   return Object.keys(errors).length === 0
 }
 
-function handleSubmit() {
-  if (!validate()) return
+async function handleSubmit(e: Event) {
+  if (!validate()) {
+    // On a phone the submit button sits below the fold of the first fields:
+    // bring the first error into view instead of leaving it off-screen.
+    const formEl = e.target as HTMLFormElement
+    await nextTick()
+    const first = formEl.querySelector<HTMLElement>('input.border-red-400, p.text-red-500')
+    first?.scrollIntoView({ block: 'center' })
+    if (first instanceof HTMLInputElement) first.focus({ preventScroll: true })
+    return
+  }
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
       firstName: form.firstName,

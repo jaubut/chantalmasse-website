@@ -80,7 +80,7 @@ test.describe('cancellation page', () => {
       await route.fulfill({ json: { success: true } })
     })
     await page.goto('/annuler?token=smoke-token')
-    await expect(page.getByRole('heading', { level: 1, name: 'Annuler votre séance' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Annuler ta séance' })).toBeVisible()
     await expect(page.getByText('Visioconférence')).toBeVisible()
     await page.getByRole('button', { name: 'Oui, annuler' }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Rendez-vous annulé' })).toBeVisible()

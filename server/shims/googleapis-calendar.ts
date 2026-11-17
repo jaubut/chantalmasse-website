@@ -96,7 +96,8 @@ export function calendar(opts: { version: string; auth: JWT }) {
       const text = await res.text()
       throw new Error(`Google Calendar API error (${res.status}): ${text}`)
     }
-    const data = await res.json()
+    // DELETE answers 204 with an empty body.
+    const data = res.status === 204 ? undefined : await res.json()
     return { data }
   }
 
@@ -131,6 +132,13 @@ export function calendar(opts: { version: string; auth: JWT }) {
             method: "PATCH",
             body: JSON.stringify(params.requestBody),
           }
+        )
+      },
+      async delete(params: { calendarId: string; eventId: string }) {
+        const calendarId = params.calendarId || process.env.GOOGLE_CALENDAR_ID || ""
+        return request(
+          `/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(params.eventId)}`,
+          { method: "DELETE" }
         )
       },
     },

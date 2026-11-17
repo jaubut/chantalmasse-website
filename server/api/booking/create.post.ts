@@ -108,7 +108,7 @@ export default defineEventHandler(async (event) => {
   if (!validSlot) {
     throw createError({
       statusCode: 409,
-      message: 'Ce créneau n\'est plus disponible. Veuillez en choisir un autre.',
+      message: 'Ce créneau n\'est plus disponible. Choisis-en un autre.',
     })
   }
 
@@ -156,7 +156,7 @@ export default defineEventHandler(async (event) => {
     console.error('[booking/create] Event creation error:', err)
     throw createError({
       statusCode: 503,
-      message: 'Impossible de créer l\'événement. Veuillez réessayer.',
+      message: 'Impossible de créer le rendez-vous. Réessaie dans un instant.',
     })
   }
 
@@ -181,6 +181,7 @@ export default defineEventHandler(async (event) => {
       body: {
         from: config.emailFrom,
         to: clientInfo.email,
+        reply_to: 'chantal.gmasse@gmail.com',
         subject: clientEmail.subject,
         html: clientEmail.html,
       },
@@ -214,6 +215,7 @@ export default defineEventHandler(async (event) => {
       body: {
         from: config.emailFrom,
         to: config.emailTo,
+        reply_to: clientInfo.email,
         subject: notifEmail.subject,
         html: notifEmail.html,
       },

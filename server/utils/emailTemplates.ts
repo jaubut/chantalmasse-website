@@ -9,7 +9,7 @@ export function clientConfirmationEmail(params: {
   meetLink?: string
   cancelToken: string
 }): { subject: string; html: string } {
-  const subject = 'Confirmation — Votre séance avec Chantal Massé'
+  const subject = 'Confirmation — Ta séance avec Chantal Massé'
   const firstName = escapeHtml(params.firstName)
   const service = escapeHtml(params.service)
   const date = escapeHtml(params.date)
@@ -60,8 +60,8 @@ export function clientConfirmationEmail(params: {
         <tr>
           <td style="padding:48px 40px 24px;text-align:center;">
             <div style="font-size:64px;color:#3D9970;">✓</div>
-            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">Votre séance est confirmée!</h1>
-            <p style="color:#424845;margin:0;">Bonjour ${firstName}, nous avons bien enregistré votre rendez-vous.</p>
+            <h1 style="font-size:28px;color:#173028;margin:16px 0 8px;font-style:italic;">Ta séance est confirmée!</h1>
+            <p style="color:#424845;margin:0;">Bonjour ${firstName}, ton rendez-vous est bien enregistré.</p>
           </td>
         </tr>
 
@@ -91,7 +91,7 @@ export function clientConfirmationEmail(params: {
         <tr>
           <td style="padding:0 40px 32px;">
             <div style="background:#cce9dd;border-radius:12px;padding:20px;text-align:center;font-size:14px;color:#173028;">
-              ⏰ Un rappel vous sera envoyé 24h avant votre séance
+              ⏰ Tu recevras un rappel 24h avant ta séance
             </div>
           </td>
         </tr>
@@ -101,7 +101,7 @@ export function clientConfirmationEmail(params: {
           <td style="padding:0 40px 40px;text-align:center;">
             <p style="font-size:13px;color:#727975;">
               Besoin d'annuler?
-              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Cliquez ici</a>
+              <a href="https://chantalmasse.com/annuler?token=${cancelToken}" style="color:#173028;">Annule ici</a>
             </p>
           </td>
         </tr>
@@ -155,7 +155,7 @@ export function clientCancellationEmail(params: {
         <tr>
           <td style="padding:48px 40px 24px;text-align:center;">
             <h1 style="font-size:26px;color:#173028;margin:0 0 12px;font-style:italic;">Rendez-vous annulé, ${firstName}.</h1>
-            <p style="color:#424845;margin:0;">La séance suivante a été retirée du calendrier. Aucune action supplémentaire de votre part.</p>
+            <p style="color:#424845;margin:0;">La séance suivante a été retirée du calendrier. Rien d'autre à faire de ton côté.</p>
           </td>
         </tr>
 

@@ -294,7 +294,7 @@
 </template>
 
 <script setup lang="ts">
-import type { BookingServiceId } from '~/utils/bookingServices'
+import { BOOKING_SERVICES, type BookingServiceId } from '~/utils/bookingServices'
 
 definePageMeta({
   minimalNav: true,
@@ -369,8 +369,9 @@ const TESTIMONIALS = [
 const FAQ = [
   {
     question: 'Combien ça coûte?',
-    answer:
-      'Les tarifs sont affichés clairement à la première étape de la réservation. Tu vois les prix avant de choisir ta plage horaire — aucune surprise.',
+    // The booking modal skips the service step when a service is preselected,
+    // so the prices are stated here, from the same source as the modal.
+    answer: `${BOOKING_SERVICES.map(s => `${s.name} (${s.duration}) : ${s.price} $`).join(' · ')}. Le tarif est rappelé avant que tu confirmes ta réservation — aucune surprise.`,
   },
   {
     question: 'Combien de temps dure une séance?',

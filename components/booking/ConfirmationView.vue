@@ -10,10 +10,10 @@
     </div>
 
     <h2 class="font-headline text-4xl italic text-primary mb-2">
-      Votre séance est confirmée!
+      Ta séance est confirmée!
     </h2>
     <p class="font-body text-on-surface-variant mb-8">
-      Merci {{ firstName }}, nous vous attendons avec plaisir.
+      Merci {{ firstName }}, au plaisir de te rencontrer.
     </p>
 
     <!-- Booking recap -->
@@ -58,15 +58,15 @@
       <div class="space-y-3 font-body text-sm text-on-surface">
         <div class="flex items-start gap-3">
           <span class="text-lg">📧</span>
-          <span>Un courriel de confirmation vous a été envoyé</span>
+          <span>Un courriel de confirmation t'a été envoyé</span>
         </div>
         <div class="flex items-start gap-3">
           <span class="text-lg">📅</span>
-          <span>Ajoutez l'événement à votre calendrier</span>
+          <span>Ajoute l'événement à ton calendrier</span>
         </div>
         <div class="flex items-start gap-3">
           <span class="text-lg">⏰</span>
-          <span>Vous recevrez un rappel 24h avant votre séance</span>
+          <span>Tu recevras un rappel 24h avant ta séance</span>
         </div>
       </div>
     </div>

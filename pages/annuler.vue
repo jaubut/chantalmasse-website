@@ -10,7 +10,7 @@
             <path class="opacity-75 text-primary" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
         </div>
-        <p class="text-on-surface-variant font-light">Chargement de votre rendez-vous...</p>
+        <p class="text-on-surface-variant font-light">Chargement de ton rendez-vous...</p>
       </div>
 
       <!-- Invalid / expired token -->
@@ -30,9 +30,9 @@
       <!-- Confirm cancellation -->
       <div v-else-if="state === 'confirm'">
         <div class="text-center mb-8">
-          <h1 class="font-headline italic text-4xl text-primary mb-3">Annuler votre séance</h1>
+          <h1 class="font-headline italic text-4xl text-primary mb-3">Annuler ta séance</h1>
           <p class="text-on-surface-variant font-light">
-            Voulez-vous annuler le rendez-vous suivant&nbsp;?
+            Veux-tu annuler le rendez-vous suivant&nbsp;?
           </p>
         </div>
 
@@ -92,7 +92,7 @@
         </div>
         <h1 class="font-headline italic text-4xl text-primary mb-4">Rendez-vous annulé</h1>
         <p class="text-on-surface-variant font-light leading-relaxed mb-8">
-          Votre séance du <span class="font-semibold text-on-surface capitalize">{{ booking?.date }}</span> à <span class="font-semibold text-on-surface">{{ booking?.time }}</span> a été retirée du calendrier. Un courriel de confirmation vient de vous être envoyé.
+          Ta séance du <span class="font-semibold text-on-surface capitalize">{{ booking?.date }}</span> à <span class="font-semibold text-on-surface">{{ booking?.time }}</span> a été retirée du calendrier. Un courriel de confirmation vient de t'être envoyé.
         </p>
         <NuxtLink to="/prendre-rendez-vous" class="inline-block bg-primary text-on-primary px-8 py-4 rounded-xl font-semibold hover:opacity-90 transition-opacity">
           Prendre un nouveau rendez-vous
@@ -126,7 +126,7 @@ const apiError = ref<string>('')
 const isSubmitting = ref(false)
 
 useSeoMeta({
-  title: 'Annuler votre rendez-vous — Chantal Massé',
+  title: 'Annuler ton rendez-vous — Chantal Massé',
   robots: 'noindex, nofollow',
 })
 

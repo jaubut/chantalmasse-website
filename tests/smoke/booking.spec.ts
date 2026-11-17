@@ -51,7 +51,7 @@ async function openModalAtCalendar(page: Page, date: Date) {
   await waitForHydration(page)
   await page.getByRole('button', { name: 'Prendre rendez-vous' }).first().click()
   const dialog = page.getByRole('dialog')
-  await expect(dialog.getByRole('heading', { name: 'Quel accompagnement souhaitez-vous?' })).toBeVisible()
+  await expect(dialog.getByRole('heading', { name: 'Quel accompagnement souhaites-tu?' })).toBeVisible()
   await dialog.getByRole('button', { name: /Thérapie Individuelle/ }).click()
   // Move to the target month if it's next month.
   if (date.getMonth() !== new Date().getMonth()) {
@@ -86,7 +86,13 @@ for (const width of [1440, 390]) {
     const submit = dialog.getByRole('button', { name: /Confirmer ma réservation/ })
     await expect(submit).toBeVisible()
 
-    // Client-side validation: empty form never reaches the API.
+    // Client-side validation: empty form never reaches the API, and the French
+    // messages show instead of the browser's (locale-dependent) native bubbles.
+    await submit.click()
+    await expect(dialog.getByText('Le prénom est requis')).toBeVisible()
+    await expect(dialog.getByText('Le courriel est requis')).toBeVisible()
+    await expect(dialog.locator('input[autocomplete="given-name"]')).toBeFocused()
+    await expect(dialog.locator('input[autocomplete="given-name"]')).toBeInViewport()
     await dialog.locator('input[autocomplete="given-name"]').fill('Marie')
     await dialog.locator('input[autocomplete="family-name"]').fill('Tremblay')
     await dialog.locator('input[type="email"]').fill('pas-un-courriel@x')
@@ -112,6 +118,9 @@ for (const width of [1440, 390]) {
     }))
     await testInfo.attach('booking-layout', { body: JSON.stringify(layout, null, 2), contentType: 'application/json' })
     expect(layout.overflow).toBe(false)
+    for (const control of layout.controls.filter(c => c.label === 'Retour' || c.label === 'Fermer')) {
+      expect(control.height).toBeGreaterThanOrEqual(44)
+    }
     await submit.focus()
     await page.keyboard.press('Enter')
 
@@ -166,7 +175,7 @@ for (const response of [
     await dialog.locator('input[type="email"]').fill('marie@example.com')
     await dialog.getByRole('checkbox').nth(1).check()
     await dialog.getByRole('button', { name: /Confirmer ma réservation/ }).click()
-    await expect(dialog.getByText('Une erreur est survenue. Veuillez réessayer.')).toBeVisible()
+    await expect(dialog.getByText('Une erreur est survenue. Réessaie dans un instant.')).toBeVisible()
     await expect(dialog).not.toHaveAttribute('aria-label', 'Réservation confirmée')
     expect(await conversionEvents(page)).toEqual([])
   })
@@ -188,6 +197,37 @@ for (const service of ['individual', 'couple'] as const) {
     expect(await conversionEvents(page)).toEqual([])
   })
 }
+
+test('booking: a failed availability load says so and retries', async ({ page, guard }) => {
+  guard.allowConsole.push(/503/)
+  const date = nextBookableDate()
+  let down = true
+  await page.route('**/api/booking/availability**', (route) => {
+    if (down) return route.fulfill({ status: 503, body: 'error code: 1102' })
+    const url = new URL(route.request().url())
+    const isTarget = url.searchParams.get('month') === ym(date)
+    return route.fulfill({ json: { availableDates: isTarget ? [ymd(date)] : [], slotsByDate: {} } })
+  })
+  await page.goto('/prendre-rendez-vous?book=open&service=individual')
+  const dialog = page.getByRole('dialog')
+  await expect(dialog.getByRole('alert')).toContainText('Impossible de charger les disponibilités')
+  down = false
+  await dialog.getByRole('button', { name: 'Réessayer' }).click()
+  if (date.getMonth() !== new Date().getMonth()) await dialog.getByRole('button', { name: 'Mois suivant' }).click()
+  await expect(dialog.getByRole('button', { name: new RegExp(`^${date.getDate()} `) })).toBeEnabled()
+  await expect(dialog.getByRole('alert')).toHaveCount(0)
+})
+
+test('booking: couple slots never advertise video (in-person only)', async ({ page }) => {
+  const date = nextBookableDate()
+  await mockAvailability(page, date)
+  await page.goto('/prendre-rendez-vous?book=open&service=couple')
+  const dialog = page.getByRole('dialog')
+  if (date.getMonth() !== new Date().getMonth()) await dialog.getByRole('button', { name: 'Mois suivant' }).click()
+  await dialog.getByRole('button', { name: new RegExp(`^${date.getDate()} `) }).click()
+  await expect(dialog.getByRole('button', { name: /09h00 — 10h00/ })).toBeVisible()
+  await expect(dialog.getByText('Visio disponible')).toHaveCount(0)
+})
 
 test('booking: the real API refuses invalid requests (no secrets configured)', async ({ request }) => {
   const bad = await request.get('/api/booking/availability?month=nope&service=individual')

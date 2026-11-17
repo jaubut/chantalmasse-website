@@ -21,13 +21,13 @@
             <!-- Back button -->
             <button
               v-if="canGoBack"
-              class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant"
+              class="w-11 h-11 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant"
               aria-label="Retour"
               @click="goBack"
             >
               <Icon icon="material-symbols:arrow-back" class="text-lg" />
             </button>
-            <div v-else class="w-9" />
+            <div v-else class="w-11" />
 
             <!-- Step dots -->
             <div class="flex items-center gap-2">
@@ -47,7 +47,7 @@
 
             <!-- Close button -->
             <button
-              class="w-9 h-9 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant text-xl leading-none"
+              class="w-11 h-11 rounded-xl flex items-center justify-center hover:bg-surface-container transition-colors text-on-surface-variant text-xl leading-none"
               aria-label="Fermer"
               @click="closeModal"
             >
@@ -233,7 +233,7 @@ async function fetchSlotsForDate(date: Date) {
     slotsForSelectedDate.value = data.slotsByDate[dateKey] || []
   } catch {
     slotsForSelectedDate.value = []
-    globalError.value = 'Impossible de charger les disponibilités. Veuillez réessayer.'
+    globalError.value = 'Impossible de charger les disponibilités. Réessaie dans un instant.'
   } finally {
     isLoadingSlots.value = false
   }
@@ -294,7 +294,7 @@ async function onFormSubmit(formData: {
     })
 
     if (result?.success !== true || typeof result.eventId !== 'string' || !result.eventId.trim()) {
-      throw new Error('Une erreur est survenue. Veuillez réessayer.')
+      throw new Error('Une erreur est survenue. Réessaie dans un instant.')
     }
 
     confirmedFirstName.value = formData.firstName
@@ -316,7 +316,7 @@ async function onFormSubmit(formData: {
     const message = data && typeof data === 'object' && 'message' in data ? data.message : undefined
     submitError.value = typeof message === 'string' && message
       ? message
-      : err instanceof Error ? err.message : 'Une erreur est survenue. Veuillez réessayer.'
+      : err instanceof Error ? err.message : 'Une erreur est survenue. Réessaie dans un instant.'
   } finally {
     isSubmitting.value = false
   }
