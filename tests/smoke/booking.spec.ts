@@ -218,6 +218,25 @@ test('booking: a failed availability load says so and retries', async ({ page, g
   await expect(dialog.getByRole('alert')).toHaveCount(0)
 })
 
+test('booking: first availability shows on open and jumps straight to the form', async ({ page }) => {
+  const date = nextBookableDate()
+  await mockAvailability(page, date)
+  const months: string[] = []
+  page.on('request', (req) => {
+    if (req.url().includes('/api/booking/availability')) months.push(new URL(req.url()).searchParams.get('month')!)
+  })
+  await page.goto('/prendre-rendez-vous?book=open&service=individual')
+  const dialog = page.getByRole('dialog')
+  await expect(dialog.getByRole('button', { name: /Première disponibilité\s:\smardi/ })).toBeVisible()
+  await dialog.getByRole('button', { name: /Choisir ce moment/ }).click()
+  await expect(page.getByRole('dialog', { name: 'Informations personnelles' })).toBeVisible()
+  // Visible month + next month in the background; picking a slot costs no extra call.
+  const now = new Date()
+  const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+  expect([...new Set(months)].sort()).toEqual([ym(now), ym(nextMonth)])
+  expect(months).toHaveLength(2)
+})
+
 test('booking: couple slots never advertise video (in-person only)', async ({ page }) => {
   const date = nextBookableDate()
   await mockAvailability(page, date)

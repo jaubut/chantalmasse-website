@@ -1,4 +1,5 @@
 import { getEventsForMonth, createBookingEvent } from '~/server/utils/googleCalendar'
+import { invalidateMonth } from '~/server/utils/bookingCache'
 import { clientConfirmationEmail, therapistNotificationEmail } from '~/server/utils/emailTemplates'
 import { bookingConfirmationSms, normalizePhone, sendSms } from '~/server/utils/sms'
 import { sendMetaCapiEvent, readFbCookies } from '~/server/utils/metaCapi'
@@ -78,7 +79,8 @@ export default defineEventHandler(async (event) => {
   const isoStart = slotStart.toISOString()
   const isoEnd = slotEnd.toISOString()
 
-  // Double-check slot availability (race condition guard)
+  // Double-check slot availability against Google live, never the KV cache:
+  // the cache is for display, this read is the double-booking guard.
   let events
   try {
     events = await getEventsForMonth(year, month)
@@ -159,6 +161,7 @@ export default defineEventHandler(async (event) => {
       message: 'Impossible de créer le rendez-vous. Réessaie dans un instant.',
     })
   }
+  await invalidateMonth(year, month)
 
   // Send confirmation email to client
   try {

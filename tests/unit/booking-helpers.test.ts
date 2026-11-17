@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  BOOKING_TIMEZONE, generateICS, generateSlotsForDate, getAvailableDatesInMonth,
+  BOOKING_TIMEZONE, formatSlotStart, generateICS, generateSlotsForDate, getAvailableDatesInMonth,
   googleCalendarUrl, isSlotAvailable,
 } from '~/utils/bookingHelpers'
 import { BOOKING_SERVICES, getBookingService } from '~/utils/bookingServices'
@@ -134,5 +134,15 @@ describe('booking services', () => {
     expect(getBookingService('couple')?.name).toBe('Coaching de Couple')
     expect(getBookingService('nope')).toBeNull()
     expect(getBookingService(null)).toBeNull()
+  })
+})
+
+describe('formatSlotStart', () => {
+  it.each([
+    ['2026-11-19T19:00:00.000Z', 'jeudi 19 novembre, 14\u00a0h'],
+    ['2026-12-01T14:30:00.000Z', 'mardi 1er décembre, 9\u00a0h\u00a030'],
+    ['2026-07-07T13:00:00.000Z', 'mardi 7 juillet, 9\u00a0h'],
+  ])('%s → %s (Shefford time)', (iso, expected) => {
+    expect(formatSlotStart(iso)).toBe(expected)
   })
 })

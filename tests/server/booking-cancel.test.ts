@@ -1,5 +1,5 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { callHandler, errorMessage, fetchMock, loadHandler, setRuntimeConfig } from '../helpers/server'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { callHandler, errorMessage, fetchMock, installKv, loadHandler, setRuntimeConfig, uninstallKv } from '../helpers/server'
 
 const gcal = vi.hoisted(() => ({
   findEventByCancelToken: vi.fn(),
@@ -133,5 +133,17 @@ describe('POST /api/booking/cancel', () => {
     const res = await callHandler(await load(), { body: { token: 'abc' } })
     expect(res.status).toBe(200)
     expect(gcal.cancelEventById).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('POST /api/booking/cancel — KV busy-times cache', () => {
+  afterEach(() => { uninstallKv() })
+
+  it('invalidates the cancelled séance\'s month so the slot shows up again', async () => {
+    const kv = installKv()
+    kv.store.set('busy:2026-10', JSON.stringify({ fetchedAt: Date.now(), events: [] }))
+    const res = await callHandler(await loadHandler('~/server/api/booking/cancel.post'), { body: { token: 'abc' } })
+    expect(res.status).toBe(200)
+    expect(kv.delete).toHaveBeenCalledWith('busy:2026-10')
   })
 })

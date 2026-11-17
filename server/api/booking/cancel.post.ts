@@ -5,6 +5,7 @@
 // matters — the trigger.dev reminder task won't find it on the next scan.
 
 import { findEventByCancelToken, cancelEventById } from '~/server/utils/googleCalendar'
+import { invalidateMonth } from '~/server/utils/bookingCache'
 import { clientCancellationEmail, therapistCancellationEmail } from '~/server/utils/emailTemplates'
 import { bookingCancellationSms, sendSms } from '~/server/utils/sms'
 import { parseISO, format } from 'date-fns'
@@ -58,6 +59,7 @@ export default defineEventHandler(async (event) => {
 
   const startET = toZonedTime(parseISO(ev.start.dateTime), 'America/Toronto')
   const endET = toZonedTime(parseISO(ev.end.dateTime), 'America/Toronto')
+  await invalidateMonth(startET.getFullYear(), startET.getMonth() + 1)
   const dateFormatted = format(startET, 'EEEE d MMMM yyyy', { locale: fr })
   const timeFormatted = `${format(startET, 'HH')}h${format(startET, 'mm')} — ${format(endET, 'HH')}h${format(endET, 'mm')}`
   const startTime = `${format(startET, 'HH')}h${format(startET, 'mm')}`

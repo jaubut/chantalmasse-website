@@ -67,3 +67,20 @@ export function freezeNow(iso: string): void {
 export function errorMessage(res: CallResult): string | undefined {
   return res.json.message || res.json.statusMessage
 }
+
+/** In-memory stand-in for the BOOKING_CACHE KV binding, exposed like the Worker does (globalThis.__env__). */
+export function installKv() {
+  const store = new Map<string, string>()
+  const kv = {
+    store,
+    get: vi.fn(async (key: string) => (store.has(key) ? JSON.parse(store.get(key)!) : null)),
+    put: vi.fn(async (key: string, value: string) => { store.set(key, value) }),
+    delete: vi.fn(async (key: string) => { store.delete(key) }),
+  }
+  ;(globalThis as { __env__?: unknown }).__env__ = { BOOKING_CACHE: kv }
+  return kv
+}
+
+export function uninstallKv(): void {
+  delete (globalThis as { __env__?: unknown }).__env__
+}

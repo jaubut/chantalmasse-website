@@ -1,4 +1,5 @@
 import { normalizeGooglePrivateKey } from "../utils/googlePrivateKey"
+import type { BookingKv } from "../utils/bookingCache"
 
 function base64url(bytes: Uint8Array | string): string {
   const buf = typeof bytes === "string" ? Buffer.from(bytes, "utf8") : Buffer.from(bytes)
@@ -35,6 +36,14 @@ export class JWT {
     const now = Math.floor(Date.now() / 1000)
     if (this.cachedToken && this.cachedToken.exp - 60 > now) {
       return this.cachedToken.token
+    }
+    // Shared through KV so a fresh isolate skips the RSA sign + OAuth round trip.
+    const kv = (globalThis as { __env__?: { BOOKING_CACHE?: BookingKv } }).__env__?.BOOKING_CACHE
+    const kvKey = `gtoken:${this.email}:${this.scopes.join(" ")}`
+    const shared = (await kv?.get(kvKey, "json").catch(() => null)) as { token: string; exp: number } | null
+    if (shared && shared.exp - 60 > now) {
+      this.cachedToken = shared
+      return shared.token
     }
     const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }))
     const payload = base64url(
@@ -76,6 +85,8 @@ export class JWT {
     }
     const data = (await res.json()) as { access_token: string; expires_in: number }
     this.cachedToken = { token: data.access_token, exp: now + (data.expires_in || 3600) }
+    await kv?.put(kvKey, JSON.stringify(this.cachedToken), { expirationTtl: Math.max(60, (data.expires_in || 3600) - 120) })
+      .catch(() => {})
     return data.access_token
   }
 }

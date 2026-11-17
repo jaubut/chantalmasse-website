@@ -1,5 +1,24 @@
 <template>
   <div class="px-2">
+    <!-- First availability, from the months already loaded -->
+    <div v-if="firstAvailable !== null" class="mb-8" aria-live="polite">
+      <button
+        v-if="firstAvailable"
+        type="button"
+        class="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-xl border border-primary/20 bg-primary-fixed/60 px-5 py-4 text-left transition-colors duration-200 hover:border-primary focus:outline-hidden focus-visible:ring-2 focus-visible:ring-primary"
+        @click="emit('pick', firstAvailable.date, firstAvailable.slots, firstAvailable.slots[0])"
+      >
+        <span class="font-body text-sm text-on-surface">
+          <span class="font-semibold text-primary">Première disponibilité&nbsp;:</span>
+          {{ formatSlotStart(firstAvailable.slots[0].isoStart) }}
+        </span>
+        <span class="font-body text-sm font-semibold text-primary underline underline-offset-4 shrink-0">
+          Choisir ce moment
+        </span>
+      </button>
+      <div v-else class="h-14 rounded-xl bg-surface-container motion-safe:animate-pulse" />
+    </div>
+
     <!-- Month navigation -->
     <div class="flex items-center justify-between mb-8">
       <button
@@ -108,6 +127,7 @@ import {
 } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import type { BookingService } from './ServiceSelector.vue'
+import { formatSlotStart, type TimeSlot } from '~/utils/bookingHelpers'
 
 interface CalendarCell {
   date: Date | null
@@ -124,8 +144,14 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  select: [date: Date]
+  select: [date: Date, slots: TimeSlot[]]
+  pick: [date: Date, slots: TimeSlot[], slot: TimeSlot]
 }>()
+
+interface MonthAvailability {
+  availableDates: string[]
+  slotsByDate: Record<string, TimeSlot[]>
+}
 
 const runtimeConfig = useRuntimeConfig()
 const publicAdvanceDays = computed(() =>
@@ -133,10 +159,13 @@ const publicAdvanceDays = computed(() =>
 )
 
 const today = new Date()
-const currentViewMonth = ref(new Date(today.getFullYear(), today.getMonth(), 1))
-const isLoading = ref(false)
+const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+const currentViewMonth = ref(thisMonth)
 const loadError = ref(false)
-const availabilityCache = ref(new Map<string, string[]>())
+const prefetchFailed = ref(false)
+const availabilityCache = ref(new Map<string, MonthAvailability>())
+const inflight = new Map<string, Promise<void>>()
+const isLoading = computed(() => !loadError.value && !availabilityCache.value.has(cacheKey(currentViewMonth.value)))
 
 const dayHeaders = ['L', 'M', 'M', 'J', 'V', 'S', 'D']
 
@@ -144,21 +173,30 @@ const monthLabel = computed(() =>
   format(currentViewMonth.value, 'MMMM yyyy', { locale: fr }),
 )
 
-const isPrevDisabled = computed(() => {
-  const thisMonth = new Date(today.getFullYear(), today.getMonth(), 1)
-  return !isBefore(thisMonth, currentViewMonth.value)
-})
+const isPrevDisabled = computed(() => !isBefore(thisMonth, currentViewMonth.value))
 
-const isNextDisabled = computed(() => {
-  const maxMonth = new Date(today.getFullYear(), today.getMonth() + Math.ceil(publicAdvanceDays.value / 28), 1)
-  return !isBefore(currentViewMonth.value, maxMonth)
-})
+const maxMonth = computed(() => new Date(today.getFullYear(), today.getMonth() + Math.ceil(publicAdvanceDays.value / 28), 1))
+const isNextDisabled = computed(() => !isBefore(currentViewMonth.value, maxMonth.value))
 
 const maxDate = computed(() => addDays(today, publicAdvanceDays.value))
 
-const availableDatesThisMonth = computed<string[]>(() => {
-  const key = cacheKey(currentViewMonth.value)
-  return availabilityCache.value.get(key) || []
+const availableDatesThisMonth = computed<string[]>(() =>
+  availabilityCache.value.get(cacheKey(currentViewMonth.value))?.availableDates || [],
+)
+
+// undefined = still loading, null = nothing this month or next.
+const firstAvailable = computed<{ date: Date; slots: TimeSlot[] } | null | undefined>(() => {
+  for (const month of [thisMonth, addMonths(thisMonth, 1)]) {
+    if (isAfter(month, maxMonth.value)) break
+    const data = availabilityCache.value.get(cacheKey(month))
+    if (!data) return loadError.value || prefetchFailed.value ? null : undefined
+    const day = data.availableDates.find(d => data.slotsByDate[d]?.length)
+    if (day) {
+      const [y, m, d] = day.split('-').map(Number)
+      return { date: new Date(y, m - 1, d), slots: data.slotsByDate[day] }
+    }
+  }
+  return null
 })
 
 function cacheKey(date: Date): string {
@@ -216,30 +254,41 @@ function dayClasses(cell: CalendarCell): string {
 }
 
 function selectDate(date: Date) {
-  emit('select', date)
+  emit('select', date, availabilityCache.value.get(cacheKey(date))?.slotsByDate[format(date, 'yyyy-MM-dd')] || [])
 }
 
-async function fetchAvailability(monthDate: Date) {
+// One request per month and service, shared by the visible load and the prefetch.
+function loadMonth(monthDate: Date): Promise<void> {
   const key = cacheKey(monthDate)
-  if (availabilityCache.value.has(key)) return
+  if (availabilityCache.value.has(key)) return Promise.resolve()
+  let pending = inflight.get(key)
+  if (!pending) {
+    pending = $fetch<MonthAvailability>('/api/booking/availability', {
+      params: { month: format(monthDate, 'yyyy-MM'), service: props.service.id },
+    })
+      .then((data) => {
+        const newCache = new Map(availabilityCache.value)
+        newCache.set(key, { availableDates: data.availableDates, slotsByDate: data.slotsByDate })
+        availabilityCache.value = newCache
+      })
+      .finally(() => inflight.delete(key))
+    inflight.set(key, pending)
+  }
+  return pending
+}
 
-  isLoading.value = true
+// Visible month first; the next one loads in the background so paging is instant.
+async function fetchAvailability(monthDate: Date) {
   loadError.value = false
   try {
-    const monthStr = format(monthDate, 'yyyy-MM')
-    const data = await $fetch<{ availableDates: string[] }>('/api/booking/availability', {
-      params: { month: monthStr, service: props.service.id },
-    })
-    // Update cache reactively
-    const newCache = new Map(availabilityCache.value)
-    newCache.set(key, data.availableDates)
-    availabilityCache.value = newCache
+    await loadMonth(monthDate)
   } catch (err) {
     console.error('[MonthCalendar] Failed to fetch availability:', err)
     loadError.value = true
-  } finally {
-    isLoading.value = false
+    return
   }
+  const next = addMonths(monthDate, 1)
+  if (!isAfter(next, maxMonth.value)) loadMonth(next).catch(() => { prefetchFailed.value = true })
 }
 
 function prevMonth() {
@@ -258,6 +307,7 @@ watch(currentViewMonth, (val) => {
 
 watch(() => props.service.id, () => {
   availabilityCache.value = new Map()
+  prefetchFailed.value = false
   fetchAvailability(currentViewMonth.value)
 })
 
