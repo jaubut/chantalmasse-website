@@ -1,0 +1,15 @@
+# Legacy Wix URLs (old ads, sitelinks, backlinks). Real 301s keep gclid/utm:
+# the prerendered meta-refresh stubs for the same routes drop the query string.
+# Keep in sync with the redirect routeRules in nuxt.config.ts.
+/coaching-relationnel-couple /coaching-de-couple/ 301
+/coaching-relationnel-couple/ /coaching-de-couple/ 301
+/coaching-relationnel-de-couple-chantal /coaching-de-couple/ 301
+/coaching-relationnel-de-couple-chantal/ /coaching-de-couple/ 301
+/therapie-individuelle-chantal /therapie-individuelle/ 301
+/therapie-individuelle-chantal/ /therapie-individuelle/ 301
+/book-online / 301
+/book-online/ / 301
+/booking-calendar / 301
+/booking-calendar/ / 301
+/services /prendre-rendez-vous/ 301
+/services/ /prendre-rendez-vous/ 301

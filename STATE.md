@@ -2,6 +2,12 @@
 
 Last updated: 2026-11-17
 
+## Booking production QA — 2026-11-17 (Ads live)
+
+- Live Worker was `321e9eb` (#45): #46 and #47 merged but not deployed. Deploys are manual (`bun run build` + `wrangler versions upload/deploy`), not Vercel.
+- Fixed in `fix/booking-prod-qa-2026-11-17`: availability/create exceeded Worker CPU (Cloudflare 1102, ~40% of calls; p99 867 ms → 57 ms); cancel link 503 (shim lacked `events.delete`); legacy meta-refresh stubs dropped gclid/utm (now `_redirects` 301s); silent empty calendar on error; native validation hid French messages; couple slots advertised video; 36px controls; FAQ price; client emails had no reply-to; booking copy in tu.
+- Open: Meta CAPI secrets (`META_PIXEL_ID`, `META_CAPI_ACCESS_TOKEN`) missing on the Worker; prerendered pages bake an empty PostHog key unless `NUXT_PUBLIC_POSTHOG_KEY` is set at build time.
+
 ## Change Plans
 
 ### Change Plan — ads-relaunch-booking-conversion (2026-11-17)

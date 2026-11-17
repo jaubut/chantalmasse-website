@@ -135,6 +135,8 @@ describe('POST /api/booking/create', () => {
 
     const recipients = fetchMock().mock.calls.map(([, init]) => init.body.to)
     expect(recipients).toEqual(['marie@example.com', 'chantal@example.com'])
+    // Client replies reach Chantal, Chantal's replies reach the client.
+    expect(fetchMock().mock.calls.map(([, init]) => init.body.reply_to)).toEqual(['chantal.gmasse@gmail.com', 'marie@example.com'])
     expect(fetchMock().mock.calls.every(([url]) => url === 'https://api.resend.com/emails')).toBe(true)
     expect(sms.sendSms).not.toHaveBeenCalled()
   })

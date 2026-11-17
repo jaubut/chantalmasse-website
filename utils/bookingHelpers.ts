@@ -66,64 +66,52 @@ export function generateSlotsForDate(
     0,
   )
 
-  const minNoticeThreshold = addMinutes(new Date(), minNoticeHours * 60)
+  const minNoticeMs = Date.now() + minNoticeHours * 3_600_000
+  // Busy intervals in absolute ms, converted once per day rather than per
+  // candidate slot: per-slot timezone conversions cost >1 s of Worker CPU on
+  // a busy month (Cloudflare 1102). All-day events block their whole ET day.
+  const busy = toBusyIntervals(existingEvents)
+  // DST switches happen at 02:00, never inside working hours, so slot
+  // instants are plain offsets from the day's first slot.
+  const dayStartMs = fromZonedTime(dayStart, BOOKING_TIMEZONE).getTime()
+  const bufferMs = BUFFER_MINUTES * 60_000
 
   const slots: TimeSlot[] = []
-  let slotStart = dayStart
+  for (
+    let slotStart = dayStart, offset = 0;
+    !isAfter(addMinutes(slotStart, durationMinutes), dayEnd);
+    slotStart = addMinutes(slotStart, SLOT_INTERVAL), offset += SLOT_INTERVAL
+  ) {
+    const startMs = dayStartMs + offset * 60_000
+    const endMs = startMs + durationMinutes * 60_000
+    if (startMs < minNoticeMs) continue
+    if (busy.some(([s, e]) => startMs - bufferMs < e && endMs + bufferMs > s)) continue
 
-  while (isBefore(slotStart, dayEnd)) {
     const slotEnd = addMinutes(slotStart, durationMinutes)
-
-    // Slot must fit within working hours
-    if (isAfter(slotEnd, dayEnd)) break
-
-    // Apply minimum notice
-    const slotStartUTC = fromZonedTime(slotStart, BOOKING_TIMEZONE)
-    if (isBefore(slotStartUTC, minNoticeThreshold)) {
-      slotStart = addMinutes(slotStart, SLOT_INTERVAL)
-      continue
-    }
-
-    // Check for conflicts with existing events (including buffer)
-    const bufferedStart = addMinutes(slotStart, -BUFFER_MINUTES)
-    const bufferedEnd = addMinutes(slotEnd, BUFFER_MINUTES)
-
-    const hasConflict = existingEvents.some((event) => {
-      const evStartStr = event.start?.dateTime || event.start?.date
-      const evEndStr = event.end?.dateTime || event.end?.date
-      if (!evStartStr || !evEndStr) return false
-
-      const evStart = parseISO(evStartStr)
-      const evEnd = parseISO(evEndStr)
-
-      // Convert event times to ET for comparison
-      const evStartET = toZonedTime(evStart, BOOKING_TIMEZONE)
-      const evEndET = toZonedTime(evEnd, BOOKING_TIMEZONE)
-
-      // Overlap check: slot (with buffer) overlaps event
-      return isBefore(bufferedStart, evEndET) && isAfter(bufferedEnd, evStartET)
+    slots.push({
+      isoStart: new Date(startMs).toISOString(),
+      isoEnd: new Date(endMs).toISOString(),
+      label: `${format(slotStart, 'HH')}h${format(slotStart, 'mm')} — ${format(slotEnd, 'HH')}h${format(slotEnd, 'mm')}`,
     })
-
-    if (!hasConflict) {
-      const slotStartUTCForISO = fromZonedTime(slotStart, BOOKING_TIMEZONE)
-      const slotEndUTCForISO = fromZonedTime(slotEnd, BOOKING_TIMEZONE)
-
-      const startHour = format(slotStart, 'HH')
-      const startMin = format(slotStart, 'mm')
-      const endHour = format(slotEnd, 'HH')
-      const endMin = format(slotEnd, 'mm')
-
-      slots.push({
-        isoStart: slotStartUTCForISO.toISOString(),
-        isoEnd: slotEndUTCForISO.toISOString(),
-        label: `${startHour}h${startMin} — ${endHour}h${endMin}`,
-      })
-    }
-
-    slotStart = addMinutes(slotStart, SLOT_INTERVAL)
   }
 
   return slots
+}
+
+function eventBoundMs(bound: { dateTime?: string | null; date?: string | null } | null | undefined): number | null {
+  if (bound?.dateTime) return parseISO(bound.dateTime).getTime()
+  if (bound?.date) return fromZonedTime(`${bound.date}T00:00:00`, BOOKING_TIMEZONE).getTime()
+  return null
+}
+
+function toBusyIntervals(events: CalendarEvent[]): Array<[number, number]> {
+  const out: Array<[number, number]> = []
+  for (const ev of events) {
+    const s = eventBoundMs(ev.start)
+    const e = eventBoundMs(ev.end)
+    if (s !== null && e !== null) out.push([s, e])
+  }
+  return out
 }
 
 /**
