@@ -1,6 +1,11 @@
 import { google } from 'googleapis'
 
+// One client per isolate so its access token survives across requests (a new
+// JWT per call meant a token round trip to Google on every request).
+let client: ReturnType<typeof google.calendar> | undefined
+
 export function getCalendarClient() {
+  if (client) return client
   const config = useRuntimeConfig()
 
   const auth = new google.auth.JWT({
@@ -9,7 +14,8 @@ export function getCalendarClient() {
     scopes: ['https://www.googleapis.com/auth/calendar'],
   })
 
-  return google.calendar({ version: 'v3', auth })
+  client = google.calendar({ version: 'v3', auth })
+  return client
 }
 
 export async function getEventsForMonth(year: number, month: number) {
@@ -25,6 +31,9 @@ export async function getEventsForMonth(year: number, month: number) {
     timeMax,
     singleEvents: true,
     orderBy: 'startTime',
+    // Slot math only needs the bounds; one page covers any real month.
+    fields: 'items(start,end)',
+    maxResults: 2500,
   })
 
   return res.data.items || []

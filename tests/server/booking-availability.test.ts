@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { callHandler, errorMessage, freezeNow, loadHandler, setRuntimeConfig } from '../helpers/server'
+import { callHandler, errorMessage, freezeNow, installKv, loadHandler, setRuntimeConfig, uninstallKv } from '../helpers/server'
 
 const gcal = vi.hoisted(() => ({ getEventsForMonth: vi.fn() }))
 vi.mock('~/server/utils/googleCalendar', () => gcal)
@@ -78,12 +78,9 @@ describe('GET /api/booking/availability', () => {
     expect(labels).toContain('13h15 — 14h15')
   })
 
-  it('caches a month/service for 5 minutes', async () => {
+  it('without a KV binding reads Google on every call', async () => {
     const handler = await load()
     await callHandler(handler, { query: { month: '2026-10', service: 'individual' } })
-    await callHandler(handler, { query: { month: '2026-10', service: 'individual' } })
-    expect(gcal.getEventsForMonth).toHaveBeenCalledTimes(1)
-    vi.setSystemTime(new Date(Date.now() + 6 * 60 * 1000))
     await callHandler(handler, { query: { month: '2026-10', service: 'individual' } })
     expect(gcal.getEventsForMonth).toHaveBeenCalledTimes(2)
   })
@@ -94,5 +91,104 @@ describe('GET /api/booking/availability', () => {
     const res = await callHandler(await load(), { query: { month: '2026-10', service: 'individual' } })
     expect(res.status).toBe(503)
     expect(errorMessage(res)).toMatch(/temporairement indisponible/)
+  })
+})
+
+describe('GET /api/booking/availability — KV busy-times cache', () => {
+  const OCT = { month: '2026-10', service: 'individual' }
+  const BUSY_13_OCT = {
+    summary: 'Séance — Marie Tremblay',
+    start: { dateTime: '2026-10-13T09:00:00-04:00' },
+    end: { dateTime: '2026-10-13T10:00:00-04:00' },
+  }
+  const firstLabel13 = (res: { json: Record<string, any> }) => res.json.slotsByDate['2026-10-13'][0].label
+  const advance = (ms: number) => vi.setSystemTime(new Date(Date.now() + ms))
+  let kv: ReturnType<typeof installKv>
+
+  beforeEach(() => {
+    setRuntimeConfig()
+    freezeNow(NOW)
+    kv = installKv()
+    gcal.getEventsForMonth.mockResolvedValue([BUSY_13_OCT])
+  })
+  afterEach(() => { vi.useRealTimers(); uninstallKv() })
+
+  it('miss → reads Google once, stores only event bounds, then serves both services from KV', async () => {
+    const handler = await load()
+    const miss = await callHandler(handler, { query: OCT })
+    expect(miss.headers.get('server-timing')).toMatch(/desc="miss"/)
+    expect(kv.store.get('busy:2026-10')).not.toMatch(/Marie|Séance/)
+
+    const hit = await callHandler(handler, { query: OCT })
+    const couple = await callHandler(handler, { query: { month: '2026-10', service: 'couple' } })
+    expect(hit.headers.get('server-timing')).toMatch(/desc="hit"/)
+    expect(couple.status).toBe(200)
+    expect(gcal.getEventsForMonth).toHaveBeenCalledTimes(1)
+    expect(firstLabel13(hit)).toBe('10h15 — 11h15')
+  })
+
+  it('stale (1–5 min) → answers from KV at once and refreshes in the background', async () => {
+    const handler = await load()
+    await callHandler(handler, { query: OCT })
+    gcal.getEventsForMonth.mockResolvedValue([])
+    advance(2 * 60_000)
+
+    const stale = await callHandler(handler, { query: OCT })
+    expect(stale.headers.get('server-timing')).toMatch(/desc="stale"/)
+    expect(firstLabel13(stale)).toBe('10h15 — 11h15')
+    await vi.waitFor(() => expect(JSON.parse(kv.store.get('busy:2026-10')!).events).toEqual([]))
+    expect(gcal.getEventsForMonth).toHaveBeenCalledTimes(2)
+
+    const fresh = await callHandler(handler, { query: OCT })
+    expect(fresh.headers.get('server-timing')).toMatch(/desc="hit"/)
+    expect(firstLabel13(fresh)).toBe('09h00 — 10h00')
+  })
+
+  it('older than 5 min → waits for Google again', async () => {
+    const handler = await load()
+    await callHandler(handler, { query: OCT })
+    gcal.getEventsForMonth.mockResolvedValue([])
+    advance(6 * 60_000)
+    const res = await callHandler(handler, { query: OCT })
+    expect(res.headers.get('server-timing')).toMatch(/desc="miss"/)
+    expect(firstLabel13(res)).toBe('09h00 — 10h00')
+  })
+
+  it('Google down → serves the last cached month instead of a 503', async () => {
+    const handler = await load()
+    await callHandler(handler, { query: OCT })
+    gcal.getEventsForMonth.mockRejectedValue(new Error('Google Calendar API error (500)'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    advance(30 * 60_000)
+    const res = await callHandler(handler, { query: OCT })
+    expect(res.status).toBe(200)
+    expect(res.headers.get('server-timing')).toMatch(/desc="fallback"/)
+    expect(firstLabel13(res)).toBe('10h15 — 11h15')
+  })
+
+  it('Google down with nothing cached → French 503', async () => {
+    gcal.getEventsForMonth.mockRejectedValue(new Error('invalid_grant'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const res = await callHandler(await load(), { query: OCT })
+    expect(res.status).toBe(503)
+  })
+
+  it('a KV outage falls back to Google', async () => {
+    kv.get.mockRejectedValue(new Error('KV unavailable'))
+    kv.put.mockRejectedValue(new Error('KV unavailable'))
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    const res = await callHandler(await load(), { query: OCT })
+    expect(res.status).toBe(200)
+    expect(firstLabel13(res)).toBe('10h15 — 11h15')
+  })
+
+  it('invalidateMonth drops the month so the next call reads Google', async () => {
+    const handler = await load()
+    await callHandler(handler, { query: OCT })
+    const { invalidateMonth } = await import('~/server/utils/bookingCache')
+    await invalidateMonth(2026, 10)
+    expect(kv.store.has('busy:2026-10')).toBe(false)
+    await callHandler(handler, { query: OCT })
+    expect(gcal.getEventsForMonth).toHaveBeenCalledTimes(2)
   })
 })

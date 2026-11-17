@@ -81,6 +81,7 @@
                 :service="selectedService!"
                 :selected-date="selectedDate"
                 @select="onDateSelected"
+                @pick="onFirstSlotPicked"
               />
 
               <!-- Step 3: Time slots -->
@@ -91,7 +92,6 @@
                 :service="selectedService!"
                 :slots="slotsForSelectedDate"
                 :selected-slot="selectedSlot"
-                :is-loading="isLoadingSlots"
                 @select="onSlotSelected"
                 @back="currentStep = 'calendar'"
               />
@@ -128,8 +128,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { format } from 'date-fns'
-import { fr } from 'date-fns/locale'
 import { useBooking } from '~/composables/useBooking'
 import type { BookingService } from './ServiceSelector.vue'
 import { getBookingService } from '~/utils/bookingServices'
@@ -159,7 +157,6 @@ const selectedDate = ref<Date | null>(null)
 const selectedSlot = ref<TimeSlot | null>(null)
 const slotsForSelectedDate = ref<TimeSlot[]>([])
 
-const isLoadingSlots = ref(false)
 const isSubmitting = ref(false)
 const submitError = ref<string | null>(null)
 const globalError = ref<string | null>(null)
@@ -212,31 +209,19 @@ function onServiceSelected(service: BookingService) {
   advance('calendar')
 }
 
-function onDateSelected(date: Date) {
+// The calendar already holds the month's slots: no second availability call.
+function onDateSelected(date: Date, slots: TimeSlot[]) {
   selectedDate.value = date
-  // Fetch slots for this date
-  fetchSlotsForDate(date)
+  slotsForSelectedDate.value = slots
   advance('time')
 }
 
-async function fetchSlotsForDate(date: Date) {
-  if (!selectedService.value) return
-  isLoadingSlots.value = true
-  slotsForSelectedDate.value = []
-  const month = format(date, 'yyyy-MM')
-  try {
-    const data = await $fetch<{ slotsByDate: Record<string, TimeSlot[]> }>(
-      '/api/booking/availability',
-      { params: { month, service: selectedService.value.id } },
-    )
-    const dateKey = format(date, 'yyyy-MM-dd')
-    slotsForSelectedDate.value = data.slotsByDate[dateKey] || []
-  } catch {
-    slotsForSelectedDate.value = []
-    globalError.value = 'Impossible de charger les disponibilités. Réessaie dans un instant.'
-  } finally {
-    isLoadingSlots.value = false
-  }
+// "Première disponibilité" shortcut: straight to the form with that slot.
+function onFirstSlotPicked(date: Date, slots: TimeSlot[], slot: TimeSlot) {
+  selectedDate.value = date
+  slotsForSelectedDate.value = slots
+  selectedSlot.value = slot
+  advance('form')
 }
 
 function onSlotSelected(slot: TimeSlot) {

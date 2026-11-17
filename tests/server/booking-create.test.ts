@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { callHandler, errorMessage, fetchMock, freezeNow, loadHandler, setRuntimeConfig } from '../helpers/server'
+import { callHandler, errorMessage, fetchMock, freezeNow, installKv, loadHandler, setRuntimeConfig, uninstallKv } from '../helpers/server'
 
 const gcal = vi.hoisted(() => ({
   getEventsForMonth: vi.fn(),
@@ -74,6 +74,40 @@ describe('POST /api/booking/create', () => {
     expect(res.status).toBe(409)
     expect(errorMessage(res)).toMatch(/plus disponible/)
     expect(gcal.createBookingEvent).not.toHaveBeenCalled()
+  })
+
+  describe('with the KV busy-times cache', () => {
+    afterEach(() => { uninstallKv() })
+
+    it('re-checks Google live even when the cache says the slot is free', async () => {
+      const kv = installKv()
+      kv.store.set('busy:2026-10', JSON.stringify({ fetchedAt: Date.now(), events: [] }))
+      gcal.getEventsForMonth.mockResolvedValue([
+        { start: { dateTime: '2026-10-13T09:00:00-04:00' }, end: { dateTime: '2026-10-13T10:00:00-04:00' } },
+      ])
+      const res = await callHandler(await load(), { body: validBody() })
+      expect(res.status).toBe(409)
+      expect(gcal.getEventsForMonth).toHaveBeenCalledWith(2026, 10)
+      expect(gcal.createBookingEvent).not.toHaveBeenCalled()
+      expect(kv.delete).not.toHaveBeenCalled()
+    })
+
+    it('invalidates the booked month once the event exists', async () => {
+      const kv = installKv()
+      kv.store.set('busy:2026-10', JSON.stringify({ fetchedAt: Date.now(), events: [] }))
+      const res = await callHandler(await load(), { body: validBody() })
+      expect(res.status).toBe(200)
+      expect(kv.delete).toHaveBeenCalledWith('busy:2026-10')
+      expect(kv.store.has('busy:2026-10')).toBe(false)
+    })
+
+    it('still confirms the booking when the invalidation fails', async () => {
+      const kv = installKv()
+      kv.delete.mockRejectedValue(new Error('KV unavailable'))
+      const res = await callHandler(await load(), { body: validBody() })
+      expect(res.status).toBe(200)
+      expect(res.json.success).toBe(true)
+    })
   })
 
   it('rejects a slot outside working hours (Friday) with 409', async () => {

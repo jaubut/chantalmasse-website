@@ -17,6 +17,8 @@ export default defineNuxtConfig({
         compatibility_date: '2025-05-05',
         compatibility_flags: ['nodejs_compat'],
         observability: { enabled: true },
+        // Busy times per month + the Google access token (server/utils/bookingCache.ts).
+        kv_namespaces: [{ binding: 'BOOKING_CACHE', id: 'e71462224c254ab5a42b710bc086ca2a' }],
       },
     },
     alias: {

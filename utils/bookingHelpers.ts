@@ -196,6 +196,26 @@ export function getAvailableDatesInMonth(
 }
 
 /**
+ * "jeudi 19 novembre, 14 h" / "mardi 1er décembre, 9 h 30" in the booking timezone
+ * (non-breaking spaces inside the time so it never wraps).
+ */
+export function formatSlotStart(isoStart: string): string {
+  const parts = new Intl.DateTimeFormat('fr-CA', {
+    timeZone: BOOKING_TIMEZONE,
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    hour: 'numeric',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(new Date(isoStart))
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(p => p.type === type)?.value ?? ''
+  const minute = part('minute')
+  const day = part('day') === '1' ? '1er' : part('day')
+  return `${part('weekday')} ${day} ${part('month')}, ${Number(part('hour'))}\u00a0h${minute === '00' ? '' : `\u00a0${minute}`}`
+}
+
+/**
  * Generate Google Calendar add URL
  */
 export function googleCalendarUrl(params: {

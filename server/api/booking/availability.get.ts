@@ -1,4 +1,4 @@
-import { getEventsForMonth } from '~/server/utils/googleCalendar'
+import { getMonthBusy } from '~/server/utils/bookingCache'
 import { getAvailableDatesInMonth } from '~/utils/bookingHelpers'
 import { addDays, endOfMonth, isAfter, isBefore, startOfMonth } from 'date-fns'
 
@@ -7,9 +7,9 @@ const SERVICE_DURATIONS: Record<string, number> = {
   couple: 90,
 }
 
-// In-memory cache: key = "YYYY-MM:service", value = { data, expiresAt }
-const cache = new Map<string, { data: unknown; expiresAt: number }>()
-const CACHE_TTL_MS = 5 * 60 * 1000 // 5 minutes
+// Slot math costs ~50 ms of CPU; reuse it while the isolate sees the same
+// calendar snapshot within the same minute (the 24 h notice moves with time).
+const computed = new Map<string, { stamp: string; slots: ReturnType<typeof getAvailableDatesInMonth> }>()
 
 export default defineEventHandler(async (event) => {
   const query = getQuery(event)
@@ -22,12 +22,6 @@ export default defineEventHandler(async (event) => {
 
   if (!service || !SERVICE_DURATIONS[service]) {
     throw createError({ statusCode: 400, message: 'Paramètre service invalide (individual ou couple)' })
-  }
-
-  const cacheKey = `${month}:${service}`
-  const cached = cache.get(cacheKey)
-  if (cached && Date.now() < cached.expiresAt) {
-    return cached.data
   }
 
   const [year, monthNum] = month.split('-').map(Number)
@@ -52,9 +46,10 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  let events: Awaited<ReturnType<typeof getEventsForMonth>>
+  const t0 = Date.now()
+  let busy: Awaited<ReturnType<typeof getMonthBusy>>
   try {
-    events = await getEventsForMonth(year, monthNum)
+    busy = await getMonthBusy(event, year, monthNum)
   } catch (err) {
     console.error('[booking/availability] Google Calendar error:', err)
     throw createError({
@@ -63,23 +58,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const result = getAvailableDatesInMonth(
-    year,
-    monthNum,
-    durationMinutes,
-    events,
-    advanceDays,
-    minNoticeHours,
-  )
-
-  const response = {
-    month,
-    service,
-    availableDates: result.availableDates,
-    slotsByDate: result.slotsByDate,
+  const memoKey = `${month}:${service}`
+  const stamp = `${busy.fetchedAt}:${Math.floor(Date.now() / 60_000)}`
+  let memo = computed.get(memoKey)
+  if (memo?.stamp !== stamp) {
+    memo = {
+      stamp,
+      slots: getAvailableDatesInMonth(year, monthNum, durationMinutes, busy.events, advanceDays, minNoticeHours),
+    }
+    computed.set(memoKey, memo)
   }
 
-  cache.set(cacheKey, { data: response, expiresAt: Date.now() + CACHE_TTL_MS })
+  setHeader(event, 'server-timing', `busy;dur=${Date.now() - t0};desc="${busy.status}"`)
 
-  return response
+  return {
+    month,
+    service,
+    availableDates: memo.slots.availableDates,
+    slotsByDate: memo.slots.slotsByDate,
+  }
 })

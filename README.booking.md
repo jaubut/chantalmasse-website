@@ -145,7 +145,8 @@ The hourly reminder scan runs in Trigger.dev, independently of Cloudflare. It ne
 ## Deployment Notes
 
 - The site uses the `cloudflare_module` preset because API routes are required for booking functionality. Page routes are pre-rendered statically at build time.
-- The `/api/booking/availability` response is cached in-memory for 5 minutes per month/service to reduce Google API calls.
+- Availability reads busy times per month from Workers KV (`BOOKING_CACHE`, namespace `chantalmasse-booking-cache`, see `server/utils/bookingCache.ts`): fresh for 60 s, served stale while refreshing up to 5 min, kept 1 h as a fallback when Google is down. A booking or cancellation through the site deletes the month's key. `POST /api/booking/create` never reads the cache: it re-checks Google live before inserting. The Google access token is cached in the same namespace until it expires. Responses carry `Server-Timing: busy;dur=…;desc="hit|stale|miss|fallback"`.
+- Load test a preview version: `bun scripts/load-test-availability.ts https://<version>-chantalmasse-website.jeremie-aubut.workers.dev 200 10`.
 - Cancellation (phase 2) generates a unique `cancelToken` per booking that can be used to cancel via `/api/booking/cancel`.
 
 ---
