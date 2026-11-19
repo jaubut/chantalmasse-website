@@ -118,13 +118,16 @@ jobs:
       - name: Build (Cloudflare preset, as deployed)
         run: bun run build
 
+      # The checkout is shallow and has no tags. Fetch the tag object the final lease names, and
+      # fail here, before wrangler, if it is missing or has moved since the guard.
       - name: site-deployed has not moved since the guard
         env:
           TAG: ${{ needs.guard.outputs.tag }}
         run: |
-          remote="$(git ls-remote origin refs/tags/site-deployed | cut -f1)"
-          if [ "$remote" != "$TAG" ]; then
-            echo "::error::site-deployed moved to $remote during this run (manual deploy?). Not deploying over it."
+          git fetch --no-tags --depth=1 origin "+refs/tags/site-deployed:refs/tags/site-deployed"
+          local_tag="$(git rev-parse -q --verify refs/tags/site-deployed || true)"
+          if [ -z "$TAG" ] || [ "$local_tag" != "$TAG" ] || ! git cat-file -e "$TAG"; then
+            echo "::error::site-deployed is ${local_tag:-missing}, the guard checked ${TAG:-nothing} (manual deploy during this run?). Not deploying."
             exit 1
           fi
 
