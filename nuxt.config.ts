@@ -28,6 +28,9 @@ export default defineNuxtConfig({
     },
     prerender: {
       crawlLinks: true,
+      // Emit /journey.html (not /journey/index.html) so Workers assets serve the no-slash URL
+      // as the real page. /journey/ → /journey is a 301 in public/_redirects.
+      autoSubfolderIndex: false,
     },
   },
 
@@ -103,7 +106,8 @@ export default defineNuxtConfig({
   // ─── Sitemap ───────────────────────────────────────────────────────────────
   // crawlLinks: true in nitro means all prerendered routes are auto-discovered
   sitemap: {
-    exclude: ['/inscription-confirmee', '/confirmer-inscription'],
+    // noindex pages stay out of the sitemap (/prendre-rendez-vous is the noindex Ads booking page).
+    exclude: ['/inscription-confirmee', '/confirmer-inscription', '/prendre-rendez-vous'],
   },
 
   // ─── OG Image ──────────────────────────────────────────────────────────────
