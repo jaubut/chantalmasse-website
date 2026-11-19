@@ -5,6 +5,8 @@
 // The www checks need the second argument: the www → apex 301 is a Cloudflare zone rule
 // (docs/url-fixes-deploy-notes.md), so it only exists on the real hostname.
 import { readdirSync, readFileSync } from 'node:fs'
+import { get as httpGet } from 'node:http'
+import { get as httpsGet } from 'node:https'
 
 const APEX = 'https://chantalmasse.com'
 const Q = '?gclid=x&utm_source=y'
@@ -22,6 +24,17 @@ function check(group: string, ok: boolean, detail: string) {
 }
 
 const get = (url: string) => fetch(url, { redirect: 'manual' })
+// fetch collapses '//' at the start of the path (Bun sends //evil.com/ as /evil.com/), so raw paths go through node:http(s).
+// Returns the absolute Location (resolved against the request), '' if none.
+const rawLocation = (origin: string, path: string) => new Promise<{ status: number, location: string }>((resolve, reject) => {
+  const u = new URL(origin)
+  const req = (u.protocol === 'https:' ? httpsGet : httpGet)({ hostname: u.hostname, port: u.port, path }, (res) => {
+    res.resume()
+    const loc = res.headers.location
+    resolve({ status: res.statusCode ?? 0, location: loc ? new URL(loc, origin + path).href : '' })
+  })
+  req.on('error', reject)
+})
 
 // Pages from pages/*.vue (+ /blog), posts from content/blog/*.md (file name = slug).
 const pages = readdirSync('pages').filter(f => f.endsWith('.vue'))
@@ -36,16 +49,18 @@ const legacy = readFileSync('public/_redirects', 'utf8').split('\n')
   .filter(([from, , status]) => from?.startsWith('/') && !from.includes('*') && status === '301')
   .map(([from = '', to = '']) => [from, to.replace(/(.)\/$/, '$1')] as const)
 
-// One request must land on `want` (path + query, absolute when `origin` is given), and `want` must answer 200.
+// One request must land on `want` (path + query, absolute when `origin` is given, else on the request's own origin),
+// and `want` must answer 200.
 async function expectOneHop(group: string, url: string, want: string, origin = '') {
   const res = await get(url)
   const loc = res.headers.get('location')
   const got = loc ? new URL(loc, url) : null
-  const gotStr = got ? (origin ? got.href : got.pathname + got.search) : '(none)'
+  const sameOrigin = got?.origin === new URL(url).origin
+  const gotStr = got ? (origin || !sameOrigin ? got.href : got.pathname + got.search) : '(none)'
   const ok = res.status === 301 && gotStr === origin + want
   check(group, ok, `${url} → ${res.status} ${gotStr} (want 301 ${origin + want})`)
   if (!ok || !got) return
-  const final = await get(origin ? got.href : base + got.pathname + got.search)
+  const final = await get(got.href)
   check(group, final.status === 200, `${url} → ${gotStr} → ${final.status} (want 200, single hop)`)
 }
 
@@ -79,6 +94,13 @@ check('noindex', /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/.test(rdv), 
 // 3. Legacy redirects: one 301 to the final URL, gclid/utm kept.
 for (const [from, to] of legacy) await expectOneHop('legacy', `${base}${from}${Q}`, to + Q)
 
+// 3b. Open redirect: a multi-slash path must not reach the /*/ catch-all (//evil.com/ → //evil.com).
+//     `new URL` keeps the leading //, and a browser turns /\evil.com/ into //evil.com/ before sending.
+for (const path of ['//evil.com/', '//evil.com/x/', '///evil.com/', '//evil.com']) {
+  const { status, location } = await rawLocation(base, path + Q)
+  check('open-redirect', status === 301 && location === `${base}/${Q}`, `${path}${Q} → ${status} ${location || '(none)'} (want 301 ${base}/${Q})`)
+}
+
 // 4. Sitemap: every page/post, no trailing slash, no noindex page, every <loc> answers 200.
 const sitemap = await (await get(`${base}/sitemap.xml`)).text()
 const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1] ?? '')
@@ -99,6 +121,8 @@ if (wwwBase) {
     await expectOneHop('www', `${wwwBase}${path}/${Q}`, path + Q, APEX)
   }
   for (const [from, to] of legacy) await expectOneHop('www', `${wwwBase}${from}${Q}`, to + Q, APEX)
+  const { location: evil } = await rawLocation(wwwBase, '//evil.com/')
+  check('www', evil.startsWith(`${APEX}/`), `${wwwBase}//evil.com/ → ${evil || '(none)'} (want a redirect on ${APEX})`)
 }
 else console.log('SKIP [www] pass the www base URL as 2nd argument (zone rule, prod only)')
 

@@ -16,5 +16,9 @@
 /services /prendre-rendez-vous 301
 /services/ /prendre-rendez-vous 301
 
+# Multi-slash paths go home first: without this, //evil.com/ would match the catch-all
+# below with :splat=/evil.com and 301 to the scheme-relative //evil.com (open redirect).
+//* / 301
+
 # No-slash URLs are canonical: /path/ → /path (query kept). Static rules above win first.
 /*/ /:splat 301

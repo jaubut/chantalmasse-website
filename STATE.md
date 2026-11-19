@@ -5,7 +5,7 @@ Last updated: 2026-11-19
 ## URL fixes — 2026-11-19 (not deployed)
 
 - No-slash URLs are canonical: `/path` 200, `/path/` 301 → `/path` (query kept); `/prendre-rendez-vous` out of the sitemap; legacy `_redirects` go to the final URL in one hop. Check: `bun scripts/check-urls.ts <base> [www-base]`.
-- Open, by hand: www → apex Cloudflare Redirect Rules, `site-deployed` tag after every manual deploy, repo secret `CLOUDFLARE_API_TOKEN` for `.github/workflows/blog-deploy.yml` (blog-only auto-deploy). Steps: `docs/url-fixes-deploy-notes.md`.
+- Open, by hand: www → apex Cloudflare Redirect Rules, `site-deployed` tag after every manual deploy, repo secret `CLOUDFLARE_API_TOKEN` for `.github/workflows/blog-deploy.yml` (blog-only auto-deploy, main-only, no automatic rollback: a failed smoke opens an issue). Steps: `docs/url-fixes-deploy-notes.md`.
 
 ## Booking production QA — 2026-11-17 (Ads live)
 
