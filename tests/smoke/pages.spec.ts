@@ -134,9 +134,11 @@ test('SEO files are generated', async ({ request }) => {
   const sitemap = await request.get('/sitemap.xml')
   expect(sitemap.status()).toBe(200)
   const xml = await sitemap.text()
-  for (const path of ['/', '/blog', '/coaching-de-couple', '/therapie-individuelle', '/prendre-rendez-vous']) {
+  for (const path of ['/', '/blog', '/coaching-de-couple', '/therapie-individuelle']) {
     expect(xml).toContain(`<loc>https://chantalmasse.com${path}</loc>`)
   }
+  // noindex pages stay out of the sitemap
+  expect(xml).not.toContain('<loc>https://chantalmasse.com/prendre-rendez-vous</loc>')
   expect(xml).not.toContain('/inscription-confirmee')
   expect(xml).not.toContain('/confirmer-inscription')
 })
