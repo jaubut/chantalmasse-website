@@ -16,7 +16,7 @@ Rollback target recorded at Stage 0: live Worker version **`d8f22b85-1835-471c-a
 | Tracking (full load + ClientRouter navigations, collection hits recorded and aborted) | identical counts to production: GA4 / Ads `page_view` and 1 Meta `PageView` per navigation; zero third-party requests on `/confirmer-inscription` |
 | Smoke suite (`tests/smoke`, 54 tests) against the preview | **54/54** (second pass: the CSS-first test passes now) |
 | Unit/server tests, typecheck gates | 203/203; Nuxt `typecheck: OK (39 known baseline errors, 0 new)`; `astro check` 0 errors (now a CI step) |
-| Lighthouse (second pass, sites interleaved) | **mobile ≥ baseline on all 5 URLs** (`/` 63 → 84, `/prendre-rendez-vous` 56 → 90); desktop ≥ baseline on all 5 (first pass) |
+| Lighthouse (second pass, final build) | **mobile ≥ baseline on all 5 URLs** (`/` 63 → 85, `/prendre-rendez-vous` 56 → 87, CLS on `/coaching-de-couple` 0.005); desktop ≥ baseline on all 5 (first pass) |
 | E2E in test mode (booking, newsletter, contact, blog publish) | **not run**: needs preview secrets and the CMS write token (see "What Jeremie needs to provide") |
 
 **Cutover is not ready**: the blog reads the **staging** CMS and no production `tls-cms` exists yet (blocker 1 below).
@@ -44,15 +44,15 @@ Rollback target recorded at Stage 0: live Worker version **`d8f22b85-1835-471c-a
 
 ## Lighthouse (mobile median of 3, Nuxt prod → Astro preview)
 
-Second pass, 2026-11-20: Nuxt production and the Astro preview run **interleaved** (Nuxt, Astro, Nuxt, … for each URL, same machine, same minutes), because Nuxt's own home score moved between 62 and 87 across sessions with no code change (Lighthouse's simulated LCP is bimodal on that page). SEO is lower on the preview only because of its deliberate `noindex` header; a11y and best-practices are equal on every URL.
+Second pass, 2026-11-20: Nuxt production and the Astro preview run **interleaved** (Nuxt, Astro, Nuxt, … for each URL, same machine, same minutes), because Nuxt's own home score moved between 62 and 87 across sessions with no code change (Lighthouse's simulated LCP is bimodal on that page). SEO is lower on the preview only because of its deliberate `noindex` header; best-practices are equal on every URL, a11y too except one timing-dependent axe hit on `/` (the rotating hero label caught mid-fade: same markup and colors as Nuxt; 98 in the interleaved round, 94 in the final-build round). The Astro column is the final pushed build (3 runs just after the interleaved round; the interleaved Astro medians, within ±3 points of it, are in the JSON).
 
 | URL | perf | FCP | LCP | TBT | CLS | weight |
 |---|---|---|---|---|---|---|
-| `/` | 63 → **84** | 1.65 → 1.50 s | 7.73 → 3.40 s | 328 → 263 ms | 0.001 → 0.026 | 2509 → 1007 KB |
-| `/coaching-de-couple` | 86 → **87** | 1.59 → 1.32 s | 1.75 → 1.93 s | 405 → 443 ms | 0.010 → 0.005 | 789 → 714 KB |
-| `/therapie-individuelle` | 87 → **88** | 1.57 → 1.33 s | 1.73 → 1.52 s | 368 → 427 ms | 0.007 → 0.006 | 789 → 714 KB |
-| `/prendre-rendez-vous` | 56 → **90** | 3.20 → 1.42 s | 9.50 → 2.41 s | 386 → 260 ms | 0.001 → 0.001 | 1700 → 835 KB |
-| `/blog/l-amour-conscient` | 83 → **87** | 1.60 → 1.41 s | 3.32 → 2.75 s | 306 → 270 ms | 0.000 → 0.026 | 1067 → 895 KB |
+| `/` | 63 → **85** | 1.65 → 1.48 s | 7.73 → 3.39 s | 328 → 261 ms | 0.001 → 0.026 | 2509 → 1007 KB |
+| `/coaching-de-couple` | 86 → **87** | 1.59 → 1.47 s | 1.75 → 2.08 s | 405 → 421 ms | 0.010 → 0.005 | 789 → 714 KB |
+| `/therapie-individuelle` | 87 → **89** | 1.57 → 1.25 s | 1.73 → 1.36 s | 368 → 413 ms | 0.007 → 0.025 | 789 → 714 KB |
+| `/prendre-rendez-vous` | 56 → **87** | 3.20 → 1.97 s | 9.50 → 2.89 s | 386 → 260 ms | 0.001 → 0.001 | 1700 → 835 KB |
+| `/blog/l-amour-conscient` | 83 → **89** | 1.60 → 1.41 s | 3.32 → 2.62 s | 306 → 260 ms | 0.000 → 0.026 | 1067 → 895 KB |
 
 First pass (before the fixes below): `/` 64, `/coaching-de-couple` 84 (CLS 0.111), `/therapie-individuelle` 86, `/prendre-rendez-vous` 51 (FCP 2.94 s), blog post 80. Desktop (first pass, 1 run): `/` 83 → 88, `/coaching-de-couple` 97 → 97, `/therapie-individuelle` 97 → 98, `/prendre-rendez-vous` 86 → 86, blog post 97 → 98.
 Raw numbers: `docs/migration-baseline/lighthouse.json` (before), `lighthouse-before-after.json` (both passes).
@@ -64,6 +64,17 @@ Raw numbers: `docs/migration-baseline/lighthouse.json` (before), `lighthouse-bef
 - **Blog hero**: responsive `srcset` (640/960/1280/1920 through the CMS media route) with `fetchpriority="high"`, preloaded from `<head>`.
 - **CLS on `/coaching-de-couple`**: the late swap of the italic Newsreader file re-wrapped the hero headline and moved the CTA row. That page alone preloads that one file (`preloadItalic`); preloading fonts everywhere cost ~0.9 s of first paint on other pages.
 - **Home hero island** hydrates on `client:idle` (it only rotates a label and shows the map on hover; its CTA works before hydration via `data-booking-open`).
+
+## PR #55 review findings (Claude + Gemini), addressed in the second pass
+
+- `astro/src/lib/nitro.ts`: an uncaught non-H3 error answers 500 "Server Error" with no `data` (Nitro's production behaviour); internal error text never reaches visitors.
+- `astro/src/pages/media/[...key].ts`: width allowlist (640, 960, 1200, 1280, 1920), every other query dropped; raster `image/*` only, `X-Content-Type-Options: nosniff`; Cache API first, KV with a 30-day TTL (bounded writes).
+- `astro/src/middleware.ts`: per-isolate `refreshedAt` + in-flight guard (an unchanged page is re-rendered at most once per minute per isolate, no KV write), stale entry deleted when the page now 404s, 7-day TTL on puts, `.catch` attached before `waitUntil` (also in the media route).
+- `astro/src/pages/index.astro`: a failing `latestPosts(2)` renders `/` without the two cards and skips the page cache (`x-page-cache-skip`, stripped before the response).
+- `astro/src/lib/client.ts`: booking and contact modals close on `astro:before-preparation`, so ClientRouter's remount can't reopen or reset a booking on the next page (verified: 1 dialog open → 0 after an in-site navigation). The privacy link in the booking form opens in a new tab.
+- `astro/src/lib/richtext.ts`: heading level limited to 2/3/4, image width/height must be positive integers, missing `content` arrays tolerated; `readTime` is optional in the three templates.
+- CI: `bun run astro:check` (`astro sync` + `astro-check`, 0 errors) runs before the Astro build.
+- Not changed (noted by the review as pre-existing, same as Nuxt): tap targets under 44 px on the calendar arrows, testimonial arrows and modal close buttons; CI build needs Google Fonts reachable.
 
 ## Tracking matrix (verified)
 
