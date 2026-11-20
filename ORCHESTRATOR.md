@@ -29,6 +29,10 @@ server/api/newsletter/*  — proxies to the dashboard's /api/public/newsletter/*
 
 ---
 
+## Astro build (migration in progress)
+
+`astro/` is the Astro 7 rebuild of this site (same URLs, SEO, tracking), deployed only to the preview Worker until cutover. Routes: `astro/src/pages/*.astro` (page bodies in `astro/src/vue/pages/*Page.vue`, sections in `astro/src/vue/components/`), layout + head in `astro/src/layouts/Base.astro`, browser glue in `astro/src/lib/client.ts`, API = the unchanged `server/api/*` behind `astro/src/pages/api/[...path].ts`, blog from the TLS CMS (`astro/src/lib/blog.ts`). A page added to Nuxt must be added there too until cutover. Status: `docs/astro-migration-parity.md`.
+
 ## Module Boundaries & Ownership
 
 ### Layout Shell (`app.vue`)

@@ -15,16 +15,23 @@
     "build:smoke": "TZ=UTC NITRO_PRESET=node-server nuxt build",
     "test:smoke": "bun run build:smoke && playwright test",
     "test:reminder": "esbuild --bundle --platform=node --format=esm --log-level=warning --alias:@trigger.dev/sdk/v3=./tests/stubs/trigger-sdk.ts --alias:googleapis=./tests/stubs/googleapis.ts --alias:twilio=./tests/stubs/twilio.ts --outfile=.test-out/booking-reminder.mjs tests/booking-reminder.test.ts && node .test-out/booking-reminder.mjs",
-    "test:rules": "esbuild --bundle --platform=node --format=esm --log-level=warning --outfile=.test-out/session-rules.mjs tests/session-rules.test.ts && node .test-out/session-rules.mjs"
+    "test:rules": "esbuild --bundle --platform=node --format=esm --log-level=warning --outfile=.test-out/session-rules.mjs tests/session-rules.test.ts && node .test-out/session-rules.mjs",
+    "astro:build": "astro build --root astro",
+    "astro:deploy:preview": "bash astro/scripts/deploy-preview.sh",
+    "test:smoke:astro": "playwright test -c playwright.astro.config.ts",
+    "parity": "bun scripts/parity-crawl.ts diff docs/migration-baseline/crawl.json https://chantalmasse-website-astro.jeremie-aubut.workers.dev --preview"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
+    "@astrojs/cloudflare": "14.4.9",
+    "@astrojs/vue": "7.1.6",
     "@google-analytics/data": "^7.2.1",
     "@nuxt/content": "^3.16.1",
     "@nuxt/image": "^2.1.0",
     "@nuxtjs/seo": "^5.3.16",
     "@tailwindcss/typography": "^0.5.20",
     "@trigger.dev/sdk": "4.7.3",
+    "astro": "7.4.13",
     "better-sqlite3": "^13.0.3",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
@@ -32,6 +39,7 @@
     "googleapis": "^185.0.0",
     "gsap": "^3.15.0",
     "nuxt": "^4.6.1",
+    "ofetch": "^1.5.1",
     "posthog-js": "^1.438.7",
     "resend": "^6.32.1",
     "twilio": "^6.1.2",
@@ -41,6 +49,8 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
     "@iconify-json/material-symbols": "^1.2.95",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify/utils": "^3.1.7",
     "@iconify/vue": "^5.0.3",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@playwright/test": "^1.64.0",
@@ -50,7 +60,8 @@
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vitest": "^5.0.3",
-    "vue-tsc": "^3.3.13"
+    "vue-tsc": "^3.3.13",
+    "wrangler": "4.165.0"
   },
   "overrides": {
     "postcss-selector-parser": "^7.1.6",

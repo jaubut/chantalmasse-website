@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE } from '../lib/seo'
+import TherapieIndividuellePage from '../vue/pages/TherapieIndividuellePage.vue'
+---
+<Base
+  title="Thérapie individuelle à Shefford | Chantal Massé — Thérapeute en relation d'aide"
+  path="/therapie-individuelle"
+  description="Thérapie individuelle à Shefford et en vidéoconférence. Approche centrée sur la personne pour explorer vos patterns, apaiser les blessures et retrouver confiance. 60 min — 105$. Reçus RITMA."
+  ogTitle="Thérapie individuelle à Shefford | Chantal Massé"
+  ogDescription="Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance."
+  ogImage={HERO_IMAGE}
+>
+  <TherapieIndividuellePage />
+</Base>

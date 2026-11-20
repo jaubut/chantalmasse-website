@@ -1,0 +1,14 @@
+---
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE } from '../lib/seo'
+import InscriptionConfirmeePage from '../vue/pages/InscriptionConfirmeePage.vue'
+---
+<Base
+  title="Inscription confirmée — Chantal Massé"
+  path="/inscription-confirmee"
+  description="Merci pour votre inscription à l'infolettre de Chantal Massé."
+  ogImage={HERO_IMAGE}
+  robots="noindex"
+>
+  <InscriptionConfirmeePage />
+</Base>

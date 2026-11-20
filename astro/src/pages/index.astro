@@ -1,0 +1,33 @@
+---
+// pages/index.vue. Not prerendered: the newsletter section lists the 2 latest posts, read from the CMS per request.
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE, SITE_DESCRIPTION } from '../lib/seo'
+import { latestPosts } from '../lib/blog'
+import HeroSection from '../vue/components/HeroSection.vue'
+import ServicesSection from '../vue/components/ServicesSection.vue'
+import PhilosophySection from '../vue/components/PhilosophySection.vue'
+import MethodsSection from '../vue/components/MethodsSection.vue'
+import TestimonialsSection from '../vue/components/TestimonialsSection.vue'
+import NewsletterSection from '../vue/components/NewsletterSection.vue'
+import BookingSection from '../vue/components/BookingSection.vue'
+
+export const prerender = false
+
+const posts = await latestPosts(2)
+---
+<Base
+  title="Chantal Massé — Thérapeute en relation d'aide à Shefford"
+  path="/"
+  description={SITE_DESCRIPTION}
+  ogImage={HERO_IMAGE}
+>
+  <div>
+    <HeroSection client:load />
+    <ServicesSection />
+    <PhilosophySection />
+    <MethodsSection />
+    <TestimonialsSection />
+    <NewsletterSection client:visible posts={posts} />
+    <BookingSection />
+  </div>
+</Base>

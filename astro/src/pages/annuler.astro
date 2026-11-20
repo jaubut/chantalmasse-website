@@ -1,0 +1,10 @@
+---
+// Rendered per request like Nuxt (/annuler was never prerendered); the token is read and checked in the browser.
+import Base from '../layouts/Base.astro'
+import AnnulerPage from '../vue/pages/AnnulerPage.vue'
+
+export const prerender = false
+---
+<Base title="Annuler ton rendez-vous — Chantal Massé" path="/annuler" robots="noindex, nofollow">
+  <AnnulerPage client:load />
+</Base>

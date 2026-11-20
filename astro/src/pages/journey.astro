@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE } from '../lib/seo'
+import EmotionalJourney from '../vue/components/EmotionalJourney.vue'
+---
+<Base
+  title="Le parcours émotionnel — Chantal Massé"
+  path="/journey"
+  description="Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix."
+  ogImage={HERO_IMAGE}
+>
+  <div>
+    <EmotionalJourney client:load />
+  </div>
+</Base>

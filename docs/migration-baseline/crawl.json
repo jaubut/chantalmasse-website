@@ -1,0 +1,2745 @@
+{
+  "base": "https://chantalmasse.com",
+  "urls": {
+    "/": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Chantal Massé — Thérapeute en relation d'aide à Shefford",
+      "canonical": "https://chantalmasse.com",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Chantal Massé — Thérapeute en relation d'aide à Shefford",
+        "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "og:description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com"
+      },
+      "h1": "Thérapeute en relation d'aide à Shefford 245 rue Colette, Shefford",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Chantal Massé — Thérapeute en relation d'aide à Shefford",
+              "url": "https://chantalmasse.com",
+              "about": {
+                "@id": "https://chantalmasse.com/#identity"
+              },
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/annuler": {
+      "status": 200,
+      "xRobotsTag": "noindex, nofollow",
+      "lang": "fr",
+      "title": "Annuler ton rendez-vous — Chantal Massé",
+      "canonical": "https://chantalmasse.com/annuler",
+      "meta": {
+        "og:type": "website",
+        "robots": "noindex, nofollow",
+        "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "twitter:card": "summary_large_image",
+        "og:title": "Annuler ton rendez-vous — Chantal Massé",
+        "og:description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/annuler"
+      },
+      "h1": "",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/annuler#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Annuler ton rendez-vous — Chantal Massé",
+              "url": "https://chantalmasse.com/annuler",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/annuler"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/annuler?token=bad": {
+      "status": 200,
+      "xRobotsTag": "noindex, nofollow",
+      "lang": "fr",
+      "title": "Annuler ton rendez-vous — Chantal Massé",
+      "canonical": "https://chantalmasse.com/annuler",
+      "meta": {
+        "og:type": "website",
+        "robots": "noindex, nofollow",
+        "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "twitter:card": "summary_large_image",
+        "og:title": "Annuler ton rendez-vous — Chantal Massé",
+        "og:description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/annuler"
+      },
+      "h1": "",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/annuler#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Annuler ton rendez-vous — Chantal Massé",
+              "url": "https://chantalmasse.com/annuler",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/annuler"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/api/nope": {
+      "status": 404
+    },
+    "/blog": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Blogue — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Blogue — Chantal Massé",
+        "description": "Des réflexions sur le mieux-être, les relations et la croissance personnelle.",
+        "og:description": "Des réflexions sur le mieux-être, les relations et la croissance personnelle.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog"
+      },
+      "h1": "Le blogue",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog#webpage",
+              "@type": "WebPage",
+              "description": "Des réflexions sur le mieux-être, les relations et la croissance personnelle.",
+              "name": "Blogue — Chantal Massé",
+              "url": "https://chantalmasse.com/blog",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/": {
+      "status": 301,
+      "location": "/blog"
+    },
+    "/blog/3-phrases-a-eviter-en-conflit": {
+      "status": 200,
+      "lang": "fr",
+      "title": "3 phrases à éviter dans un conflit de couple (et quoi dire à la place) — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "3 phrases à éviter dans un conflit de couple (et quoi dire à la place) — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_7f944d22c8da465bb5caad2ad5e511a6~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/68c806_7f944d22c8da465bb5caad2ad5e511a6~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit"
+      },
+      "h1": "3 phrases à éviter dans un conflit de couple (et quoi dire à la place)",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "3 phrases à éviter dans un conflit de couple (et quoi dire à la place) — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/3-phrases-a-eviter-en-conflit/": {
+      "status": 301,
+      "location": "/blog/3-phrases-a-eviter-en-conflit"
+    },
+    "/blog/apprendre-a-se-comprendre": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Apprendre à se comprendre : la première étape vers le changement ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/apprendre-a-se-comprendre",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Apprendre à se comprendre : la première étape vers le changement ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_c23d160ba61e47948767da2d40e3a45c~mv2_d_6038_4140_s_4_2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_c23d160ba61e47948767da2d40e3a45c~mv2_d_6038_4140_s_4_2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/apprendre-a-se-comprendre"
+      },
+      "h1": "Apprendre à se comprendre : la première étape vers le changement ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/apprendre-a-se-comprendre#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Apprendre à se comprendre : la première étape vers le changement ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/apprendre-a-se-comprendre",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/apprendre-a-se-comprendre"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/apprendre-a-se-comprendre/": {
+      "status": 301,
+      "location": "/blog/apprendre-a-se-comprendre"
+    },
+    "/blog/choisir-therapeute-relation-aide-quebec": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Choisir une thérapeute au Québec — ce que ma formation veut dire pour toi — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Choisir une thérapeute au Québec — ce que ma formation veut dire pour toi — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://images.unsplash.com/photo-1761289358623-3fddd0854000?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec"
+      },
+      "h1": "Choisir une thérapeute au Québec — ce que ma formation veut dire pour toi",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Choisir une thérapeute au Québec — ce que ma formation veut dire pour toi — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/choisir-therapeute-relation-aide-quebec/": {
+      "status": 301,
+      "location": "/blog/choisir-therapeute-relation-aide-quebec"
+    },
+    "/blog/comment-calmer-l-anxiete": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Comment calmer l'anxiété en 3 étapes simples — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/comment-calmer-l-anxiete",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Comment calmer l'anxiété en 3 étapes simples — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/804c18c8464044daa438b6b945afad94.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/804c18c8464044daa438b6b945afad94.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/comment-calmer-l-anxiete"
+      },
+      "h1": "Comment calmer l'anxiété en 3 étapes simples",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/comment-calmer-l-anxiete#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Comment calmer l'anxiété en 3 étapes simples — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/comment-calmer-l-anxiete",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/comment-calmer-l-anxiete"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/comment-calmer-l-anxiete/": {
+      "status": 301,
+      "location": "/blog/comment-calmer-l-anxiete"
+    },
+    "/blog/comment-calmer-le-besoin-de-tout-controler": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Comment calmer le besoin de tout contrôler ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Comment calmer le besoin de tout contrôler ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_0efa6a6b5b6c4b109116e5d13a3eb239~mv2.png/v1/fill/w_940,h_411,fp_0.50_0.50,q_95,enc_avif,quality_auto/68c806_0efa6a6b5b6c4b109116e5d13a3eb239~mv2.png",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler"
+      },
+      "h1": "Comment calmer le besoin de tout contrôler ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Comment calmer le besoin de tout contrôler ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/comment-calmer-le-besoin-de-tout-controler/": {
+      "status": 301,
+      "location": "/blog/comment-calmer-le-besoin-de-tout-controler"
+    },
+    "/blog/comment-gerer-anxiete-travail": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Comment gérer l'anxiété au travail quand l'alarme reste allumée — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/comment-gerer-anxiete-travail",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Comment gérer l'anxiété au travail quand l'alarme reste allumée — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://images.unsplash.com/photo-1688498410602-e50d6f2435a0?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/comment-gerer-anxiete-travail"
+      },
+      "h1": "Comment gérer l'anxiété au travail quand l'alarme reste allumée",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/comment-gerer-anxiete-travail#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Comment gérer l'anxiété au travail quand l'alarme reste allumée — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/comment-gerer-anxiete-travail",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/comment-gerer-anxiete-travail"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/comment-gerer-anxiete-travail/": {
+      "status": 301,
+      "location": "/blog/comment-gerer-anxiete-travail"
+    },
+    "/blog/decembre-fragilites-interieures": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Décembre : quand la magie des fêtes révèle nos fragilités intérieures — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/decembre-fragilites-interieures",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Décembre : quand la magie des fêtes révèle nos fragilités intérieures — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_0b484817d7894a458fd9654165e90789~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_0b484817d7894a458fd9654165e90789~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/decembre-fragilites-interieures"
+      },
+      "h1": "Décembre : quand la magie des fêtes révèle nos fragilités intérieures",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/decembre-fragilites-interieures#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Décembre : quand la magie des fêtes révèle nos fragilités intérieures — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/decembre-fragilites-interieures",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/decembre-fragilites-interieures"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/decembre-fragilites-interieures/": {
+      "status": 301,
+      "location": "/blog/decembre-fragilites-interieures"
+    },
+    "/blog/faire-le-point-fin-annee-couple": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Faire le point en fin d'année : pourquoi consulter un thérapeute de couple — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Faire le point en fin d'année : pourquoi consulter un thérapeute de couple — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/59f1af555f404c53a01c1d5a99ba4385.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/59f1af555f404c53a01c1d5a99ba4385.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple"
+      },
+      "h1": "Faire le point en fin d'année : pourquoi consulter un thérapeute de couple",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Faire le point en fin d'année : pourquoi consulter un thérapeute de couple — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/faire-le-point-fin-annee-couple/": {
+      "status": 301,
+      "location": "/blog/faire-le-point-fin-annee-couple"
+    },
+    "/blog/l-amour-conscient": {
+      "status": 200,
+      "lang": "fr",
+      "title": "L'amour conscient : sortir du mode réaction pour co-créer la relation — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/l-amour-conscient",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "L'amour conscient : sortir du mode réaction pour co-créer la relation — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_4b4d2cbf956849dca15a96c7eca83733~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_4b4d2cbf956849dca15a96c7eca83733~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/l-amour-conscient"
+      },
+      "h1": "L'amour conscient : sortir du mode réaction pour co-créer la relation",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/l-amour-conscient#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "L'amour conscient : sortir du mode réaction pour co-créer la relation — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/l-amour-conscient",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/l-amour-conscient"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/l-amour-conscient/": {
+      "status": 301,
+      "location": "/blog/l-amour-conscient"
+    },
+    "/blog/l-automne-redonner-souffle-au-couple": {
+      "status": 200,
+      "lang": "fr",
+      "title": "L'automne, saison du renouveau : redonner un souffle à votre relation de couple — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "L'automne, saison du renouveau : redonner un souffle à votre relation de couple — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_dd4965be5ec741df88f8a66d7d6a70a3~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_dd4965be5ec741df88f8a66d7d6a70a3~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple"
+      },
+      "h1": "L'automne, saison du renouveau : redonner un souffle à votre relation de couple",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "L'automne, saison du renouveau : redonner un souffle à votre relation de couple — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/l-automne-redonner-souffle-au-couple/": {
+      "status": 301,
+      "location": "/blog/l-automne-redonner-souffle-au-couple"
+    },
+    "/blog/l-automne-therapie-individuelle": {
+      "status": 200,
+      "lang": "fr",
+      "title": "L'automne et la rentrée : une saison idéale pour se recentrer grâce à la thérapie individuelle — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/l-automne-therapie-individuelle",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "L'automne et la rentrée : une saison idéale pour se recentrer grâce à la thérapie individuelle — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_5a25ae8f88e940a493727c3cf9af2ee4~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_5a25ae8f88e940a493727c3cf9af2ee4~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/l-automne-therapie-individuelle"
+      },
+      "h1": "L'automne et la rentrée : une saison idéale pour se recentrer grâce à la thérapie individuelle",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/l-automne-therapie-individuelle#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "L'automne et la rentrée : une saison idéale pour se recentrer grâce à la thérapie individuelle — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/l-automne-therapie-individuelle",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/l-automne-therapie-individuelle"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/l-automne-therapie-individuelle/": {
+      "status": 301,
+      "location": "/blog/l-automne-therapie-individuelle"
+    },
+    "/blog/le-danger-de-faire-semblant": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Le danger du « faire semblant que tout va bien » dans les relations — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/le-danger-de-faire-semblant",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Le danger du « faire semblant que tout va bien » dans les relations — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_1033acf61063427a9d3abda159f11f02~mv2.png/v1/fill/w_940,h_411,fp_0.50_0.50,q_95,enc_avif,quality_auto/68c806_1033acf61063427a9d3abda159f11f02~mv2.png",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/le-danger-de-faire-semblant"
+      },
+      "h1": "Le danger du « faire semblant que tout va bien » dans les relations",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/le-danger-de-faire-semblant#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Le danger du « faire semblant que tout va bien » dans les relations — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/le-danger-de-faire-semblant",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/le-danger-de-faire-semblant"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/le-danger-de-faire-semblant/": {
+      "status": 301,
+      "location": "/blog/le-danger-de-faire-semblant"
+    },
+    "/blog/nope": {
+      "status": 404,
+      "xRobotsTag": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    },
+    "/blog/pourquoi-je-reproduis-les-memes-schemas": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Pourquoi je reproduis toujours les mêmes schémas ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Pourquoi je reproduis toujours les mêmes schémas ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_c532fa9c32cc4c67be845de5a208e955~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/68c806_c532fa9c32cc4c67be845de5a208e955~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas"
+      },
+      "h1": "Pourquoi je reproduis toujours les mêmes schémas ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Pourquoi je reproduis toujours les mêmes schémas ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/pourquoi-je-reproduis-les-memes-schemas/": {
+      "status": 301,
+      "location": "/blog/pourquoi-je-reproduis-les-memes-schemas"
+    },
+    "/blog/pourquoi-on-narrive-plus-a-se-parler": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Pourquoi on n'arrive plus à se parler sans se blesser ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Pourquoi on n'arrive plus à se parler sans se blesser ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_703d1af816f248f191ee8a77fed2b329~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/68c806_703d1af816f248f191ee8a77fed2b329~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler"
+      },
+      "h1": "Pourquoi on n'arrive plus à se parler sans se blesser ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Pourquoi on n'arrive plus à se parler sans se blesser ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/pourquoi-on-narrive-plus-a-se-parler/": {
+      "status": 301,
+      "location": "/blog/pourquoi-on-narrive-plus-a-se-parler"
+    },
+    "/blog/quand-consulter-un-therapeute-de-couple": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Quand consulter un thérapeute de couple ? Les signes à ne pas ignorer — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Quand consulter un thérapeute de couple ? Les signes à ne pas ignorer — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_84604b0d8f814afbaf5099233eb47ce0~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_84604b0d8f814afbaf5099233eb47ce0~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple"
+      },
+      "h1": "Quand consulter un thérapeute de couple ? Les signes à ne pas ignorer",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Quand consulter un thérapeute de couple ? Les signes à ne pas ignorer — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/quand-consulter-un-therapeute-de-couple/": {
+      "status": 301,
+      "location": "/blog/quand-consulter-un-therapeute-de-couple"
+    },
+    "/blog/quand-le-quotidien-eteint-le-lien": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Quand le quotidien éteint le lien : comment raviver la connexion émotionnelle dans le couple — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Quand le quotidien éteint le lien : comment raviver la connexion émotionnelle dans le couple — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/68c806_651ff0fce042477eac56d592941a7174~mv2.png/v1/fill/w_940,h_411,fp_0.50_0.50,q_95,enc_avif,quality_auto/68c806_651ff0fce042477eac56d592941a7174~mv2.png",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien"
+      },
+      "h1": "Quand le quotidien éteint le lien : comment raviver la connexion émotionnelle dans le couple",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Quand le quotidien éteint le lien : comment raviver la connexion émotionnelle dans le couple — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/quand-le-quotidien-eteint-le-lien/": {
+      "status": 301,
+      "location": "/blog/quand-le-quotidien-eteint-le-lien"
+    },
+    "/blog/retrouver-confiance-therapie-couple": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Retrouver la confiance grâce à la thérapie de couple : un chemin vers une relation plus forte — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Retrouver la confiance grâce à la thérapie de couple : un chemin vers une relation plus forte — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_0704444454da49cf94552212dc8b923f~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_0704444454da49cf94552212dc8b923f~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple"
+      },
+      "h1": "Retrouver la confiance grâce à la thérapie de couple : un chemin vers une relation plus forte",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Retrouver la confiance grâce à la thérapie de couple : un chemin vers une relation plus forte — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/retrouver-confiance-therapie-couple/": {
+      "status": 301,
+      "location": "/blog/retrouver-confiance-therapie-couple"
+    },
+    "/blog/retrouver-equilibre-de-vie": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Comment retrouver un équilibre de vie avec l'accompagnement thérapeutique ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/retrouver-equilibre-de-vie",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Comment retrouver un équilibre de vie avec l'accompagnement thérapeutique ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/28fed2f3c95f4589a1259daaedda1b0f.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/28fed2f3c95f4589a1259daaedda1b0f.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/retrouver-equilibre-de-vie"
+      },
+      "h1": "Comment retrouver un équilibre de vie avec l'accompagnement thérapeutique ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/retrouver-equilibre-de-vie#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Comment retrouver un équilibre de vie avec l'accompagnement thérapeutique ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/retrouver-equilibre-de-vie",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/retrouver-equilibre-de-vie"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/retrouver-equilibre-de-vie/": {
+      "status": 301,
+      "location": "/blog/retrouver-equilibre-de-vie"
+    },
+    "/blog/signes-couple-en-difficulte-silence": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Quand le silence s'installe : reconnaître les signes d'un couple en difficulté — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Quand le silence s'installe : reconnaître les signes d'un couple en difficulté — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://images.unsplash.com/photo-1463569643904-4fbae71ed917?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence"
+      },
+      "h1": "Quand le silence s'installe : reconnaître les signes d'un couple en difficulté",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Quand le silence s'installe : reconnaître les signes d'un couple en difficulté — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/signes-couple-en-difficulte-silence/": {
+      "status": 301,
+      "location": "/blog/signes-couple-en-difficulte-silence"
+    },
+    "/blog/signes-epuisement-professionnel-reconnaitre-tot": {
+      "status": 200,
+      "lang": "fr",
+      "title": "L'épuisement, ce signal qu'on n'entend pas tout de suite — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "L'épuisement, ce signal qu'on n'entend pas tout de suite — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://images.unsplash.com/photo-1529047033375-f402d3da24ca?w=1200&h=630&q=80&fm=jpg&fit=crop&crop=entropy",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot"
+      },
+      "h1": "L'épuisement, ce signal qu'on n'entend pas tout de suite",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "L'épuisement, ce signal qu'on n'entend pas tout de suite — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/signes-epuisement-professionnel-reconnaitre-tot/": {
+      "status": 301,
+      "location": "/blog/signes-epuisement-professionnel-reconnaitre-tot"
+    },
+    "/blog/stress-et-anxiete-quotidien-serein": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Stress et anxiété : comment retrouver un quotidien plus serein ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Stress et anxiété : comment retrouver un quotidien plus serein ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_468bd8c779904ce9961141045c3a2572~mv2.jpeg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_468bd8c779904ce9961141045c3a2572~mv2.jpeg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein"
+      },
+      "h1": "Stress et anxiété : comment retrouver un quotidien plus serein ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Stress et anxiété : comment retrouver un quotidien plus serein ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/stress-et-anxiete-quotidien-serein/": {
+      "status": 301,
+      "location": "/blog/stress-et-anxiete-quotidien-serein"
+    },
+    "/blog/therapie-de-couple-derniere-chance": {
+      "status": 200,
+      "lang": "fr",
+      "title": "La thérapie de couple pour éviter la séparation : est-ce la dernière chance ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "La thérapie de couple pour éviter la séparation : est-ce la dernière chance ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/8e2a95a81bd67d6d59f9fc086239d1be.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/8e2a95a81bd67d6d59f9fc086239d1be.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance"
+      },
+      "h1": "La thérapie de couple pour éviter la séparation : est-ce la dernière chance ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "La thérapie de couple pour éviter la séparation : est-ce la dernière chance ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/therapie-de-couple-derniere-chance/": {
+      "status": 301,
+      "location": "/blog/therapie-de-couple-derniere-chance"
+    },
+    "/blog/therapie-individuelle-developpement-personnel": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Pourquoi la thérapie individuelle est un levier de développement personnel ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Pourquoi la thérapie individuelle est un levier de développement personnel ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/11062b_5d050a8369f94648825cf28787eb2b82~mv2.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/11062b_5d050a8369f94648825cf28787eb2b82~mv2.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel"
+      },
+      "h1": "Pourquoi la thérapie individuelle est un levier de développement personnel ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Pourquoi la thérapie individuelle est un levier de développement personnel ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/therapie-individuelle-developpement-personnel/": {
+      "status": 301,
+      "location": "/blog/therapie-individuelle-developpement-personnel"
+    },
+    "/blog/therapie-individuelle-et-solitude": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Comment la thérapie individuelle peut vous aider à mieux vivre la solitude ? — Chantal Massé",
+      "canonical": "https://chantalmasse.com/blog/therapie-individuelle-et-solitude",
+      "meta": {
+        "og:type": "article",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Comment la thérapie individuelle peut vous aider à mieux vivre la solitude ? — Chantal Massé",
+        "description": "",
+        "og:description": "",
+        "og:image": "https://static.wixstatic.com/media/4432a4c385c44e609ac41982225b1669.jpg/v1/fill/w_940,h_411,fp_0.50_0.50,q_90,enc_avif,quality_auto/4432a4c385c44e609ac41982225b1669.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/blog/therapie-individuelle-et-solitude"
+      },
+      "h1": "Comment la thérapie individuelle peut vous aider à mieux vivre la solitude ?",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/blog/therapie-individuelle-et-solitude#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Comment la thérapie individuelle peut vous aider à mieux vivre la solitude ? — Chantal Massé",
+              "url": "https://chantalmasse.com/blog/therapie-individuelle-et-solitude",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/blog/therapie-individuelle-et-solitude"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/blog/therapie-individuelle-et-solitude/": {
+      "status": 301,
+      "location": "/blog/therapie-individuelle-et-solitude"
+    },
+    "/book-online/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/?gclid=test&utm_source=test"
+    },
+    "/book-online?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/?gclid=test&utm_source=test"
+    },
+    "/booking-calendar/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/?gclid=test&utm_source=test"
+    },
+    "/booking-calendar?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/?gclid=test&utm_source=test"
+    },
+    "/coaching-de-couple": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Coaching de couple à Shefford | Chantal Massé — Thérapeute",
+      "canonical": "https://chantalmasse.com/coaching-de-couple",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "description": "Coaching de couple à Shefford, en présentiel. Dialogue intentionnel Imago pour transformer les conflits en connexion. 90 min — 160$. Reçus RITMA.",
+        "og:title": "Coaching de couple à Shefford | Chantal Massé",
+        "og:description": "Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/coaching-de-couple"
+      },
+      "h1": "Ce n'est pas un manque d'amour qui sépare un couple, mais un manque d'outils.",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/coaching-de-couple#webpage",
+              "@type": "WebPage",
+              "description": "Coaching de couple à Shefford, en présentiel. Dialogue intentionnel Imago pour transformer les conflits en connexion. 90 min — 160$. Reçus RITMA.",
+              "name": "Coaching de couple à Shefford | Chantal Massé — Thérapeute",
+              "url": "https://chantalmasse.com/coaching-de-couple",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/coaching-de-couple"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/coaching-de-couple/": {
+      "status": 301,
+      "location": "/coaching-de-couple"
+    },
+    "/coaching-de-couple/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/coaching-de-couple?gclid=test&utm_source=test"
+    },
+    "/coaching-relationnel-couple/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/coaching-de-couple?gclid=test&utm_source=test"
+    },
+    "/coaching-relationnel-couple?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/coaching-de-couple?gclid=test&utm_source=test"
+    },
+    "/coaching-relationnel-de-couple-chantal/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/coaching-de-couple?gclid=test&utm_source=test"
+    },
+    "/coaching-relationnel-de-couple-chantal?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/coaching-de-couple?gclid=test&utm_source=test"
+    },
+    "/confidentialite": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Confidentialité — Chantal Massé",
+      "canonical": "https://chantalmasse.com/confidentialite",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Confidentialité — Chantal Massé",
+        "description": "Politique de confidentialité du site de Chantal Massé, thérapeute.",
+        "og:description": "Politique de confidentialité du site de Chantal Massé, thérapeute.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/confidentialite"
+      },
+      "h1": "Politique de confidentialité",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/confidentialite#webpage",
+              "@type": "WebPage",
+              "description": "Politique de confidentialité du site de Chantal Massé, thérapeute.",
+              "name": "Confidentialité — Chantal Massé",
+              "url": "https://chantalmasse.com/confidentialite",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/confidentialite"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/confidentialite-infolettre": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Infolettre et confidentialité — Chantal Massé",
+      "canonical": "https://chantalmasse.com/confidentialite-infolettre",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "description": "Comment l’infolettre de Chantal Massé traite votre adresse courriel.",
+        "twitter:card": "summary_large_image",
+        "og:title": "Infolettre et confidentialité — Chantal Massé",
+        "og:description": "Comment l’infolettre de Chantal Massé traite votre adresse courriel.",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/confidentialite-infolettre"
+      },
+      "h1": "Infolettre et confidentialité",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/confidentialite-infolettre#webpage",
+              "@type": "WebPage",
+              "description": "Comment l’infolettre de Chantal Massé traite votre adresse courriel.",
+              "name": "Infolettre et confidentialité — Chantal Massé",
+              "url": "https://chantalmasse.com/confidentialite-infolettre",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/confidentialite-infolettre"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/confidentialite-infolettre/": {
+      "status": 301,
+      "location": "/confidentialite-infolettre"
+    },
+    "/confidentialite/": {
+      "status": 301,
+      "location": "/confidentialite"
+    },
+    "/confirmer-inscription": {
+      "status": 200,
+      "xRobotsTag": "noindex, nofollow",
+      "lang": "fr",
+      "title": "Confirmer votre inscription — Chantal Massé",
+      "canonical": "https://chantalmasse.com/confirmer-inscription",
+      "meta": {
+        "og:type": "website",
+        "robots": "noindex",
+        "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "twitter:card": "summary_large_image",
+        "og:title": "Confirmer votre inscription — Chantal Massé",
+        "og:description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/confirmer-inscription"
+      },
+      "h1": "Confirmer votre inscription",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/confirmer-inscription#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "name": "Confirmer votre inscription — Chantal Massé",
+              "url": "https://chantalmasse.com/confirmer-inscription",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/confirmer-inscription"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/inscription-confirmee": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Inscription confirmée — Chantal Massé",
+      "canonical": "https://chantalmasse.com/inscription-confirmee",
+      "meta": {
+        "og:type": "website",
+        "robots": "noindex",
+        "og:title": "Inscription confirmée — Chantal Massé",
+        "description": "Merci pour votre inscription à l'infolettre de Chantal Massé.",
+        "og:description": "Merci pour votre inscription à l'infolettre de Chantal Massé.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/inscription-confirmee"
+      },
+      "h1": "Merci pour votre inscription !",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/inscription-confirmee#webpage",
+              "@type": "WebPage",
+              "description": "Merci pour votre inscription à l'infolettre de Chantal Massé.",
+              "name": "Inscription confirmée — Chantal Massé",
+              "url": "https://chantalmasse.com/inscription-confirmee",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/inscription-confirmee"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/journey": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Le parcours émotionnel — Chantal Massé",
+      "canonical": "https://chantalmasse.com/journey",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Le parcours émotionnel — Chantal Massé",
+        "description": "Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix.",
+        "og:description": "Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/journey"
+      },
+      "h1": "",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/journey#webpage",
+              "@type": "WebPage",
+              "description": "Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix.",
+              "name": "Le parcours émotionnel — Chantal Massé",
+              "url": "https://chantalmasse.com/journey",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/journey"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/journey/": {
+      "status": 301,
+      "location": "/journey"
+    },
+    "/mentions-legales": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Mentions Légales — Chantal Massé",
+      "canonical": "https://chantalmasse.com/mentions-legales",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "og:title": "Mentions Légales — Chantal Massé",
+        "description": "Mentions légales du site de Chantal Massé, thérapeute.",
+        "og:description": "Mentions légales du site de Chantal Massé, thérapeute.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/mentions-legales"
+      },
+      "h1": "Mentions Légales",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/mentions-legales#webpage",
+              "@type": "WebPage",
+              "description": "Mentions légales du site de Chantal Massé, thérapeute.",
+              "name": "Mentions Légales — Chantal Massé",
+              "url": "https://chantalmasse.com/mentions-legales",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/mentions-legales"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/mentions-legales/": {
+      "status": 301,
+      "location": "/mentions-legales"
+    },
+    "/nope": {
+      "status": 404,
+      "xRobotsTag": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    },
+    "/prendre-rendez-vous": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Prendre rendez-vous avec Chantal Massé",
+      "canonical": "https://chantalmasse.com/prendre-rendez-vous",
+      "meta": {
+        "og:type": "website",
+        "robots": "noindex, nofollow",
+        "description": "Réserve ta séance avec Chantal Massé, thérapeute en relation d'aide à Shefford et en vidéoconférence.",
+        "og:title": "Prendre rendez-vous avec Chantal Massé",
+        "og:description": "Réserve ta séance avec Chantal Massé, thérapeute en relation d'aide à Shefford et en vidéoconférence.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/prendre-rendez-vous"
+      },
+      "h1": "Réserve ta séance avec Chantal, en moins de 2 minutes.",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/prendre-rendez-vous#webpage",
+              "@type": "WebPage",
+              "description": "Réserve ta séance avec Chantal Massé, thérapeute en relation d'aide à Shefford et en vidéoconférence.",
+              "name": "Prendre rendez-vous avec Chantal Massé",
+              "url": "https://chantalmasse.com/prendre-rendez-vous",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/prendre-rendez-vous"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/services/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/prendre-rendez-vous?gclid=test&utm_source=test"
+    },
+    "/services?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/prendre-rendez-vous?gclid=test&utm_source=test"
+    },
+    "/therapie-individuelle": {
+      "status": 200,
+      "lang": "fr",
+      "title": "Thérapie individuelle à Shefford | Chantal Massé — Thérapeute en relation d'aide",
+      "canonical": "https://chantalmasse.com/therapie-individuelle",
+      "meta": {
+        "og:type": "website",
+        "robots": "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1",
+        "description": "Thérapie individuelle à Shefford et en vidéoconférence. Approche centrée sur la personne pour explorer vos patterns, apaiser les blessures et retrouver confiance. 60 min — 105$. Reçus RITMA.",
+        "og:title": "Thérapie individuelle à Shefford | Chantal Massé",
+        "og:description": "Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance.",
+        "og:image": "https://chantalmasse.com/images/chantal-hero.jpg",
+        "twitter:card": "summary_large_image",
+        "og:site_name": "Chantal Massé — Thérapeute en relation d'aide",
+        "og:url": "https://chantalmasse.com/therapie-individuelle"
+      },
+      "h1": "Tu as de la valeur — ne laisse pas ta souffrance te définir.",
+      "jsonLd": [
+        {
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@id": "https://chantalmasse.com/#website",
+              "@type": "WebSite",
+              "description": "Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.",
+              "inLanguage": "fr",
+              "name": "Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/",
+              "publisher": {
+                "@id": "https://chantalmasse.com/#identity"
+              }
+            },
+            {
+              "@id": "https://chantalmasse.com/therapie-individuelle#webpage",
+              "@type": "WebPage",
+              "description": "Thérapie individuelle à Shefford et en vidéoconférence. Approche centrée sur la personne pour explorer vos patterns, apaiser les blessures et retrouver confiance. 60 min — 105$. Reçus RITMA.",
+              "name": "Thérapie individuelle à Shefford | Chantal Massé — Thérapeute en relation d'aide",
+              "url": "https://chantalmasse.com/therapie-individuelle",
+              "isPartOf": {
+                "@id": "https://chantalmasse.com/#website"
+              },
+              "potentialAction": [
+                {
+                  "@type": "ReadAction",
+                  "target": [
+                    "https://chantalmasse.com/therapie-individuelle"
+                  ]
+                }
+              ]
+            },
+            {
+              "@id": "https://chantalmasse.com/#identity",
+              "@type": "Person",
+              "description": "Thérapeute en relation d'aide et coach de couple, Shefford (Québec)",
+              "name": "Chantal Massé",
+              "url": "https://chantalmasse.com",
+              "address": {
+                "@type": "PostalAddress",
+                "addressLocality": "Shefford",
+                "addressRegion": "QC",
+                "addressCountry": "CA"
+              },
+              "sameAs": []
+            }
+          ]
+        }
+      ]
+    },
+    "/therapie-individuelle-chantal/?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/therapie-individuelle?gclid=test&utm_source=test"
+    },
+    "/therapie-individuelle-chantal?gclid=test&utm_source=test": {
+      "status": 301,
+      "location": "/therapie-individuelle?gclid=test&utm_source=test"
+    },
+    "/therapie-individuelle/": {
+      "status": 301,
+      "location": "/therapie-individuelle"
+    }
+  },
+  "sitemap": [
+    "https://chantalmasse.com/",
+    "https://chantalmasse.com/blog",
+    "https://chantalmasse.com/blog/3-phrases-a-eviter-en-conflit",
+    "https://chantalmasse.com/blog/apprendre-a-se-comprendre",
+    "https://chantalmasse.com/blog/choisir-therapeute-relation-aide-quebec",
+    "https://chantalmasse.com/blog/comment-calmer-l-anxiete",
+    "https://chantalmasse.com/blog/comment-calmer-le-besoin-de-tout-controler",
+    "https://chantalmasse.com/blog/comment-gerer-anxiete-travail",
+    "https://chantalmasse.com/blog/decembre-fragilites-interieures",
+    "https://chantalmasse.com/blog/faire-le-point-fin-annee-couple",
+    "https://chantalmasse.com/blog/l-amour-conscient",
+    "https://chantalmasse.com/blog/l-automne-redonner-souffle-au-couple",
+    "https://chantalmasse.com/blog/l-automne-therapie-individuelle",
+    "https://chantalmasse.com/blog/le-danger-de-faire-semblant",
+    "https://chantalmasse.com/blog/pourquoi-je-reproduis-les-memes-schemas",
+    "https://chantalmasse.com/blog/pourquoi-on-narrive-plus-a-se-parler",
+    "https://chantalmasse.com/blog/quand-consulter-un-therapeute-de-couple",
+    "https://chantalmasse.com/blog/quand-le-quotidien-eteint-le-lien",
+    "https://chantalmasse.com/blog/retrouver-confiance-therapie-couple",
+    "https://chantalmasse.com/blog/retrouver-equilibre-de-vie",
+    "https://chantalmasse.com/blog/signes-couple-en-difficulte-silence",
+    "https://chantalmasse.com/blog/signes-epuisement-professionnel-reconnaitre-tot",
+    "https://chantalmasse.com/blog/stress-et-anxiete-quotidien-serein",
+    "https://chantalmasse.com/blog/therapie-de-couple-derniere-chance",
+    "https://chantalmasse.com/blog/therapie-individuelle-developpement-personnel",
+    "https://chantalmasse.com/blog/therapie-individuelle-et-solitude",
+    "https://chantalmasse.com/coaching-de-couple",
+    "https://chantalmasse.com/confidentialite",
+    "https://chantalmasse.com/confidentialite-infolettre",
+    "https://chantalmasse.com/journey",
+    "https://chantalmasse.com/mentions-legales",
+    "https://chantalmasse.com/therapie-individuelle"
+  ],
+  "robots": "# START nuxt-robots (indexable)\nUser-agent: *\nDisallow: \n\nSitemap: https://chantalmasse.com/sitemap.xml\n# END nuxt-robots"
+}
