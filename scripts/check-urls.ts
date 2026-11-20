@@ -94,11 +94,14 @@ check('noindex', /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/.test(rdv), 
 // 3. Legacy redirects: one 301 to the final URL, gclid/utm kept.
 for (const [from, to] of legacy) await expectOneHop('legacy', `${base}${from}${Q}`, to + Q)
 
-// 3b. Open redirect: a multi-slash path must not reach the /*/ catch-all (//evil.com/ → //evil.com).
-//     `new URL` keeps the leading //, and a browser turns /\evil.com/ into //evil.com/ before sending.
-for (const path of ['//evil.com/', '//evil.com/x/', '///evil.com/', '//evil.com']) {
+// 3b. Open redirect: a multi-slash path must never 301 to another host (//evil.com/ → //evil.com).
+//     Locally `//* /` sends it home; on prod Cloudflare collapses the slashes first (→ /evil.com). Both are safe:
+//     the resolved Location must stay on our origin or the apex. `new URL` treats `\` as `/`, like a browser.
+const ownOrigins = new Set([new URL(base).origin, APEX])
+for (const path of ['//evil.com/', '//evil.com/x/', '///evil.com/', '//evil.com', '/\\evil.com/', '/%2F%2Fevil.com/', '/%5Cevil.com/', '/.//evil.com/']) {
   const { status, location } = await rawLocation(base, path + Q)
-  check('open-redirect', status === 301 && location === `${base}/${Q}`, `${path}${Q} → ${status} ${location || '(none)'} (want 301 ${base}/${Q})`)
+  const ok = status === 301 && ownOrigins.has(new URL(location || 'x:').origin)
+  check('open-redirect', ok, `${path}${Q} → ${status} ${location || '(none)'} (want 301 on ${[...ownOrigins].join(' or ')})`)
 }
 
 // 4. Sitemap: every page/post, no trailing slash, no noindex page, every <loc> answers 200.
