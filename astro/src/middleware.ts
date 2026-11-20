@@ -6,6 +6,7 @@
 //   background once the copy is older than FRESH_MS, so a visitor never waits on the CMS: a post published in the portal
 //   shows up within about a minute, with no rebuild. KV is written only when the HTML changed (writes ≈ publishes).
 import { defineMiddleware } from 'astro:middleware'
+import { cssFirst } from './lib/css-first.mjs'
 
 const FRESH_MS = 60_000
 const CACHED = /^\/(blog(\/[a-z0-9-]+)?|sitemap\.xml)?$/
@@ -18,8 +19,10 @@ interface Kv {
 interface Entry { at: number, status: number, type: string, cacheControl: string | null, body: string }
 interface WorkerEnv { PAGE_CACHE?: Kv, PREVIEW_NOINDEX?: string, CF_VERSION?: { id: string } }
 
-function headersFor(upstream: Response, pathname: string, env: WorkerEnv): Response {
-  const res = new Response(upstream.body, upstream) // proxied responses (CMS media) have immutable headers
+async function headersFor(upstream: Response, pathname: string, env: WorkerEnv): Promise<Response> {
+  // Rendered HTML: JS after CSS (src/lib/css-first.mjs). Other bodies stream through (proxied CMS media has immutable headers).
+  const html = upstream.headers.get('content-type')?.includes('text/html')
+  const res = new Response(html ? cssFirst(await upstream.text()) : upstream.body, upstream)
   if (pathname === '/annuler') res.headers.set('X-Robots-Tag', 'noindex, nofollow')
   else if (res.status === 404 && !pathname.startsWith('/api/')) res.headers.set('X-Robots-Tag', NUXT_404_ROBOTS)
   if (env.PREVIEW_NOINDEX === '1' && !res.headers.has('X-Robots-Tag')) res.headers.set('X-Robots-Tag', 'noindex')
@@ -40,7 +43,7 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
   const e = env as unknown as WorkerEnv
   const { pathname } = ctx.url
   const kv = e.PAGE_CACHE
-  if (!kv || ctx.request.method !== 'GET' || !CACHED.test(pathname)) return headersFor(await next(), pathname, e)
+  if (!kv || ctx.request.method !== 'GET' || !CACHED.test(pathname)) return await headersFor(await next(), pathname, e)
 
   // Query strings (gclid, utm_*) never change these pages: one copy per path, as the prerendered Nuxt pages were.
   // Keyed by Worker version: cached HTML points at this deploy's hashed /_astro assets, which the next deploy removes.
@@ -50,10 +53,10 @@ export const onRequest = defineMiddleware(async (ctx, next) => {
   if (!old) {
     const res = await next()
     waitUntil(store(kv, key, res.clone(), null))
-    return headersFor(res, pathname, e)
+    return await headersFor(res, pathname, e)
   }
   if (Date.now() - old.at > FRESH_MS) waitUntil(next().then(res => store(kv, key, res, old)))
   const headers = new Headers({ 'content-type': old.type })
   if (old.cacheControl) headers.set('cache-control', old.cacheControl)
-  return headersFor(new Response(old.body, { status: old.status, headers }), pathname, e)
+  return await headersFor(new Response(old.body, { status: old.status, headers }), pathname, e)
 })

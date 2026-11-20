@@ -108,7 +108,7 @@
           <img
             src="/images/chantal-hero.jpg"
             sizes="(max-width: 1023px) 137vw, 690px"
-            srcset="/images/chantal-hero.jpg 690w, /images/chantal-hero.jpg 877w, /images/chantal-hero.jpg 1380w, /images/chantal-hero.jpg 1754w"
+            srcset="/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w"
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"

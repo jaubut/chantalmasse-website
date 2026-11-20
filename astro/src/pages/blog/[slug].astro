@@ -16,6 +16,7 @@ const { post, doc } = found
 const rel = related(post, await allPosts())
 const body = richTextToHtml(doc.body)
 const title = `${post.title} — Chantal Massé`
+// The hero is the LCP: sized per screen (the engine resizes and picks AVIF/WebP) and fetched first.
 const ogImage = post.imageFull.startsWith('/') ? SITE_URL + post.imageFull : post.imageFull
 
 function formatDate(dateStr: string): string {
@@ -30,6 +31,9 @@ function formatDate(dateStr: string): string {
       <div class="w-full aspect-[21/9] overflow-hidden">
         <img
           src={post.image}
+          srcset={[640, 960, 1280, 1920].map(w => `${post.imageFull}?w=${w} ${w}w`).join(', ')}
+          sizes="100vw"
+          fetchpriority="high"
           alt={post.title}
           class="w-full h-full object-cover"
         />

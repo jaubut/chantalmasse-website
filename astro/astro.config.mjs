@@ -2,12 +2,13 @@
 // Astro build of chantalmasse.com, next to the Nuxt app until cutover (docs/astro-migration-plan.md).
 // Reuses the repo's server/, utils/, public/, assets/ and content/ as they are: Trigger.dev tasks keep importing
 // server/utils and utils, and public/_redirects stays the only redirect source (Workers assets apply it first).
-import { appendFileSync } from 'node:fs'
+import { appendFileSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig, fontProviders } from 'astro/config'
 import cloudflare from '@astrojs/cloudflare'
 import vue from '@astrojs/vue'
 import tailwindcss from '@tailwindcss/vite'
+import { cssFirst } from './src/lib/css-first.mjs'
 
 const repo = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url))
 
@@ -28,7 +29,14 @@ export default defineConfig({
       // The static /confirmer-inscription keeps Nuxt's `X-Robots-Tag: noindex, nofollow` (routeRules robots:false).
       name: 'robots-headers',
       hooks: {
-        'astro:build:done': ({ dir }) => appendFileSync(new URL('_headers', dir), '\n/confirmer-inscription\n  X-Robots-Tag: noindex, nofollow\n'),
+        'astro:build:done': ({ dir }) => {
+          appendFileSync(new URL('_headers', dir), '\n/confirmer-inscription\n  X-Robots-Tag: noindex, nofollow\n')
+          // Prerendered pages: JS after CSS (src/lib/css-first.mjs). Rendered pages get it in src/middleware.ts.
+          for (const f of readdirSync(dir).filter(f => f.endsWith('.html'))) {
+            const file = new URL(f, dir)
+            writeFileSync(file, cssFirst(readFileSync(file, 'utf8')))
+          }
+        },
       },
     },
   ],

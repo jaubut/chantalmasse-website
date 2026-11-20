@@ -1,5 +1,4 @@
 // Browser glue for every page, bundled once by the layout. What Nuxt did in app.vue and plugins/*.client.ts:
-//   - html.has-js, [data-animate] scroll reveal (composables/useScrollAnimation.ts)
 //   - the page veil between pages (plugins/page-veil.client.ts), now on the ClientRouter lifecycle
 //   - data-booking-open / data-contact-open on static markup open the shared modals (the islands render them)
 //   - PostHog (plugins/posthog.client.ts), one $pageview per page load including ClientRouter navigations
@@ -11,22 +10,6 @@ import type { BookingServiceId } from '~/utils/bookingServices'
 
 const PRIVATE_PATH = /^\/confirmer-inscription\/?$/
 const html = document.documentElement
-html.classList.add('has-js')
-
-// ---------- scroll reveal ----------
-let reveal: IntersectionObserver | undefined
-function observeReveals(): void {
-  reveal?.disconnect()
-  const elements = document.querySelectorAll('[data-animate]')
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    elements.forEach(el => el.classList.add('visible'))
-    return
-  }
-  reveal = new IntersectionObserver((entries) => {
-    for (const entry of entries) if (entry.isIntersecting) entry.target.classList.add('visible')
-  }, { threshold: 0.1 })
-  elements.forEach(el => reveal!.observe(el))
-}
 
 // ---------- page veil (styles: .cm-veil in assets/css/main.css) ----------
 const MOVE_MS = 500
@@ -52,7 +35,7 @@ function lift(): void {
   covering = false
   clearTimeout(safety)
   const v = veilEl()
-  // Two frames so the new page's reveal observer has fired: its content is already shown under the panel.
+  // Two frames so the new page's reveal script (Base.astro) has run: its content is already shown under the panel.
   requestAnimationFrame(() => requestAnimationFrame(() => {
     v.classList.replace('is-in', 'is-out')
     setTimeout(() => {
@@ -118,7 +101,6 @@ function trackPageView(): void {
 }
 
 document.addEventListener('astro:page-load', () => {
-  observeReveals()
   lift()
   trackPageView()
 })
