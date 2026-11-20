@@ -21,8 +21,13 @@ interface Props extends Seo {
   /** Preload the italic Newsreader file (display headlines). Only where its late swap re-wraps the hero and moves the
    * CTA row (/coaching-de-couple: CLS 0.11 without it); elsewhere the extra early request costs first paint on mobile. */
   preloadItalic?: boolean
+  /** No layout booking bar: transactional pages (cancel, newsletter confirmation). Implied by minimalNav: the booking LP
+   * renders its own service-aware bar, and the layout one (no #hero there, so shown at once) sat on top of it and opened
+   * booking without the service. Nuxt's app.vue had the same bug on /prendre-rendez-vous. */
+  hideBookingBar?: boolean
 }
-const { minimalNav = false, bare = false, preloadItalic = false, ...seo } = Astro.props
+const { minimalNav = false, bare = false, preloadItalic = false, hideBookingBar = false, ...seo } = Astro.props
+const bookingBar = !minimalNav && !hideBookingBar
 const h = head(seo)
 // Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
 const path = Astro.url.pathname.replace(/\.html$/, '')
@@ -64,7 +69,7 @@ const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
           overlay alone with the hero one frame later (the later paint became the LCP). */}
       <IntroLoader />
       <TheFooter />
-      <BookingStickyBar client:idle revealAfterSelector="#hero" />
+      {bookingBar && <BookingStickyBar client:idle revealAfterSelector="#hero" />}
       <BookingModal client:only="vue" />
       {/* client:only: the modals Teleport to <body>, which server rendering drops; closed at load, nothing to prerender. */}
       <ContactModal client:only="vue" />

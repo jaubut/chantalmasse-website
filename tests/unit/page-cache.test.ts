@@ -35,7 +35,7 @@ describe('page cache', () => {
     expect(cache.refreshedAt.has(KEY)).toBe(false)
   })
 
-  it('warm 404 (post unpublished): one kv.delete, refreshedAt entry removed', async () => {
+  it('warm 404 (post unpublished): one kv.delete, then no repeat delete while KV still returns the stale entry', async () => {
     let t = 1_000_000
     const { kv, data } = fakeKv({ [KEY]: entry(t) })
     const cache = createPageCache(() => t)
@@ -46,7 +46,14 @@ describe('page cache', () => {
     await flush()
     expect(kv.delete).toHaveBeenCalledTimes(1)
     expect(data.has(KEY)).toBe(false)
-    expect(cache.refreshedAt.has(KEY)).toBe(false)
+    expect(cache.refreshedAt.get(KEY)).toBe(t) // stamped: the next FRESH_MS needs no second delete
+
+    // KV is eventually consistent: other colos may still read the deleted entry for a while.
+    data.set(KEY, JSON.stringify(entry(1_000_000)))
+    t += 1_000
+    for (let i = 0; i < 5; i++) await cache.serve(kv, KEY, async () => html('gone', 404), waitUntil)
+    await flush()
+    expect(kv.delete).toHaveBeenCalledTimes(1)
   })
 
   it('warm refresh that rejects (CMS down) backs off for FRESH_MS instead of re-rendering on every request', async () => {

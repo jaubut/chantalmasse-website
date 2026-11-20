@@ -31,9 +31,11 @@ export function createPageCache(now: () => number = Date.now): PageCache {
 
   async function store(kv: Kv, key: string, res: Response, old: Entry | null): Promise<void> {
     if (res.status === 404) {
-      refreshedAt.delete(key)
-      if (old) await kv.delete(key)
-      return
+      if (!old) return
+      // Stamped, not cleared: KV reads stay eventually consistent for ~60 s after the delete, and a cleared stamp would
+      // make every request in that window see the stale entry as due and delete it again.
+      refreshedAt.set(key, now())
+      return kv.delete(key)
     }
     refreshedAt.set(key, now())
     if (res.status !== 200 || res.headers.has(SKIP_CACHE)) return
