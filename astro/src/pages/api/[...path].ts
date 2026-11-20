@@ -1,7 +1,7 @@
 // Every /api/* route: the repo's server/api handlers, unchanged, behind one h3 router (same paths and methods as Nitro).
 import '../../lib/nitro'
 import type { APIRoute } from 'astro'
-import { createApp, createRouter, defineEventHandler, getRequestURL, toWebHandler, type EventHandler } from 'h3'
+import { createApp, createError, createRouter, defineEventHandler, getRequestURL, toWebHandler, type EventHandler } from 'h3'
 import { nitroError } from '../../lib/nitro'
 import availability from '~/server/api/booking/availability.get'
 import cancelInfo from '~/server/api/booking/cancel-info.get'
@@ -53,7 +53,7 @@ export const ALL: APIRoute = async ({ request, locals }) => {
   // h3 answers an unmatched route with its own 404: turn it into Nitro's body, like the Nuxt Worker.
   if (res.status === 404 && res.headers.get('content-type')?.includes('json') && !(await res.clone().text()).includes('"message": "')) {
     const path = new URL(url).pathname
-    return nitroError({ statusCode: 404, statusMessage: `Page not found: ${path}`, data: { path } }, url)
+    return nitroError(createError({ statusCode: 404, statusMessage: `Page not found: ${path}`, data: { path } }), url)
   }
   return res
 }

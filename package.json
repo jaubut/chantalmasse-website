@@ -19,7 +19,8 @@
     "astro:build": "astro build --root astro",
     "astro:deploy:preview": "bash astro/scripts/deploy-preview.sh",
     "test:smoke:astro": "playwright test -c playwright.astro.config.ts",
-    "parity": "bun scripts/parity-crawl.ts diff docs/migration-baseline/crawl.json https://chantalmasse-website-astro.jeremie-aubut.workers.dev --preview"
+    "parity": "bun scripts/parity-crawl.ts diff docs/migration-baseline/crawl.json https://chantalmasse-website-astro.jeremie-aubut.workers.dev --preview",
+    "astro:check": "astro sync --root astro && astro-check --root astro"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
@@ -47,6 +48,7 @@
     "vue-router": "^5.4.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.13.0",
     "@iconify-json/material-symbols": "^1.2.95",
     "@iconify-json/mdi": "^1.2.3",

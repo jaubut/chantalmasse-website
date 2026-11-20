@@ -180,7 +180,7 @@
         </div>
         <span class="font-body text-sm text-on-surface-variant leading-relaxed">
           J'accepte la
-          <a href="/confidentialite" class="text-primary underline hover:opacity-70 transition-opacity">politique de confidentialité</a>
+          <a href="/confidentialite" target="_blank" rel="noopener" class="text-primary underline hover:opacity-70 transition-opacity">politique de confidentialité</a>
           *
         </span>
       </label>

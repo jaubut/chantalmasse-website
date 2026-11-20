@@ -49,18 +49,20 @@ g.$fetch = ofetch
 // server/utils/bookingCache.ts reads the KV binding where Nitro's cloudflare_module preset puts the env.
 g.__env__ = vars
 
-/** Nitro's production error body (pretty JSON, statusMessage defaults to "Server Error"). */
+/** Nitro's production error body (pretty JSON, statusMessage defaults to "Server Error"). An uncaught error that is not
+ * an H3Error (bad JSON, KV or Google failure) is masked like Nitro does in production: 500, "Server Error", no data. */
 export function nitroError(error: unknown, url: string): Response {
-  const e = h3.createError(error as Error)
+  const known = h3.isError(error)
+  if (!known) console.error('[api]', error)
+  const e = known ? error : h3.createError({ statusCode: 500, statusMessage: 'Server Error' })
   const body: Record<string, unknown> = {
     error: true,
     url,
     statusCode: e.statusCode,
     statusMessage: e.statusMessage || 'Server Error',
-    message: e.message,
+    message: known ? e.message : 'Server Error',
   }
-  if (e.data !== undefined) body.data = e.data
-  if (e.statusCode >= 500 && !e.statusMessage) console.error('[api]', error)
+  if (known && e.data !== undefined) body.data = e.data
   return new Response(JSON.stringify(body, null, 2), {
     status: e.statusCode,
     headers: { 'content-type': 'application/json' },

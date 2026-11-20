@@ -18,8 +18,11 @@ interface Props extends Seo {
   minimalNav?: boolean
   /** error.vue: Nuxt's error page renders without the app shell, canonical, og:url or JSON-LD. */
   bare?: boolean
+  /** Preload the italic Newsreader file (display headlines). Only where its late swap re-wraps the hero and moves the
+   * CTA row (/coaching-de-couple: CLS 0.11 without it); elsewhere the extra early request costs first paint on mobile. */
+  preloadItalic?: boolean
 }
-const { minimalNav = false, bare = false, ...seo } = Astro.props
+const { minimalNav = false, bare = false, preloadItalic = false, ...seo } = Astro.props
 const h = head(seo)
 // Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
 const path = Astro.url.pathname.replace(/\.html$/, '')
@@ -38,15 +41,14 @@ const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
         history.pushState): both tags count each one with their own history listeners, as under Nuxt's router. */}
     <script is:inline>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}if(!/^\/confirmer-inscription\/?$/.test(location.pathname)){gtag('js',new Date());gtag('config','G-CTE3NV511W')}</script>
     <script is:inline>!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);if(!/^\/confirmer-inscription\/?$/.test(location.pathname)){fbq('init','948606391153047');fbq('track','PageView')}</script>
-    {/* Only the italic Newsreader file (the display headlines): its late swap re-wrapped the hero headline and moved the
-        CTA row (CLS 0.11 on /coaching-de-couple). Preloading every font file delayed first paint instead. */}
-    <Font cssVariable="--font-newsreader" preload={[{ style: 'italic', weight: 400 }]} />
+    <Font cssVariable="--font-newsreader" preload={preloadItalic ? [{ style: 'italic', weight: 400 }] : false} />
     <Font cssVariable="--font-manrope" />
     <script is:inline type="module">if(!/^\/confirmer-inscription\/?$/.test(location.pathname))for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}</script>
     {meta.map(m => <meta name={m.name} property={m.property} content={m.content} />)}
     {!bare && <link rel="canonical" href={h.canonical} />}
     {!bare && <script is:inline type="application/ld+json" set:html={h.jsonLd} />}
     <ClientRouter />
+    <slot name="head" />
   </head>
   <body>
     {/* Meta pixel for visitors without JS. Persisted: ClientRouter parses the next page with scripting off, which would
@@ -54,11 +56,13 @@ const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
     <noscript id="fb-noscript" transition:persist><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=948606391153047&ev=PageView&noscript=1" /></noscript>
     {bare ? <slot /> : (
     <div>
-      <IntroLoader />
       <TheNav client:load path={path} minimalNav={minimalNav} />
       <main>
         <slot />
       </main>
+      {/* After <main> (it's a fixed overlay, z-index 100): the first paint then holds the hero too, instead of the
+          overlay alone with the hero one frame later (the later paint became the LCP). */}
+      <IntroLoader />
       <TheFooter />
       <BookingStickyBar client:idle revealAfterSelector="#hero" />
       <BookingModal client:only="vue" />

@@ -21,23 +21,31 @@ function inline(nodes: Inline[] = []): string {
   }).join('')
 }
 
+// The vendored client doesn't validate (no zod in the Worker): numbers and levels are checked here before they reach HTML.
+const level = (l: unknown): 2 | 3 | 4 => (l === 3 || l === 4 ? l : 2)
+const dim = (v: unknown): number => (typeof v === 'number' && Number.isInteger(v) && v > 0 && v < 10_000 ? v : 0)
+
 function node(n: RichNode): string {
   switch (n.type) {
     case 'paragraph': return `<p>${inline(n.content)}</p>`
-    case 'heading': return `<h${n.attrs.level}>${inline(n.content)}</h${n.attrs.level}>`
-    case 'image': {
-      const { src, alt, width, height } = n.attrs
-      const size = width && height ? ` width="${width}" height="${height}"` : ''
-      return `<img src="${esc(src)}" alt="${esc(alt)}"${size} loading="lazy">`
+    case 'heading': {
+      const h = level(n.attrs?.level)
+      return `<h${h}>${inline(n.content)}</h${h}>`
     }
-    case 'blockquote': return `<blockquote>${n.content.map(node).join('')}</blockquote>`
+    case 'image': {
+      const { src, alt } = n.attrs
+      const [width, height] = [dim(n.attrs.width), dim(n.attrs.height)]
+      const size = width && height ? ` width="${width}" height="${height}"` : ''
+      return `<img src="${esc(String(src))}" alt="${esc(String(alt ?? ''))}"${size} loading="lazy">`
+    }
+    case 'blockquote': return `<blockquote>${(n.content ?? []).map(node).join('')}</blockquote>`
     case 'bulletList':
     case 'orderedList': {
       const tag = n.type === 'bulletList' ? 'ul' : 'ol'
-      return `<${tag}>${n.content.map(li => `<li>${li.content.map(node).join('')}</li>`).join('')}</${tag}>`
+      return `<${tag}>${(n.content ?? []).map(li => `<li>${(li.content ?? []).map(node).join('')}</li>`).join('')}</${tag}>`
     }
     default: return ''
   }
 }
 
-export const richTextToHtml = (doc: RichText): string => doc.content.map(node).join('\n')
+export const richTextToHtml = (doc: RichText): string => (doc.content ?? []).map(node).join('\n')

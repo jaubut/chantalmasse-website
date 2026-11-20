@@ -10,6 +10,7 @@ import vue from '@astrojs/vue'
 import tailwindcss from '@tailwindcss/vite'
 import { cssFirst } from './src/lib/css-first.mjs'
 
+/** @param {string} p */
 const repo = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url))
 
 export default defineConfig({

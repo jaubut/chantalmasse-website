@@ -45,6 +45,13 @@ function lift(): void {
   }))
 }
 
+// A page change closes the modals first: ClientRouter remounts their islands on the new page, and the shared module
+// state would otherwise reopen (and reset) a booking in progress there. Links inside the booking form open in a new tab.
+document.addEventListener('astro:before-preparation', () => {
+  useBooking().close()
+  useContact().close()
+})
+
 document.addEventListener('astro:before-preparation', (e) => {
   const ev = e as Event & { from: URL, to: URL, loader: () => Promise<void> }
   if (ev.from.pathname === ev.to.pathname || covering) return

@@ -64,7 +64,7 @@
               <span class="text-xs uppercase tracking-widest text-on-secondary-container bg-secondary-fixed rounded-full px-3 py-1">
                 {{ post.category }}
               </span>
-              <span class="text-xs text-on-surface-variant font-light">
+              <span v-if="post.readTime != null" class="text-xs text-on-surface-variant font-light">
                 {{ post.readTime }} min
               </span>
             </div>

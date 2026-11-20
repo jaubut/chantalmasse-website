@@ -86,7 +86,7 @@
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
             class="liquid-fill bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:text-on-secondary-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            @click="booking.open()"
+            data-booking-open
           >
             Prendre rendez-vous
           </button>
@@ -123,9 +123,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-import { useBooking } from '../composables/useBooking'
 
-const booking = useBooking()
 
 const showMap = ref(false)
 const mapLoaded = ref(false)

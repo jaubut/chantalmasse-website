@@ -58,7 +58,7 @@
             />
           </div>
           <div class="p-6">
-            <span class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture {{ post.readTime }} min</span>
+            <span v-if="post.readTime != null" class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture {{ post.readTime }} min</span>
             <h4 class="font-headline text-xl text-on-tertiary">{{ post.title }}</h4>
           </div>
         </a>
@@ -74,7 +74,7 @@ import { ofetch } from 'ofetch'
 import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
 
 defineProps<{
-  posts: { slug: string; title: string; image: string; readTime: number }[]
+  posts: { slug: string; title: string; image: string; readTime: number | null }[]
 }>()
 
 const email = ref('')

@@ -16,7 +16,8 @@ const { post, doc } = found
 const rel = related(post, await allPosts())
 const body = richTextToHtml(doc.body)
 const title = `${post.title} — Chantal Massé`
-// The hero is the LCP: sized per screen (the engine resizes and picks AVIF/WebP) and fetched first.
+// The hero is the LCP: sized per screen (the engine resizes and picks AVIF/WebP), preloaded from <head>.
+const heroSrcset = [640, 960, 1280, 1920].map(w => `${post.imageFull}?w=${w} ${w}w`).join(', ')
 const ogImage = post.imageFull.startsWith('/') ? SITE_URL + post.imageFull : post.imageFull
 
 function formatDate(dateStr: string): string {
@@ -25,13 +26,14 @@ function formatDate(dateStr: string): string {
 }
 ---
 <Base title={title} path={`/blog/${post.slug}`} ogType="article" ogImage={ogImage} emptyDescription>
+  {post.imageFull && <link slot="head" rel="preload" as="image" href={post.image} imagesrcset={heroSrcset} imagesizes="100vw" fetchpriority="high" />}
   <div class="min-h-screen bg-background">
     <article>
       <!-- Hero image -->
       <div class="w-full aspect-[21/9] overflow-hidden">
         <img
           src={post.image}
-          srcset={[640, 960, 1280, 1920].map(w => `${post.imageFull}?w=${w} ${w}w`).join(', ')}
+          srcset={heroSrcset}
           sizes="100vw"
           fetchpriority="high"
           alt={post.title}
@@ -46,7 +48,7 @@ function formatDate(dateStr: string): string {
             <span class="text-xs uppercase tracking-widest text-on-secondary-container bg-secondary-fixed rounded-full px-3 py-1">
               {post.category}
             </span>
-            <span class="text-xs text-on-surface-variant font-light">{post.readTime} min de lecture</span>
+            {post.readTime != null && <span class="text-xs text-on-surface-variant font-light">{post.readTime} min de lecture</span>}
             <span class="text-xs text-on-surface-variant font-light">{formatDate(post.date)}</span>
           </div>
 
