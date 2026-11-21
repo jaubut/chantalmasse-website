@@ -1,0 +1,14 @@
+---
+// /blog: the listing, read from the CMS on each request (a post published in the portal shows up without a rebuild).
+import Base from '../../layouts/Base.astro'
+import BlogIndexPage from '../../vue/pages/BlogIndexPage.vue'
+import { allPosts } from '../../lib/blog'
+import { HERO_IMAGE } from '../../lib/seo'
+
+export const prerender = false
+const posts = await allPosts()
+const description = 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.'
+---
+<Base title="Blogue — Chantal Massé" path="/blog" description={description} ogImage={HERO_IMAGE}>
+  <BlogIndexPage client:load posts={posts} />
+</Base>

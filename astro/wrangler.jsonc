@@ -1,0 +1,54 @@
+// Astro build of chantalmasse.com. Top level = the PREVIEW Worker (parity checks before cutover, never indexed).
+// Cutover (stage 5, only on Jeremie's « Deploy Chantal »): `--env production` uploads a new version of the live Worker
+// chantalmasse-website (same KV, same secrets, same routes), deployed with `wrangler versions deploy`; rollback is the
+// same command with the Nuxt version id (docs/astro-migration-parity.md).
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "chantalmasse-website-astro",
+  "main": "@astrojs/cloudflare/entrypoints/server",
+  "compatibility_date": "2026-11-01",
+  // nodejs_compat: process.env carries the secrets (server/utils/sms.ts, metaCapi.ts read it).
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "./dist",
+    // /journey.html is served at /journey; public/_redirects (copied to dist) runs first: /path/ → /path 301.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "none"
+  },
+  "observability": { "enabled": true },
+  // Version id: part of the HTML cache key (src/middleware.ts), so a deploy never serves pages built by the previous one.
+  "version_metadata": { "binding": "CF_VERSION" },
+  "workers_dev": true,
+  "preview_urls": false,
+  // Busy times per month + the Google access token (server/utils/bookingCache.ts). Preview namespace, not prod's.
+  // PAGE_CACHE: HTML of the CMS-backed pages (src/middleware.ts), same namespace, keys `html:<path>`.
+  "kv_namespaces": [
+    { "binding": "BOOKING_CACHE", "id": "58bc546d6b284742ad3d004887cbce25" },
+    { "binding": "PAGE_CACHE", "id": "58bc546d6b284742ad3d004887cbce25" }
+  ],
+  // Blog posts and media: the TLS CMS read API (cms-client), staging engine for the preview.
+  "services": [{ "binding": "CMS", "service": "tls-cms-staging", "entrypoint": "SiteReads" }],
+  "vars": {
+    // Preview only: every response says noindex (src/middleware.ts); production leaves it unset.
+    "PREVIEW_NOINDEX": "1"
+  },
+  // Preview secrets (names only, test values: test calendar, Resend to Jeremie, no Twilio, Meta test event code):
+  //   GOOGLE_SERVICE_ACCOUNT_EMAIL, GOOGLE_PRIVATE_KEY, GOOGLE_CALENDAR_ID, RESEND_API_KEY, EMAIL_FROM, EMAIL_TO,
+  //   CHANTAL_MEET_LINK, NEWSLETTER_SITE_KEY, META_PIXEL_ID, META_CAPI_ACCESS_TOKEN, META_CAPI_TEST_EVENT_CODE
+  "env": {
+    "production": {
+      "name": "chantalmasse-website",
+      "workers_dev": false,
+      "kv_namespaces": [
+        { "binding": "BOOKING_CACHE", "id": "e71462224c254ab5a42b710bc086ca2a" },
+        { "binding": "PAGE_CACHE", "id": "e71462224c254ab5a42b710bc086ca2a" }
+      ],
+      // BLOCKER before cutover: there is no production tls-cms yet (cms/worker/wrangler.jsonc only deploys --env staging).
+      // Point this at the production engine once it exists with the chantal-masse D1; never at staging.
+      "services": [{ "binding": "CMS", "service": "tls-cms", "entrypoint": "SiteReads" }],
+      "version_metadata": { "binding": "CF_VERSION" },
+      "vars": {}
+    }
+  }
+}

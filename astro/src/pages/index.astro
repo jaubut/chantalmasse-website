@@ -1,0 +1,44 @@
+---
+// pages/index.vue. Not prerendered: the newsletter section lists the 2 latest posts, read from the CMS per request.
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE, SITE_DESCRIPTION } from '../lib/seo'
+import { latestPosts, type BlogPost } from '../lib/blog'
+import { SKIP_CACHE } from '../lib/page-cache'
+import HeroSection from '../vue/components/HeroSection.vue'
+import ServicesSection from '../vue/components/ServicesSection.vue'
+import PhilosophySection from '../vue/components/PhilosophySection.vue'
+import MethodsSection from '../vue/components/MethodsSection.vue'
+import TestimonialsSection from '../vue/components/TestimonialsSection.vue'
+import NewsletterSection from '../vue/components/NewsletterSection.vue'
+import BookingSection from '../vue/components/BookingSection.vue'
+
+export const prerender = false
+
+// A CMS hiccup must not take the home page down: render it without the two cards, and keep it out of the page cache
+// so the next request tries again.
+let posts: BlogPost[] = []
+try {
+  posts = await latestPosts(2)
+} catch (err) {
+  console.error('[home] latest posts unavailable', err)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+---
+<Base
+  title="Chantal Massé — Thérapeute en relation d'aide à Shefford"
+  path="/"
+  description={SITE_DESCRIPTION}
+  ogImage={HERO_IMAGE}
+>
+  <div>
+    {/* idle: the island only rotates the label and shows the map on hover; its CTA works before hydration
+        (data-booking-open, src/lib/client.ts), so hydration stays off the first-paint path. */}
+    <HeroSection client:idle />
+    <ServicesSection />
+    <PhilosophySection />
+    <MethodsSection />
+    <TestimonialsSection />
+    <NewsletterSection client:visible posts={posts} />
+    <BookingSection />
+  </div>
+</Base>

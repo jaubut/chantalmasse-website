@@ -1,0 +1,35 @@
+<template>
+  <div class="max-w-3xl mx-auto px-8 py-24">
+    <h1 class="font-headline italic text-4xl text-primary mb-12">Mentions Légales</h1>
+
+    <section class="mb-10">
+      <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Éditeur du site</h2>
+      <p class="text-on-surface-variant leading-relaxed">
+        Chantal Massé, thérapeute en relation d'aide, travailleuse autonome<br>
+        245 rue Colette, Shefford (Québec) J2M 2B7, Canada<br>
+        Courriel : <a href="mailto:chantal.gmasse@gmail.com" class="text-primary hover:underline">chantal.gmasse@gmail.com</a>
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Hébergement</h2>
+      <p class="text-on-surface-variant leading-relaxed">
+        Ce site est hébergé par Cloudflare, Inc., 101 Townsend Street, San Francisco, CA 94107, États-Unis.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Propriété intellectuelle</h2>
+      <p class="text-on-surface-variant leading-relaxed">
+        L'ensemble du contenu de ce site (textes, images, graphismes) est la propriété exclusive de Chantal Massé, sauf mention contraire. Toute reproduction, distribution ou utilisation sans autorisation écrite préalable est interdite.
+      </p>
+    </section>
+
+    <section class="mb-10">
+      <h2 class="text-lg font-semibold uppercase tracking-wide text-primary mb-3">Responsabilité</h2>
+      <p class="text-on-surface-variant leading-relaxed">
+        Les informations publiées sur ce site sont fournies à titre indicatif. Elles ne constituent pas un avis médical ou thérapeutique et ne remplacent pas une consultation professionnelle. Chantal Massé ne saurait être tenue responsable de tout dommage découlant de l'utilisation de ces informations.
+      </p>
+    </section>
+  </div>
+</template>

@@ -1,0 +1,156 @@
+{
+ "run": "2026-11-20, lighthouse 12, headless chromium on Zettlab",
+ "worker_version": "d8f22b85-1835-471c-a323-686da909e2da",
+ "results": [
+  {
+   "url": "https://chantalmasse.com/",
+   "formFactor": "desktop",
+   "scores": {
+    "performance": 83,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 100
+   },
+   "lcp": 2193.7819999999992,
+   "tbt": 15,
+   "cls": 0.004510699182798934,
+   "fcp": 893.5484999999999,
+   "transferBytes": 2633269
+  },
+  {
+   "url": "https://chantalmasse.com/",
+   "formFactor": "mobile",
+   "scores": {
+    "performance": 67,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100
+   },
+   "lcp": 6780.315420000001,
+   "tbt": 325.4999999999991,
+   "cls": 0.001051969022754957,
+   "fcp": 1250.7262999999998,
+   "transferBytes": 2569056
+  },
+  {
+   "url": "https://chantalmasse.com/blog/l-amour-conscient",
+   "formFactor": "desktop",
+   "scores": {
+    "performance": 97,
+    "accessibility": 100,
+    "best-practices": 78,
+    "seo": 92
+   },
+   "lcp": 835.9450000000002,
+   "tbt": 16.5,
+   "cls": 0.0004014418442253184,
+   "fcp": 515.419,
+   "transferBytes": 1157408
+  },
+  {
+   "url": "https://chantalmasse.com/blog/l-amour-conscient",
+   "formFactor": "mobile",
+   "scores": {
+    "performance": 76,
+    "accessibility": 100,
+    "best-practices": 79,
+    "seo": 92
+   },
+   "lcp": 3327.05808,
+   "tbt": 548.5,
+   "cls": 0.0002070814178879126,
+   "fcp": 1647.18244,
+   "transferBytes": 1092982
+  },
+  {
+   "url": "https://chantalmasse.com/coaching-de-couple",
+   "formFactor": "desktop",
+   "scores": {
+    "performance": 97,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 100
+   },
+   "lcp": 537.98552,
+   "tbt": 7,
+   "cls": 0.006592409365773062,
+   "fcp": 537.98552,
+   "transferBytes": 872858
+  },
+  {
+   "url": "https://chantalmasse.com/coaching-de-couple",
+   "formFactor": "mobile",
+   "scores": {
+    "performance": 86,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100
+   },
+   "lcp": 1772.9680199999998,
+   "tbt": 412.8511399999993,
+   "cls": 0.009856992959796522,
+   "fcp": 1614.4881599999999,
+   "transferBytes": 808535
+  },
+  {
+   "url": "https://chantalmasse.com/prendre-rendez-vous",
+   "formFactor": "desktop",
+   "scores": {
+    "performance": 86,
+    "accessibility": 95,
+    "best-practices": 78,
+    "seo": 69
+   },
+   "lcp": 2151.9166200000004,
+   "tbt": 18,
+   "cls": 0.0004046889750231527,
+   "fcp": 495.65327,
+   "transferBytes": 1741347
+  },
+  {
+   "url": "https://chantalmasse.com/prendre-rendez-vous",
+   "formFactor": "mobile",
+   "scores": {
+    "performance": 56,
+    "accessibility": 95,
+    "best-practices": 79,
+    "seo": 69
+   },
+   "lcp": 9229.191880000002,
+   "tbt": 554,
+   "cls": 0.0006599774181530603,
+   "fcp": 1612.28476,
+   "transferBytes": 1741384
+  },
+  {
+   "url": "https://chantalmasse.com/therapie-individuelle",
+   "formFactor": "desktop",
+   "scores": {
+    "performance": 97,
+    "accessibility": 93,
+    "best-practices": 78,
+    "seo": 100
+   },
+   "lcp": 511.95036000000005,
+   "tbt": 13.5,
+   "cls": 0.0035268927825396357,
+   "fcp": 511.95036,
+   "transferBytes": 872882
+  },
+  {
+   "url": "https://chantalmasse.com/therapie-individuelle",
+   "formFactor": "mobile",
+   "scores": {
+    "performance": 87,
+    "accessibility": 93,
+    "best-practices": 79,
+    "seo": 100
+   },
+   "lcp": 1197.0942999999997,
+   "tbt": 402.66890999999987,
+   "cls": 0.0017975027770775294,
+   "fcp": 1197.0942999999997,
+   "transferBytes": 808545
+  }
+ ]
+}

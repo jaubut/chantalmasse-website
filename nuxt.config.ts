@@ -151,6 +151,9 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  // astro/ is the Astro build of this site (separate project, own module types): not part of the Nuxt typecheck.
+  typescript: { tsConfig: { exclude: ['../astro'] } },
+
   vite: {
     plugins: [tailwindcss()],
   },

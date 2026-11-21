@@ -1,0 +1,15 @@
+---
+import Base from '../layouts/Base.astro'
+import { HERO_IMAGE } from '../lib/seo'
+import PrendreRendezVousPage from '../vue/pages/PrendreRendezVousPage.vue'
+---
+<Base
+  title="Prendre rendez-vous avec Chantal Massé"
+  path="/prendre-rendez-vous"
+  description="Réserve ta séance avec Chantal Massé, thérapeute en relation d'aide à Shefford et en vidéoconférence."
+  robots="noindex, nofollow"
+  ogImage={HERO_IMAGE}
+  minimalNav
+>
+  <PrendreRendezVousPage client:load />
+</Base>

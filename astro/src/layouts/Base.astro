@@ -1,0 +1,104 @@
+---
+// Every page: the head Nuxt rendered (nuxt.config.ts app.head + @nuxtjs/seo + the page's useSeoMeta) and the app.vue
+// shell (intro loader, nav, footer, booking bar, booking + contact modals). <ClientRouter /> replaces Nuxt's client
+// router; src/lib/client.ts sends one page view per in-site navigation.
+import { ClientRouter } from 'astro:transitions'
+import { Font } from 'astro:assets'
+import '../styles/main.css'
+import { head, type Seo } from '../lib/seo'
+import IntroLoader from '../components/IntroLoader.astro'
+import TheNav from '../vue/components/TheNav.vue'
+import TheFooter from '../vue/components/TheFooter.vue'
+import BookingStickyBar from '../vue/components/BookingStickyBar.vue'
+import BookingModal from '../vue/components/booking/BookingModal.vue'
+import ContactModal from '../vue/components/ContactModal.vue'
+
+interface Props extends Seo {
+  /** prendre-rendez-vous: nav without the section links (definePageMeta minimalNav). */
+  minimalNav?: boolean
+  /** error.vue: Nuxt's error page renders without the app shell, canonical, og:url or JSON-LD. */
+  bare?: boolean
+  /** Preload the italic Newsreader file (display headlines). Only where its late swap re-wraps the hero and moves the
+   * CTA row (/coaching-de-couple: CLS 0.11 without it); elsewhere the extra early request costs first paint on mobile. */
+  preloadItalic?: boolean
+  /** No layout booking bar: transactional pages (cancel, newsletter confirmation). Implied by minimalNav: the booking LP
+   * renders its own service-aware bar, and the layout one (no #hero there, so shown at once) sat on top of it and opened
+   * booking without the service. Nuxt's app.vue had the same bug on /prendre-rendez-vous. */
+  hideBookingBar?: boolean
+}
+const { minimalNav = false, bare = false, preloadItalic = false, hideBookingBar = false, ...seo } = Astro.props
+const bookingBar = !minimalNav && !hideBookingBar
+const h = head(seo)
+// Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
+const path = Astro.url.pathname.replace(/\.html$/, '')
+const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
+---
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{h.title}</title>
+    {/* Intro loader: first visit of the session only, never with reduced motion. Runs pre-paint. */}
+    <script is:inline>try{if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('cm-intro');sessionStorage.setItem('cm-intro','1')}}catch(e){}</script>
+    {/* GA4 (also loads the linked Ads tag) and the Meta pixel queue their calls here; the libraries load after the CSS
+        below. Confirmation links hold a private token: nothing runs on that page. In-site navigations (ClientRouter use
+        history.pushState): both tags count each one with their own history listeners, as under Nuxt's router. */}
+    <script is:inline>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}if(!/^\/confirmer-inscription\/?$/.test(location.pathname)){gtag('js',new Date());gtag('config','G-CTE3NV511W')}</script>
+    <script is:inline>!function(f,n){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[]}(window);if(!/^\/confirmer-inscription\/?$/.test(location.pathname)){fbq('init','948606391153047');fbq('track','PageView')}</script>
+    <Font cssVariable="--font-newsreader" preload={preloadItalic ? [{ style: 'italic', weight: 400 }] : false} />
+    <Font cssVariable="--font-manrope" />
+    <script is:inline type="module">if(!/^\/confirmer-inscription\/?$/.test(location.pathname))for(const src of['https://www.googletagmanager.com/gtag/js?id=G-CTE3NV511W','https://connect.facebook.net/en_US/fbevents.js']){const s=document.createElement('script');s.async=true;s.src=src;document.head.append(s)}</script>
+    {meta.map(m => <meta name={m.name} property={m.property} content={m.content} />)}
+    {!bare && <link rel="canonical" href={h.canonical} />}
+    {!bare && <script is:inline type="application/ld+json" set:html={h.jsonLd} />}
+    <ClientRouter />
+    <slot name="head" />
+  </head>
+  <body>
+    {/* Meta pixel for visitors without JS. Persisted: ClientRouter parses the next page with scripting off, which would
+        turn this <img> into a real request (an extra PageView) on every in-site navigation. */}
+    <noscript id="fb-noscript" transition:persist><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=948606391153047&ev=PageView&noscript=1" /></noscript>
+    {bare ? <slot /> : (
+    <div>
+      <TheNav client:load path={path} minimalNav={minimalNav} />
+      <main>
+        <slot />
+      </main>
+      {/* After <main> (it's a fixed overlay, z-index 100): the first paint then holds the hero too, instead of the
+          overlay alone with the hero one frame later (the later paint became the LCP). */}
+      <IntroLoader />
+      <TheFooter />
+      {bookingBar && <BookingStickyBar client:idle revealAfterSelector="#hero" />}
+      <BookingModal client:only="vue" />
+      {/* client:only: the modals Teleport to <body>, which server rendering drops; closed at load, nothing to prerender. */}
+      <ContactModal client:only="vue" />
+    </div>
+    )}
+    {/* Scroll reveal (composables/useScrollAnimation.ts), inline so it runs before first paint instead of after the module
+        chain: has-js hides [data-animate] (main.css), so elements already on screen are marked visible right here, and the
+        rest reveal on scroll. ClientRouter re-runs this script after each navigation. */}
+    <script is:inline>
+      (() => {
+        const html = document.documentElement
+        html.classList.add('has-js')
+        const els = [...document.querySelectorAll('[data-animate]')]
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return els.forEach(el => el.classList.add('visible'))
+        const io = new IntersectionObserver((entries) => {
+          for (const e of entries) if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target) }
+        }, { threshold: 0.1 })
+        const vh = innerHeight
+        for (const el of els) {
+          const r = el.getBoundingClientRect()
+          if (r.bottom > 0 && r.top < vh) el.classList.add('visible')
+          else io.observe(el)
+        }
+        window.__cmReveal?.disconnect()
+        window.__cmReveal = io
+      })()
+    </script>
+    <script>
+      import '../lib/client'
+    </script>
+  </body>
+</html>

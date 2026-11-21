@@ -1,0 +1,421 @@
+{
+ "method": "Lighthouse 12, headless Chromium on Zettlab, mobile preset, median of 3 runs per URL, Nuxt production and the Astro preview interleaved run by run on the same machine (2026-11-20, second pass). Preview SEO score is lower only because of its deliberate X-Robots-Tag: noindex. Astro column re-measured on the final pushed build (3 runs) right after; the interleaved Astro runs are kept under mobile_interleaved_astro.",
+ "mobile": {
+  "/": {
+   "nuxt": {
+    "performance": 63,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1648,
+    "lcp_ms": 7730,
+    "tbt_ms": 328,
+    "cls": 0.001,
+    "si_ms": 5418,
+    "kb": 2509
+   },
+   "astro": {
+    "performance": 85,
+    "accessibility": 94,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 1483,
+    "lcp_ms": 3394,
+    "tbt_ms": 261,
+    "cls": 0.026,
+    "si_ms": 3741,
+    "kb": 1007
+   }
+  },
+  "/coaching-de-couple": {
+   "nuxt": {
+    "performance": 86,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1591,
+    "lcp_ms": 1750,
+    "tbt_ms": 405,
+    "cls": 0.01,
+    "si_ms": 4690,
+    "kb": 789
+   },
+   "astro": {
+    "performance": 87,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 66,
+    "fcp_ms": 1470,
+    "lcp_ms": 2075,
+    "tbt_ms": 421,
+    "cls": 0.005,
+    "si_ms": 3630,
+    "kb": 714
+   }
+  },
+  "/therapie-individuelle": {
+   "nuxt": {
+    "performance": 87,
+    "accessibility": 93,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1572,
+    "lcp_ms": 1730,
+    "tbt_ms": 368,
+    "cls": 0.007,
+    "si_ms": 4623,
+    "kb": 789
+   },
+   "astro": {
+    "performance": 89,
+    "accessibility": 93,
+    "best-practices": 79,
+    "seo": 66,
+    "fcp_ms": 1254,
+    "lcp_ms": 1364,
+    "tbt_ms": 413,
+    "cls": 0.025,
+    "si_ms": 3551,
+    "kb": 714
+   }
+  },
+  "/prendre-rendez-vous": {
+   "nuxt": {
+    "performance": 56,
+    "accessibility": 95,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 3198,
+    "lcp_ms": 9498,
+    "tbt_ms": 386,
+    "cls": 0.001,
+    "si_ms": 5447,
+    "kb": 1700
+   },
+   "astro": {
+    "performance": 87,
+    "accessibility": 95,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 1968,
+    "lcp_ms": 2889,
+    "tbt_ms": 260,
+    "cls": 0.001,
+    "si_ms": 3796,
+    "kb": 835
+   }
+  },
+  "/blog/l-amour-conscient": {
+   "nuxt": {
+    "performance": 83,
+    "accessibility": 100,
+    "best-practices": 79,
+    "seo": 92,
+    "fcp_ms": 1596,
+    "lcp_ms": 3319,
+    "tbt_ms": 306,
+    "cls": 0.0,
+    "si_ms": 3894,
+    "kb": 1067
+   },
+   "astro": {
+    "performance": 89,
+    "accessibility": 100,
+    "best-practices": 79,
+    "seo": 61,
+    "fcp_ms": 1409,
+    "lcp_ms": 2618,
+    "tbt_ms": 260,
+    "cls": 0.026,
+    "si_ms": 3753,
+    "kb": 895
+   }
+  }
+ },
+ "desktop_first_pass": {
+  "/": {
+   "nuxt": {
+    "performance": 83,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 100,
+    "lcp_ms": 2194,
+    "cls": 0.005
+   },
+   "astro": {
+    "performance": 88,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 69,
+    "lcp_ms": 1921,
+    "cls": 0.025
+   }
+  },
+  "/coaching-de-couple": {
+   "nuxt": {
+    "performance": 97,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 100,
+    "lcp_ms": 538,
+    "cls": 0.007
+   },
+   "astro": {
+    "performance": 97,
+    "accessibility": 98,
+    "best-practices": 78,
+    "seo": 66,
+    "lcp_ms": 603,
+    "cls": 0.026
+   }
+  },
+  "/therapie-individuelle": {
+   "nuxt": {
+    "performance": 97,
+    "accessibility": 93,
+    "best-practices": 78,
+    "seo": 100,
+    "lcp_ms": 512,
+    "cls": 0.004
+   },
+   "astro": {
+    "performance": 98,
+    "accessibility": 93,
+    "best-practices": 78,
+    "seo": 66,
+    "lcp_ms": 477,
+    "cls": 0.013
+   }
+  },
+  "/prendre-rendez-vous": {
+   "nuxt": {
+    "performance": 86,
+    "accessibility": 95,
+    "best-practices": 78,
+    "seo": 69,
+    "lcp_ms": 2152,
+    "cls": 0.0
+   },
+   "astro": {
+    "performance": 86,
+    "accessibility": 95,
+    "best-practices": 78,
+    "seo": 69,
+    "lcp_ms": 2095,
+    "cls": 0.003
+   }
+  },
+  "/blog/l-amour-conscient": {
+   "nuxt": {
+    "performance": 97,
+    "accessibility": 100,
+    "best-practices": 78,
+    "seo": 92,
+    "lcp_ms": 836,
+    "cls": 0.0
+   },
+   "astro": {
+    "performance": 98,
+    "accessibility": 100,
+    "best-practices": 78,
+    "seo": 61,
+    "lcp_ms": 675,
+    "cls": 0.003
+   }
+  }
+ },
+ "mobile_first_pass": {
+  "/": {
+   "nuxt": {
+    "performance": 63,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1608,
+    "lcp_ms": 6196,
+    "tbt_ms": 310,
+    "cls": 0.009,
+    "si_ms": 5749,
+    "kb": 2509
+   },
+   "astro": {
+    "performance": 64,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 1982,
+    "lcp_ms": 8187,
+    "tbt_ms": 294,
+    "cls": 0.024,
+    "si_ms": 4964,
+    "kb": 1783
+   }
+  },
+  "/coaching-de-couple": {
+   "nuxt": {
+    "performance": 84,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1611,
+    "lcp_ms": 1769,
+    "tbt_ms": 507,
+    "cls": 0.012,
+    "si_ms": 4785,
+    "kb": 790
+   },
+   "astro": {
+    "performance": 84,
+    "accessibility": 98,
+    "best-practices": 79,
+    "seo": 66,
+    "fcp_ms": 1548,
+    "lcp_ms": 1624,
+    "tbt_ms": 414,
+    "cls": 0.111,
+    "si_ms": 3891,
+    "kb": 715
+   }
+  },
+  "/therapie-individuelle": {
+   "nuxt": {
+    "performance": 80,
+    "accessibility": 93,
+    "best-practices": 79,
+    "seo": 100,
+    "fcp_ms": 1628,
+    "lcp_ms": 1787,
+    "tbt_ms": 604,
+    "cls": 0.004,
+    "si_ms": 4869,
+    "kb": 790
+   },
+   "astro": {
+    "performance": 86,
+    "accessibility": 93,
+    "best-practices": 79,
+    "seo": 66,
+    "fcp_ms": 1366,
+    "lcp_ms": 1393,
+    "tbt_ms": 426,
+    "cls": 0.025,
+    "si_ms": 3884,
+    "kb": 715
+   }
+  },
+  "/prendre-rendez-vous": {
+   "nuxt": {
+    "performance": 56,
+    "accessibility": 95,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 1625,
+    "lcp_ms": 9338,
+    "tbt_ms": 545,
+    "cls": 0.001,
+    "si_ms": 5437,
+    "kb": 1701
+   },
+   "astro": {
+    "performance": 51,
+    "accessibility": 95,
+    "best-practices": 79,
+    "seo": 69,
+    "fcp_ms": 2945,
+    "lcp_ms": 9896,
+    "tbt_ms": 622,
+    "cls": 0.001,
+    "si_ms": 4713,
+    "kb": 1631
+   }
+  },
+  "/blog/l-amour-conscient": {
+   "nuxt": {
+    "performance": 83,
+    "accessibility": 100,
+    "best-practices": 79,
+    "seo": 92,
+    "fcp_ms": 1604,
+    "lcp_ms": 3272,
+    "tbt_ms": 325,
+    "cls": 0.0,
+    "si_ms": 4119,
+    "kb": 1067
+   },
+   "astro": {
+    "performance": 80,
+    "accessibility": 100,
+    "best-practices": 79,
+    "seo": 61,
+    "fcp_ms": 1554,
+    "lcp_ms": 3135,
+    "tbt_ms": 388,
+    "cls": 0.022,
+    "si_ms": 4595,
+    "kb": 896
+   }
+  }
+ },
+ "mobile_interleaved_astro": {
+  "/": {
+   "performance": 84,
+   "accessibility": 98,
+   "best-practices": 79,
+   "seo": 69,
+   "fcp_ms": 1496,
+   "lcp_ms": 3398,
+   "tbt_ms": 263,
+   "cls": 0.026,
+   "si_ms": 3712,
+   "kb": 1007
+  },
+  "/coaching-de-couple": {
+   "performance": 87,
+   "accessibility": 98,
+   "best-practices": 79,
+   "seo": 66,
+   "fcp_ms": 1317,
+   "lcp_ms": 1929,
+   "tbt_ms": 443,
+   "cls": 0.005,
+   "si_ms": 3608,
+   "kb": 714
+  },
+  "/therapie-individuelle": {
+   "performance": 88,
+   "accessibility": 93,
+   "best-practices": 79,
+   "seo": 66,
+   "fcp_ms": 1326,
+   "lcp_ms": 1517,
+   "tbt_ms": 427,
+   "cls": 0.006,
+   "si_ms": 3684,
+   "kb": 714
+  },
+  "/prendre-rendez-vous": {
+   "performance": 90,
+   "accessibility": 95,
+   "best-practices": 79,
+   "seo": 69,
+   "fcp_ms": 1421,
+   "lcp_ms": 2406,
+   "tbt_ms": 260,
+   "cls": 0.001,
+   "si_ms": 3631,
+   "kb": 835
+  },
+  "/blog/l-amour-conscient": {
+   "performance": 87,
+   "accessibility": 100,
+   "best-practices": 79,
+   "seo": 61,
+   "fcp_ms": 1410,
+   "lcp_ms": 2755,
+   "tbt_ms": 270,
+   "cls": 0.026,
+   "si_ms": 3639,
+   "kb": 895
+  }
+ }
+}

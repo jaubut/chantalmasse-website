@@ -63,6 +63,14 @@ jobs:
       - name: Build (Cloudflare preset, as deployed)
         run: bun run build
 
+      # astro/ is excluded from `nuxt typecheck`: its .astro/.ts files are checked here (Astro's own TS project).
+      - name: Typecheck (Astro)
+        run: bun run astro:check
+
+      # Astro build next to Nuxt (docs/astro-migration-parity.md): prerenders the static pages, bundles the Worker.
+      - name: Build (Astro, preview of the migration)
+        run: bun run astro:build
+
       - name: Playwright version
         id: pw
         run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"

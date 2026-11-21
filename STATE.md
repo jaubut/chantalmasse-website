@@ -1,6 +1,15 @@
 # STATE — Chantal Massé website
 
-Last updated: 2026-11-19
+Last updated: 2026-11-20
+
+## Astro migration, stages 0–4 — 2026-11-20 (preview only, live untouched)
+
+- Astro 7.4 build in `astro/` next to Nuxt; preview Worker `chantalmasse-website-astro` (workers.dev, noindex). Report, blockers, cutover/rollback runbook: `docs/astro-migration-parity.md`. Baseline (crawl, Lighthouse, rollback version `d8f22b85`): `docs/migration-baseline/`.
+- Parity: 0 crawl diffs except `og:image` on the 24 posts (self-hosted CMS copy), API errors byte-identical, tracking counts identical incl. ClientRouter navigations, smoke 53/54.
+- Blog reads the TLS CMS (site `chantal-masse`, **staging** engine) via `cms-client`; import + publish-via-CMS in jaubut/tls-dashboard-v2#468 (`BLOG_PUBLISH_TARGET` default `github`).
+- Blocked on: production `tls-cms` + import, preview test secrets for booking/newsletter E2E, Jeremie's sign-off. Cutover only on « Deploy Chantal ».
+- Second pass (2026-11-20): mobile Lighthouse ≥ Nuxt on all 5 URLs (CSS-first scripts, inline intro/reveal, resized hero, per-page italic preload), PR review findings fixed, smoke 54/54. CMS moved to jaubut/tls-portal-cms: production `tls-cms` deploys from there; it predates tls-dashboard-v2#468 (Chantal importer + `DB_CHANTAL_MASSE` + publish-via-CMS must be ported there). Preview secrets list: report §« What Jeremie needs to provide ».
+- Gotchas: `server/api/*` run unchanged through h3 (`astro/src/lib/nitro.ts`), keep them framework-free of new Nitro auto-imports; the `<noscript>` pixel must stay `transition:persist` (else +1 Meta PageView per navigation); the HTML cache key includes the Worker version id.
 
 ## URL fixes — 2026-11-19 (not deployed)
 
