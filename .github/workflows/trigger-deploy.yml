@@ -1,19 +1,11 @@
 name: Trigger.dev deploy
 
-# Deploys the trigger/ tasks to Trigger.dev production whenever code they bundle
-# changes on main. Before this, deploys were manual and prod ran a stale bundle
-# for 8 days after PR #33 merged.
+# Deploys the trigger/ tasks to Trigger.dev production. Manual only (Jeremie,
+# 2026-11-18: releases are manual, a merge to main deploys nothing). Run it on
+# "Deploy chantalmasse-website" when trigger/, server/utils/, utils/,
+# trigger.config.ts or the lockfile changed since the last release:
+#   gh workflow run trigger-deploy.yml -R jaubut/chantalmasse-website --ref main
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'trigger/**'
-      - 'server/utils/**'
-      - 'utils/**'
-      - 'trigger.config.ts'
-      - 'package.json'
-      - 'bun.lock'
-      - '.github/workflows/trigger-deploy.yml'
   workflow_dispatch:
 
 # Never cancel a deploy mid-flight; queue the next one instead.
