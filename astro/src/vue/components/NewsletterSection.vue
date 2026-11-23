@@ -1,20 +1,11 @@
 <template>
-  <section
-    class="py-32 px-8 bg-tertiary text-on-tertiary"
-    v-bind="tlsBlockAttrs(on, 'infolettre', 'collection')"
-  >
+  <section class="py-32 px-8 bg-tertiary text-on-tertiary">
     <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
       <!-- Left: form -->
       <div data-animate>
-        <h2
-          class="font-headline text-5xl mb-6"
-          v-bind="tlsBlockFieldAttrs(on, docId, 'infolettre', 'title')"
-        >Pensées &amp; Réflexions</h2>
-        <p
-          class="text-on-tertiary-container font-light text-lg mb-10 max-w-md"
-          v-bind="tlsBlockFieldAttrs(on, docId, 'infolettre', 'lede')"
-        >
+        <h2 class="font-headline text-5xl mb-6">Pensées &amp; Réflexions</h2>
+        <p class="text-on-tertiary-container font-light text-lg mb-10 max-w-md">
           Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.
         </p>
         <form class="flex flex-col gap-4" @submit.prevent="subscribe">
@@ -50,7 +41,7 @@
         <p v-if="error" role="alert" class="mt-3 text-sm text-red-400">{{ error }}</p>
       </div>
 
-      <!-- Right: blog cards -->
+      <!-- Right: blog cards (read from the TLS CMS via latestPosts) -->
       <div
         class="grid grid-cols-1 sm:grid-cols-2 gap-6"
         data-animate
@@ -91,10 +82,7 @@ import { computed, ref } from 'vue'
 import { ofetch } from 'ofetch'
 import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
 import {
-  pageDocId,
   postDocId,
-  tlsBlockAttrs,
-  tlsBlockFieldAttrs,
   tlsCollectionAttrs,
   tlsEntryFieldAttrs,
   tlsItemAttrs,
@@ -107,7 +95,6 @@ const props = defineProps<{
 }>()
 
 const on = computed(() => Boolean(props.previewMode))
-const docId = pageDocId('home')
 const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const email = ref('')

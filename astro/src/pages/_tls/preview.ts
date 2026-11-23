@@ -1,19 +1,38 @@
 // /_tls/preview: preview handshake and cookie management for Stage 4b (S4b) of the tls-cms on-site editor.
 // - GET /_tls/preview?token=<previewToken>&path=<relativePath>[&tls_edit=<editToken>]
-//   Validates `token` (non-empty, <= 2048 chars) and `path` (/^\/(?!\/)[^\s\\]*$/, default `/`; rejects `//` or external URLs with 400).
-//   Sets `__tls_preview=<token>; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600` (+ `Secure` on https:) and 303-redirects to `<path>`
-//   preserving `?tls_edit=<editToken>` when present (`Cache-Control: no-store`, `Referrer-Policy: no-referrer`).
+//   Validates `token` (non-empty, <= 2048 chars; cryptographically verified as an HS256 JWT with `aud: "tls-preview"`
+//   and `site: "chantal-masse"` when `PREVIEW_SECRET` is configured) and `path` (/^\/(?!\/)[^\s\\]*$/, default `/`;
+//   rejects `//` or external URLs with 400).
+//   Sets `__tls_preview=<token>; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600` (+ `Secure` on https:) and 303-redirects
+//   to `<path>` preserving `?tls_edit=<editToken>` when present (`Cache-Control: no-store`, `Referrer-Policy: no-referrer`).
 // - POST /_tls/preview
 //   Accepts JSON `{ token?: string, clear?: boolean }` from same-origin fetch so `<tls-edit-bar>` can refresh or clear `__tls_preview`.
+//
+// Threat model note:
+// - The 1-click portal launch redirects the editor's browser here with a short-lived (1 h), site-bound (`site: "chantal-masse"`,
+//   `aud: "tls-preview"`) HS256 preview token signed by `tls-cms` (`cms/worker/src/auth.ts` `signPreview`) plus a single-use
+//   10-min `tls_edit` token.
+// - Both this handshake route and `src/middleware.ts` verify the HS256 signature against `PREVIEW_SECRET` before trusting the
+//   cookie, and `tls-cms` `SiteReads` (`cms/worker/src/index.ts` `readHandler` -> `hasPreview`) independently re-verifies
+//   `Authorization: Preview <token>` against `PREVIEW_SECRET` on the service binding before serving any `stage=draft` read.
+// - `Referrer-Policy: no-referrer` and immediate `history.replaceState` stripping of `?tls_edit` in `Base.astro` prevent token
+//   leakage via Referer headers or third-party analytics.
 import type { APIRoute } from 'astro'
+import { env } from 'cloudflare:workers'
 import {
   buildPreviewSetCookie,
   isValidPreviewToken,
   SAFE_PREVIEW_PATH_RE,
+  SITE_ID,
   validatePreviewPath,
+  verifyPreviewToken,
 } from '../../lib/tls-edit-attrs'
 
 export const prerender = false
+
+interface PreviewEnv {
+  PREVIEW_SECRET?: string
+}
 
 const NO_STORE_HEADERS = {
   'cache-control': 'no-store',
@@ -22,6 +41,11 @@ const NO_STORE_HEADERS = {
 
 function isHttpsRequest(request: Request, url: URL): boolean {
   return url.protocol === 'https:' || request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+}
+
+function getPreviewSecret(): string | undefined {
+  const workerSecret = (env as unknown as PreviewEnv | undefined)?.PREVIEW_SECRET
+  return workerSecret || (typeof process !== 'undefined' ? process.env.PREVIEW_SECRET : undefined)
 }
 
 function jsonResponse(body: Record<string, unknown>, status: number, extraHeaders: Record<string, string> = {}): Response {
@@ -40,6 +64,11 @@ export const GET: APIRoute = async ({ request }) => {
   const token = url.searchParams.get('token')
   if (!isValidPreviewToken(token)) {
     return jsonResponse({ error: 'invalid_token' }, 400)
+  }
+
+  const secret = getPreviewSecret()
+  if (!(await verifyPreviewToken(token, secret, SITE_ID))) {
+    return jsonResponse({ error: 'invalid_token' }, secret ? 401 : 400)
   }
 
   const rawPath = url.searchParams.get('path')
@@ -103,6 +132,10 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (isValidPreviewToken(body.token)) {
+    const secret = getPreviewSecret()
+    if (!(await verifyPreviewToken(body.token, secret, SITE_ID))) {
+      return jsonResponse({ error: 'invalid_token' }, secret ? 401 : 400)
+    }
     return jsonResponse(
       { ok: true, preview: true },
       200,

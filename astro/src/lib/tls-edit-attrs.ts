@@ -1,5 +1,6 @@
-// Contract-level `data-tls-*` attribute helpers, preview cookie utilities, and dormant loader builder
-// for Stage 4b (S4b) of the `tls-cms` on-site floating-bar editor (`chantal-masse`).
+// Contract-level `data-tls-*` attribute helpers, cryptographic HS256 preview token verification,
+// preview cookie utilities, and dormant loader builder for Stage 4b (S4b) of the `tls-cms` on-site
+// floating-bar editor (`chantal-masse`).
 // Every attribute helper returns `{}` when `previewMode` is false so public live renders emit 0 `data-tls-*` attributes.
 
 export const SITE_ID = 'chantal-masse'
@@ -16,6 +17,143 @@ export function isValidPreviewToken(token: unknown): token is string {
     && token.length > 0
     && token.length <= MAX_PREVIEW_TOKEN_LENGTH
     && !/[\x00-\x1f\x7f;\s]/.test(token)
+  )
+}
+
+// ---------- Web Crypto HS256 JWT verification matching `tls-cms` (`cms/worker/src/auth.ts` `signPreview`) ----------
+
+function base64UrlEncodeBytes(bytes: Uint8Array): string {
+  let binary = ''
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]!)
+  return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
+function base64UrlEncodeJson(value: unknown): string {
+  return base64UrlEncodeBytes(new TextEncoder().encode(JSON.stringify(value)))
+}
+
+function base64UrlDecodeBytes(seg: string): Uint8Array | null {
+  if (!seg || !/^[A-Za-z0-9_-]+$/.test(seg)) return null
+  const pad = seg.length % 4 === 0 ? '' : '='.repeat(4 - (seg.length % 4))
+  try {
+    const bin = atob(seg.replace(/-/g, '+').replace(/_/g, '/') + pad)
+    const out = new Uint8Array(bin.length)
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i)
+    return out
+  } catch {
+    return null
+  }
+}
+
+function base64UrlDecodeJson(seg: string): Record<string, unknown> | null {
+  const bytes = base64UrlDecodeBytes(seg)
+  if (!bytes) return null
+  try {
+    const parsed = JSON.parse(new TextDecoder().decode(bytes))
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : null
+  } catch {
+    return null
+  }
+}
+
+export interface PreviewTokenClaims {
+  aud: 'tls-preview'
+  site: string
+  exp: number
+}
+
+/**
+ * Validates the structural JWT claims of a `tls-cms` preview token:
+ * `header.alg === "HS256"`, `payload.aud === "tls-preview"`, `payload.site === expectedSite`,
+ * and `now < payload.exp <= now + 3600 (+ 60s clock skew)`.
+ */
+export function parsePreviewJwtClaims(
+  token: string,
+  expectedSite = SITE_ID,
+  nowMs = Date.now(),
+): PreviewTokenClaims | null {
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+  const [hSeg, pSeg, sSeg] = parts as [string, string, string]
+  if (!hSeg || !pSeg || !sSeg) return null
+  const header = base64UrlDecodeJson(hSeg)
+  if (!header || header.alg !== 'HS256') return null
+  const payload = base64UrlDecodeJson(pSeg)
+  if (!payload) return null
+  if (payload.aud !== 'tls-preview' || payload.site !== expectedSite) return null
+  if (typeof payload.exp !== 'number' || !Number.isFinite(payload.exp)) return null
+  const nowS = Math.floor(nowMs / 1000)
+  if (payload.exp <= nowS || payload.exp > nowS + PREVIEW_MAX_AGE + 60) return null
+  return { aud: 'tls-preview', site: expectedSite, exp: payload.exp }
+}
+
+/**
+ * Signs an HS256 preview token identical to `tls-cms` (`cms/worker/src/auth.ts` `signPreview`).
+ */
+export async function signPreviewToken(
+  site = SITE_ID,
+  secret: string,
+  nowMs = Date.now(),
+  ttlS = PREVIEW_MAX_AGE,
+): Promise<string> {
+  const header = base64UrlEncodeJson({ alg: 'HS256', typ: 'JWT' })
+  const payload = base64UrlEncodeJson({
+    aud: 'tls-preview',
+    site,
+    exp: Math.floor(nowMs / 1000) + ttlS,
+  })
+  const signingInput = `${header}.${payload}`
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  )
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signingInput))
+  return `${signingInput}.${base64UrlEncodeBytes(new Uint8Array(sig))}`
+}
+
+/**
+ * Verifies a `__tls_preview` token:
+ * - Always checks `isValidPreviewToken`.
+ * - When `secret` (`PREVIEW_SECRET`) is configured, cryptographically verifies the HS256 signature
+ *   via Web Crypto `crypto.subtle.verify` and checks `{ aud: "tls-preview", site: expectedSite, exp }`.
+ * - When `secret` is not configured, still validates JWT claims if the token has dot-separated segments.
+ */
+export async function verifyPreviewToken(
+  token: unknown,
+  secret?: string | null,
+  expectedSite = SITE_ID,
+  nowMs = Date.now(),
+): Promise<boolean> {
+  if (!isValidPreviewToken(token)) return false
+  const trimmedSecret = secret?.trim()
+  if (!trimmedSecret) {
+    if (token.includes('.')) {
+      return parsePreviewJwtClaims(token, expectedSite, nowMs) !== null
+    }
+    return true
+  }
+  const claims = parsePreviewJwtClaims(token, expectedSite, nowMs)
+  if (!claims) return false
+  const [hSeg, pSeg, sSeg] = token.split('.') as [string, string, string]
+  const sigBytes = base64UrlDecodeBytes(sSeg)
+  if (!sigBytes) return false
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(trimmedSecret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['verify'],
+  )
+  return crypto.subtle.verify(
+    'HMAC',
+    key,
+    new Uint8Array(sigBytes),
+    new TextEncoder().encode(`${hSeg}.${pSeg}`),
   )
 }
 
@@ -59,6 +197,16 @@ export function readPreviewCookie(cookieHeader: string | null | undefined): stri
   return null
 }
 
+export function hasRawPreviewCookie(cookieHeader: string | null | undefined): boolean {
+  if (!cookieHeader) return false
+  return cookieHeader.split(';').some((part) => {
+    const eq = part.indexOf('=')
+    const name = (eq < 0 ? part : part.slice(0, eq)).trim()
+    const val = eq < 0 ? '' : part.slice(eq + 1).trim()
+    return name === PREVIEW_COOKIE && val.length > 0
+  })
+}
+
 export function hasPreviewCookie(cookieHeader: string | null | undefined): boolean {
   return readPreviewCookie(cookieHeader) !== null
 }
@@ -72,7 +220,10 @@ export function buildPreviewSetCookie(token: string | null, isHttps: boolean): s
 export function applyPreviewResponseHeaders(headers: Headers, previewMode: boolean): void {
   if (!previewMode) return
   headers.set('Cache-Control', 'private, no-store')
-  headers.set('X-Robots-Tag', 'noindex')
+  const existingRobots = headers.get('X-Robots-Tag')
+  if (!existingRobots || !existingRobots.includes('noindex')) {
+    headers.set('X-Robots-Tag', 'noindex')
+  }
 }
 
 // ---------- Document ID helpers ----------
@@ -238,6 +389,39 @@ export function tlsItemAttrs(
     'data-tls-item': docId,
     'data-tls-kind': kindOrPost,
   }
+}
+
+// ---------- Layout preview state resolution (shared by `Base.astro` and unit tests) ----------
+
+export interface ResolveBaseLayoutTlsInput {
+  isPrerendered?: boolean
+  locals?: { previewToken?: string | null, previewMode?: boolean }
+  cookieHeader?: string | null
+  pageDocId?: string | null
+  path: string
+  locale?: string
+  previewModeProp?: boolean
+  editOrigin?: string
+}
+
+export interface ResolvedBaseLayoutTls {
+  previewToken: string | null
+  previewMode: boolean
+  resolvedPageDocId: string
+  mainAttrs: Record<string, string>
+  loaderScript: string
+}
+
+export function resolveBaseLayoutTls(input: ResolveBaseLayoutTlsInput): ResolvedBaseLayoutTls {
+  const isPrerendered = Boolean(input.isPrerendered)
+  const previewToken = isPrerendered
+    ? null
+    : (input.locals?.previewToken !== undefined ? input.locals.previewToken : readPreviewCookie(input.cookieHeader))
+  const previewMode = input.previewModeProp ?? (isPrerendered ? false : (input.locals?.previewMode ?? Boolean(previewToken)))
+  const resolvedPageDocId = input.pageDocId ?? pageDocIdForPath(input.path)
+  const mainAttrs = tlsPageAttrs(previewMode, resolvedPageDocId, input.locale ?? DEFAULT_LOCALE)
+  const loaderScript = buildDormantLoaderScript(input.editOrigin)
+  return { previewToken, previewMode, resolvedPageDocId, mainAttrs, loaderScript }
 }
 
 // ---------- Zero-cost dormant inline loader (~450 B) ----------

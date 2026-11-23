@@ -7,11 +7,9 @@ import { Font } from 'astro:assets'
 import '../styles/main.css'
 import { head, type Seo } from '../lib/seo'
 import {
-  buildDormantLoaderScript,
+  applyPreviewResponseHeaders,
   DEFAULT_LOCALE,
-  pageDocIdForPath,
-  readPreviewCookie,
-  tlsPageAttrs,
+  resolveBaseLayoutTls,
 } from '../lib/tls-edit-attrs'
 import IntroLoader from '../components/IntroLoader.astro'
 import TheNav from '../vue/components/TheNav.vue'
@@ -54,17 +52,19 @@ const h = head(seo)
 // Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
 const path = Astro.url.pathname.replace(/\.html$/, '')
 const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
-const previewToken = Astro.isPrerendered
-  ? null
-  : (Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie')))
-const previewMode = previewModeProp ?? (Astro.isPrerendered ? false : (Astro.locals.previewMode ?? Boolean(previewToken)))
+const { previewMode, mainAttrs, loaderScript } = resolveBaseLayoutTls({
+  isPrerendered: Astro.isPrerendered,
+  locals: Astro.locals,
+  cookieHeader: Astro.isPrerendered ? null : Astro.request.headers.get('cookie'),
+  pageDocId,
+  path: seo.path || path,
+  locale,
+  previewModeProp,
+  editOrigin: import.meta.env.PUBLIC_TLS_EDIT_ORIGIN as string | undefined,
+})
 if (previewMode && !Astro.isPrerendered) {
-  Astro.response.headers.set('Cache-Control', 'private, no-store')
-  Astro.response.headers.set('X-Robots-Tag', 'noindex')
+  applyPreviewResponseHeaders(Astro.response.headers, true)
 }
-const resolvedPageDocId = pageDocId ?? pageDocIdForPath(seo.path || path)
-const mainAttrs = tlsPageAttrs(previewMode, resolvedPageDocId, locale)
-const loaderScript = buildDormantLoaderScript(import.meta.env.PUBLIC_TLS_EDIT_ORIGIN as string | undefined)
 ---
 <!doctype html>
 <html lang="fr">
@@ -103,7 +103,7 @@ const loaderScript = buildDormantLoaderScript(import.meta.env.PUBLIC_TLS_EDIT_OR
       {/* After <main> (it's a fixed overlay, z-index 100): the first paint then holds the hero too, instead of the
           overlay alone with the hero one frame later (the later paint became the LCP). */}
       <IntroLoader />
-      <TheFooter previewMode={previewMode} />
+      <TheFooter />
       {bookingBar && <BookingStickyBar client:idle revealAfterSelector="#hero" />}
       <BookingModal client:only="vue" />
       {/* client:only: the modals Teleport to <body>, which server rendering drops; closed at load, nothing to prerender. */}

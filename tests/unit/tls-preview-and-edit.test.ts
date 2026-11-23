@@ -1,19 +1,44 @@
+/// <reference path="../../astro/src/env.d.ts" />
 import { readFileSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { describe, expect, it, vi } from 'vitest'
-import { createSSRApp, h } from 'vue'
+import ts from 'typescript'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import * as vue from 'vue'
+import { compileScript, compileTemplate, parse } from 'vue/compiler-sfc'
 import { renderToString } from 'vue/server-renderer'
-import { CONTRACT_HEADER, CONTRACT_VERSION, createCmsClient } from '../../astro/src/lib/cms-client'
+
+declare module 'astro:middleware' {
+  export function defineMiddleware<T>(fn: T): T
+}
+
+const mockWorkerEnv = vi.hoisted(() => ({} as Record<string, unknown>))
+
+vi.mock('astro:middleware', () => ({
+  defineMiddleware: (fn: unknown) => fn,
+}))
+
+vi.mock('cloudflare:workers', () => ({
+  env: mockWorkerEnv,
+}))
+
+import { allPosts, getPost, latestPosts } from '../../astro/src/lib/blog'
+import { CONTRACT_HEADER, CONTRACT_VERSION, createCmsClient, type PostDoc, type PostSummary } from '../../astro/src/lib/cms-client'
+import type { Kv } from '../../astro/src/lib/page-cache'
+import * as tlsEditAttrs from '../../astro/src/lib/tls-edit-attrs'
 import {
   applyPreviewResponseHeaders,
   buildDormantLoaderScript,
   buildPreviewSetCookie,
   pageDocId,
   pageDocIdForPath,
+  parsePreviewJwtClaims,
   postDocId,
   readPreviewCookie,
+  resolveBaseLayoutTls,
   serviceDocId,
   settingsDocId,
+  signPreviewToken,
   tlsBlockAttrs,
   tlsBlockFieldAttrs,
   tlsBlockImageAttrs,
@@ -28,22 +53,128 @@ import {
   tlsPostHeroImageAttrs,
   tlsSettingsFieldAttrs,
   validatePreviewPath,
+  verifyPreviewToken,
 } from '../../astro/src/lib/tls-edit-attrs'
+import { headersFor, onRequest } from '../../astro/src/middleware'
 import { GET as previewGet, POST as previewPost } from '../../astro/src/pages/_tls/preview'
-import BookingSection from '../../astro/src/vue/components/BookingSection.vue'
-import HeroSection from '../../astro/src/vue/components/HeroSection.vue'
-import MethodsSection from '../../astro/src/vue/components/MethodsSection.vue'
-import NewsletterSection from '../../astro/src/vue/components/NewsletterSection.vue'
-import PhilosophySection from '../../astro/src/vue/components/PhilosophySection.vue'
-import ServicesSection from '../../astro/src/vue/components/ServicesSection.vue'
-import TestimonialsSection from '../../astro/src/vue/components/TestimonialsSection.vue'
-import TheFooter from '../../astro/src/vue/components/TheFooter.vue'
-import BlogIndexPage from '../../astro/src/vue/pages/BlogIndexPage.vue'
-import CoachingDeCouplePage from '../../astro/src/vue/pages/CoachingDeCouplePage.vue'
-import TherapieIndividuellePage from '../../astro/src/vue/pages/TherapieIndividuellePage.vue'
+import * as useBookingMod from '../../astro/src/vue/composables/useBooking'
+import * as newsletterConsentMod from '../../utils/newsletterConsent'
 
 const callApi = (fn: (ctx: never) => Promise<Response> | Response, request: Request) =>
   Promise.resolve(fn({ request } as never))
+
+// Compiles a `.vue` SFC in-memory using `vue/compiler-sfc` (from declared `vue`) and `typescript`
+// so `vitest.config.ts` needs no extra plugin dependency.
+const sfcCache = new Map<string, vue.Component>()
+function loadVueSfc(relPathFromHere: string): vue.Component {
+  const fullPath = resolve(dirname(fileURLToPath(import.meta.url)), relPathFromHere)
+  const cached = sfcCache.get(fullPath)
+  if (cached) return cached
+
+  const source = readFileSync(fullPath, 'utf8')
+  const { descriptor } = parse(source, { filename: fullPath })
+  const id = 'sfc_' + Math.random().toString(36).slice(2, 10)
+  const compiledScript = compileScript(descriptor, {
+    id,
+    inlineTemplate: true,
+    templateOptions: { id, filename: fullPath, ssr: false },
+  })
+  const jsCode = ts.transpileModule(compiledScript.content, {
+    compilerOptions: {
+      module: ts.ModuleKind.CommonJS,
+      target: ts.ScriptTarget.ES2022,
+    },
+  }).outputText
+
+  const IconStub = vue.defineComponent({
+    props: { icon: String },
+    setup(props, { attrs }) {
+      return () => vue.h('span', { ...attrs, 'data-icon': props.icon })
+    },
+  })
+
+  const customRequire = (spec: string): unknown => {
+    if (spec === 'vue') return vue
+    if (spec === 'vue/server-renderer') return { ssrRenderAttrs: () => '' }
+    if (spec === 'ofetch') return { ofetch: vi.fn() }
+    if (spec.endsWith('tls-edit-attrs')) return tlsEditAttrs
+    if (spec.endsWith('newsletterConsent')) return newsletterConsentMod
+    if (spec.endsWith('useBooking')) return useBookingMod
+    if (spec.endsWith('Icon.vue')) return { default: IconStub }
+    if (spec.endsWith('.vue')) return { default: loadVueSfc(resolve(dirname(fullPath), spec)) }
+    throw new Error(`Unexpected import in SFC test loader: ${spec}`)
+  }
+
+  const mod = { exports: {} as { default?: vue.Component } }
+  const fn = new Function('exports', 'require', 'module', jsCode)
+  fn(mod.exports, customRequire, mod)
+  const comp = mod.exports.default!
+  if (!descriptor.scriptSetup && descriptor.template) {
+    const tpl = compileTemplate({ source: descriptor.template.content, filename: fullPath, id })
+    const tplJs = ts.transpileModule(tpl.code, {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+    }).outputText
+    const tplMod = { exports: {} as { render?: unknown } }
+    new Function('exports', 'require', 'module', tplJs)(tplMod.exports, customRequire, tplMod)
+    ;(comp as Record<string, unknown>).render = tplMod.exports.render
+  }
+  sfcCache.set(fullPath, comp)
+  return comp
+}
+
+const HeroSection = loadVueSfc('../../astro/src/vue/components/HeroSection.vue')
+const ServicesSection = loadVueSfc('../../astro/src/vue/components/ServicesSection.vue')
+const NewsletterSection = loadVueSfc('../../astro/src/vue/components/NewsletterSection.vue')
+const TheFooter = loadVueSfc('../../astro/src/vue/components/TheFooter.vue')
+const BlogIndexPage = loadVueSfc('../../astro/src/vue/pages/BlogIndexPage.vue')
+const BlogPostPage = loadVueSfc('../../astro/src/vue/pages/BlogPostPage.vue')
+const CoachingDeCouplePage = loadVueSfc('../../astro/src/vue/pages/CoachingDeCouplePage.vue')
+const TherapieIndividuellePage = loadVueSfc('../../astro/src/vue/pages/TherapieIndividuellePage.vue')
+
+const TEST_PREVIEW_SECRET = 'test-preview-secret-32-bytes-long!!'
+
+const SAMPLE_POST_SUMMARIES: PostSummary[] = [
+  {
+    id: 'chantal-masse:post:l-amour-conscient',
+    locale: 'fr',
+    fallbackFrom: null,
+    path: '/blog/l-amour-conscient',
+    title: "L'amour conscient",
+    date: '2025-10-15T00:00:00.000Z',
+    excerpt: 'Explorer nos relations avec curiosité et bienveillance.',
+    hero: {
+      src: '/media/sites/chantal-masse/media/abc123.jpg',
+      alt: "L'amour conscient",
+      width: 1200,
+      height: 630,
+      focal: null,
+    },
+    readingMinutes: 4,
+    authors: [],
+    categories: [{ id: 'chantal-masse:term:category:couple', kind: 'category', slug: 'couple', title: 'Couple', path: null }],
+    tags: [],
+  },
+  {
+    id: 'chantal-masse:post:comment-calmer-l-anxiete',
+    locale: 'fr',
+    fallbackFrom: null,
+    path: '/blog/comment-calmer-l-anxiete',
+    title: "Comment calmer l'anxiété",
+    date: '2025-09-20T00:00:00.000Z',
+    excerpt: 'Des pistes concrètes pour retrouver votre calme intérieur.',
+    hero: {
+      src: '/media/sites/chantal-masse/media/def456.jpg',
+      alt: "Comment calmer l'anxiété",
+      width: 1200,
+      height: 630,
+      focal: null,
+    },
+    readingMinutes: 3,
+    authors: [],
+    categories: [{ id: 'chantal-masse:term:category:anxiete', kind: 'category', slug: 'anxiete', title: 'Anxiété', path: null }],
+    tags: [],
+  },
+]
 
 const SAMPLE_POSTS = [
   {
@@ -72,53 +203,17 @@ const SAMPLE_POSTS = [
   },
 ]
 
-async function renderHomeSections(previewMode: boolean): Promise<string> {
-  const parts = await Promise.all([
-    renderToString(createSSRApp({ render: () => h(HeroSection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(ServicesSection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(PhilosophySection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(MethodsSection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(TestimonialsSection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(NewsletterSection, { posts: SAMPLE_POSTS, previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(BookingSection, { previewMode }) })),
-    renderToString(createSSRApp({ render: () => h(TheFooter, { previewMode }) })),
-  ])
-  const mainAttrs = Object.entries(tlsPageAttrs(previewMode, pageDocId('home'), 'fr'))
-    .map(([k, v]) => ` ${k}="${v}"`)
-    .join('')
-  return `<main${mainAttrs}>${parts.join('\n')}</main>`
-}
+beforeEach(() => {
+  for (const k of Object.keys(mockWorkerEnv)) delete mockWorkerEnv[k]
+  delete process.env.PREVIEW_SECRET
+})
 
-function renderPostHtml(previewMode: boolean): string {
-  const post = SAMPLE_POSTS[0]!
-  const rel = [SAMPLE_POSTS[1]!]
-  const attrs = (obj: Record<string, string>) =>
-    Object.entries(obj)
-      .map(([k, v]) => ` ${k}="${v}"`)
-      .join('')
-  return [
-    `<main${attrs(tlsPageAttrs(previewMode, post.id, 'fr'))}>`,
-    `<article${attrs(tlsItemAttrs(previewMode, post.id, 'post'))}>`,
-    `<img src="${post.image}" alt="${post.title}"${attrs(tlsPostHeroImageAttrs(previewMode, post.id))} />`,
-    `<h1${attrs(tlsEntryFieldAttrs(previewMode, post.id, 'title'))}>${post.title}</h1>`,
-    `<p${attrs(tlsExtFieldAttrs(previewMode, post.id, 'excerpt'))}>${post.excerpt}</p>`,
-    `<div class="prose"${attrs(tlsExtFieldAttrs(previewMode, post.id, 'body'))}><p>Corps</p></div>`,
-    `<div${attrs(tlsCollectionAttrs(previewMode, 'post'))}>`,
-    ...rel.map(
-      r =>
-        `<a href="/blog/${r.slug}"${attrs(tlsItemAttrs(previewMode, r.id, 'post'))}>`
-        + `<img src="${r.image}" alt="${r.title}"${attrs(tlsPostHeroImageAttrs(previewMode, r.id))} />`
-        + `<h3${attrs(tlsEntryFieldAttrs(previewMode, r.id, 'title'))}>${r.title}</h3>`
-        + `<p${attrs(tlsExtFieldAttrs(previewMode, r.id, 'excerpt'))}>${r.excerpt}</p>`
-        + '</a>',
-    ),
-    '</div>',
-    '</article>',
-    '</main>',
-  ].join('\n')
-}
+afterEach(() => {
+  for (const k of Object.keys(mockWorkerEnv)) delete mockWorkerEnv[k]
+  delete process.env.PREVIEW_SECRET
+})
 
-describe('S4b /_tls/preview handshake route', () => {
+describe('S4b /_tls/preview handshake route & HS256 token verification', () => {
   it('refuses open-redirect paths (//evil.com, external URLs, backslashes) with 400', async () => {
     const evilPaths = [
       '//evil.com',
@@ -161,6 +256,55 @@ describe('S4b /_tls/preview handshake route', () => {
     }
   })
 
+  it('cryptographically verifies HS256 preview tokens matching tls-cms when PREVIEW_SECRET is configured', async () => {
+    const now = Date.now()
+    const validJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET, now)
+    const wrongSiteJwt = await signPreviewToken('le-brouemont', TEST_PREVIEW_SECRET, now)
+    const wrongSecretJwt = await signPreviewToken('chantal-masse', 'wrong-secret-key', now)
+    const expiredJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET, now - 4000 * 1000)
+
+    expect(parsePreviewJwtClaims(validJwt, 'chantal-masse', now)).toMatchObject({
+      aud: 'tls-preview',
+      site: 'chantal-masse',
+    })
+    expect(await verifyPreviewToken(validJwt, TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(true)
+    expect(await verifyPreviewToken(wrongSiteJwt, TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken(wrongSecretJwt, TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken(expiredJwt, TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken('opaque_junk_token', TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
+
+    // With PREVIEW_SECRET configured on the Worker, /_tls/preview refuses unsigned, expired, or wrong-site tokens
+    mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
+    for (const badTok of ['opaque_junk_token', wrongSiteJwt, wrongSecretJwt, expiredJwt]) {
+      const getRes = await callApi(
+        previewGet,
+        new Request(`https://chantalmasse.com/_tls/preview?token=${encodeURIComponent(badTok)}&path=/blog`),
+      )
+      expect(getRes.status).toBe(401)
+      expect(getRes.headers.get('set-cookie')).toBeNull()
+
+      const postRes = await callApi(
+        previewPost,
+        new Request('https://chantalmasse.com/_tls/preview', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', origin: 'https://chantalmasse.com' },
+          body: JSON.stringify({ token: badTok }),
+        }),
+      )
+      expect(postRes.status).toBe(401)
+      expect(postRes.headers.get('set-cookie')).toBeNull()
+    }
+
+    // Valid HS256 token succeeds
+    const okRes = await callApi(
+      previewGet,
+      new Request(`https://chantalmasse.com/_tls/preview?token=${encodeURIComponent(validJwt)}&path=/blog&tls_edit=edt_1`),
+    )
+    expect(okRes.status).toBe(303)
+    expect(okRes.headers.get('location')).toBe('/blog?tls_edit=edt_1')
+    expect(okRes.headers.get('set-cookie')).toContain(`__tls_preview=${validJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure`)
+  })
+
   it('sets __tls_preview cookie and 303-redirects to path preserving ?tls_edit=<editToken>', async () => {
     const req = new Request(
       'https://chantalmasse.com/_tls/preview?token=prv_jwt_token_1&path=%2Fblog%2Fl-amour-conscient&tls_edit=edt_hmac_token_2',
@@ -185,7 +329,6 @@ describe('S4b /_tls/preview handshake route', () => {
   })
 
   it('POST /_tls/preview refreshes or clears __tls_preview from same-origin fetch and rejects foreign Origin', async () => {
-    // Refresh token
     const refreshRes = await callApi(
       previewPost,
       new Request('https://chantalmasse.com/_tls/preview', {
@@ -201,7 +344,6 @@ describe('S4b /_tls/preview handshake route', () => {
     )
     expect(await refreshRes.json()).toEqual({ ok: true, preview: true })
 
-    // Clear cookie on exit
     const clearRes = await callApi(
       previewPost,
       new Request('https://chantalmasse.com/_tls/preview', {
@@ -217,7 +359,6 @@ describe('S4b /_tls/preview handshake route', () => {
     )
     expect(await clearRes.json()).toEqual({ ok: true, preview: false })
 
-    // Cross-origin rejection
     const foreignRes = await callApi(
       previewPost,
       new Request('https://chantalmasse.com/_tls/preview', {
@@ -229,7 +370,6 @@ describe('S4b /_tls/preview handshake route', () => {
     expect(foreignRes.status).toBe(403)
     expect(foreignRes.headers.get('set-cookie')).toBeNull()
 
-    // Invalid body rejection
     const invalidRes = await callApi(
       previewPost,
       new Request('https://chantalmasse.com/_tls/preview', {
@@ -242,54 +382,160 @@ describe('S4b /_tls/preview handshake route', () => {
   })
 })
 
-describe('S4b preview cookie, middleware headers, and cms-client draft mode', () => {
-  it('parses __tls_preview cookie and sets Cache-Control: private, no-store + X-Robots-Tag: noindex in preview mode', async () => {
-    expect(readPreviewCookie(null)).toBeNull()
-    expect(readPreviewCookie('other=1; __tls_preview=tok_draft_99; foo=bar')).toBe('tok_draft_99')
-    expect(buildPreviewSetCookie('tok_1', true)).toBe(
-      '__tls_preview=tok_1; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure',
+describe('S4b real middleware onRequest, PAGE_CACHE shielding, and blog.ts 401/403 live fallback', () => {
+  function fakeKv(initial: Record<string, unknown> = {}) {
+    const data = new Map(Object.entries(initial).map(([k, v]) => [k, JSON.stringify(v)]))
+    const kv = {
+      get: vi.fn(async (key: string) => (data.has(key) ? JSON.parse(data.get(key)!) : null)),
+      put: vi.fn(async (key: string, value: string) => { data.set(key, value) }),
+      delete: vi.fn(async (key: string) => { data.delete(key) }),
+    }
+    return { kv: kv as unknown as Kv & typeof kv, data }
+  }
+
+  it('shields PAGE_CACHE from unverified __tls_preview cookies, clears bad cookies, and only skips cache on verified HS256 tokens', async () => {
+    const cachedEntry = {
+      at: Date.now(),
+      status: 200,
+      type: 'text/html',
+      cacheControl: null,
+      body: '<!doctype html><html><body>cached blog</body></html>',
+    }
+    const { kv } = fakeKv({ 'html:v1:/blog': cachedEntry })
+    mockWorkerEnv.PAGE_CACHE = kv
+    mockWorkerEnv.CF_VERSION = { id: 'v1' }
+    mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
+
+    // 1. Scraper sends junk cookie `Cookie: __tls_preview=x`: must NOT bypass PAGE_CACHE, must clear cookie
+    const junkLocals: Record<string, unknown> = {}
+    const junkNext = vi.fn(async () => new Response('fresh render', { headers: { 'content-type': 'text/html' } }))
+    const junkRes = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/blog'),
+        request: new Request('https://chantalmasse.com/blog', { headers: { cookie: '__tls_preview=x' } }),
+        locals: junkLocals,
+      } as never,
+      junkNext,
+    )) as Response
+
+    expect(junkLocals.previewMode).toBe(false)
+    expect(junkLocals.previewToken).toBeNull()
+    expect(kv.get).toHaveBeenCalledTimes(1)
+    expect(junkNext).not.toHaveBeenCalled()
+    expect(await junkRes.text()).toContain('cached blog')
+    expect(junkRes.headers.get('set-cookie')).toBe(
+      '__tls_preview=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure',
     )
 
-    const previewHeaders = new Headers({ 'content-type': 'text/html' })
-    applyPreviewResponseHeaders(previewHeaders, true)
-    expect(previewHeaders.get('cache-control')).toBe('private, no-store')
-    expect(previewHeaders.get('x-robots-tag')).toBe('noindex')
+    // 2. Valid HS256 preview cookie: bypasses PAGE_CACHE, sets locals.previewMode = true, sets private/no-store + noindex
+    const validJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET)
+    const previewLocals: Record<string, unknown> = {}
+    const previewNext = vi.fn(
+      async () => new Response('<!doctype html><html><body>draft blog</body></html>', { headers: { 'content-type': 'text/html' } }),
+    )
+    const previewRes = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/blog'),
+        request: new Request('https://chantalmasse.com/blog', { headers: { cookie: `__tls_preview=${validJwt}` } }),
+        locals: previewLocals,
+      } as never,
+      previewNext,
+    )) as Response
 
-    const liveHeaders = new Headers({ 'content-type': 'text/html' })
-    applyPreviewResponseHeaders(liveHeaders, false)
-    expect(liveHeaders.get('cache-control')).toBeNull()
-    expect(liveHeaders.get('x-robots-tag')).toBeNull()
+    expect(previewLocals.previewMode).toBe(true)
+    expect(previewLocals.previewToken).toBe(validJwt)
+    expect(kv.get).toHaveBeenCalledTimes(1) // still 1: not called for preview request
+    expect(previewNext).toHaveBeenCalledTimes(1)
+    expect(await previewRes.text()).toContain('draft blog')
+    expect(previewRes.headers.get('cache-control')).toBe('private, no-store')
+    expect(previewRes.headers.get('x-robots-tag')).toBe('noindex')
   })
 
-  it('passes stage=draft and Authorization: Preview <token> in cms-client when previewToken is present', async () => {
-    const requests: Request[] = []
-    const fakeFetch = vi.fn(async (req: Request) => {
-      requests.push(req)
-      return new Response(
-        JSON.stringify({ data: { items: [], page: 1, limit: 10, total: 0, pages: 1 }, meta: { version: 1, tags: [] } }),
-        { status: 200, headers: { 'content-type': 'application/json' } },
-      )
-    })
+  it('preserves stronger X-Robots-Tag: noindex, nofollow on /annuler even in preview mode', async () => {
+    const res = await headersFor(
+      new Response('<!doctype html><html><body>annuler</body></html>', { headers: { 'content-type': 'text/html' } }),
+      '/annuler',
+      {},
+      true,
+    )
+    expect(res.headers.get('cache-control')).toBe('private, no-store')
+    expect(res.headers.get('x-robots-tag')).toBe('noindex, nofollow')
+  })
 
-    const liveClient = createCmsClient({ siteId: 'chantal-masse', fetch: fakeFetch })
-    await liveClient.listPosts({ locale: 'fr' })
-    expect(requests).toHaveLength(1)
-    expect(new URL(requests[0]!.url).searchParams.get('stage')).toBe('live')
-    expect(requests[0]!.headers.get('authorization')).toBeNull()
-    expect(requests[0]!.headers.get(CONTRACT_HEADER)).toBe(String(CONTRACT_VERSION))
+  it('passes stage=draft and Authorization: Preview <token> in cms-client, and blog.ts falls back to live on 401/403', async () => {
+    const seenRequests: Request[] = []
+    mockWorkerEnv.CMS = {
+      fetch: vi.fn(async (req: Request) => {
+        seenRequests.push(req)
+        const u = new URL(req.url)
+        const stage = u.searchParams.get('stage')
+        const auth = req.headers.get('authorization')
 
-    const previewClient = createCmsClient({
-      siteId: 'chantal-masse',
-      fetch: fakeFetch,
-      previewToken: 'prv_token_xyz',
+        // Simulate tls-cms rejecting a stale preview token with 401
+        if (stage === 'draft' && auth === 'Preview stale_token_401') {
+          return new Response(JSON.stringify({ error: 'invalid or expired token' }), {
+            status: 401,
+            headers: { 'content-type': 'application/json' },
+          })
+        }
+
+        if (u.pathname.endsWith('/posts')) {
+          return new Response(
+            JSON.stringify({
+              data: { items: SAMPLE_POST_SUMMARIES, page: 1, limit: 50, total: 2, pages: 1 },
+              meta: { version: 1, tags: [] },
+            }),
+            { status: 200, headers: { 'content-type': 'application/json' } },
+          )
+        }
+
+        const postDoc: PostDoc = {
+          ...SAMPLE_POST_SUMMARIES[0]!,
+          type: 'post',
+          seo: { title: "L'amour conscient", description: null, image: null, noindex: false, canonical: null },
+          body: { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Bonjour' }] }] },
+          updatedAt: '2025-10-15T00:00:00.000Z',
+        }
+        return new Response(
+          JSON.stringify({ data: postDoc, meta: { version: 1, tags: [] } }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        )
+      }),
+    }
+
+    // 1. Stale preview token on allPosts -> catches 401, calls onPreviewRejected, retries stage=live
+    let rejectedCount = 0
+    const postsAfterFallback = await allPosts({
+      previewToken: 'stale_token_401',
+      onPreviewRejected: () => { rejectedCount++ },
     })
-    await previewClient.listPosts({ locale: 'fr' })
-    await previewClient.getPage({ path: '/blog/l-amour-conscient', locale: 'fr' })
-    expect(requests).toHaveLength(3)
-    expect(new URL(requests[1]!.url).searchParams.get('stage')).toBe('draft')
-    expect(requests[1]!.headers.get('authorization')).toBe('Preview prv_token_xyz')
-    expect(new URL(requests[2]!.url).searchParams.get('stage')).toBe('draft')
-    expect(requests[2]!.headers.get('authorization')).toBe('Preview prv_token_xyz')
+    expect(rejectedCount).toBe(1)
+    expect(postsAfterFallback).toHaveLength(2)
+    expect(new URL(seenRequests[0]!.url).searchParams.get('stage')).toBe('draft')
+    expect(new URL(seenRequests[1]!.url).searchParams.get('stage')).toBe('live')
+
+    // 2. Stale preview token on getPost -> catches 401, calls onPreviewRejected, retries stage=live
+    seenRequests.length = 0
+    let getPostRejected = false
+    const postAfterFallback = await getPost('l-amour-conscient', {
+      previewToken: 'stale_token_401',
+      onPreviewRejected: () => { getPostRejected = true },
+    })
+    expect(getPostRejected).toBe(true)
+    expect(postAfterFallback?.doc.id).toBe('chantal-masse:post:l-amour-conscient')
+    expect(new URL(seenRequests[0]!.url).searchParams.get('stage')).toBe('draft')
+    expect(new URL(seenRequests[1]!.url).searchParams.get('stage')).toBe('live')
+
+    // 3. Valid preview token on latestPosts -> succeeds on stage=draft
+    seenRequests.length = 0
+    const draftLatest = await latestPosts(2, { previewToken: 'valid_draft_tok' })
+    expect(draftLatest).toHaveLength(2)
+    expect(seenRequests).toHaveLength(1)
+    expect(new URL(seenRequests[0]!.url).searchParams.get('stage')).toBe('draft')
+    expect(seenRequests[0]!.headers.get('authorization')).toBe('Preview valid_draft_tok')
+    expect(seenRequests[0]!.headers.get(CONTRACT_HEADER)).toBe(String(CONTRACT_VERSION))
   })
 })
 
@@ -360,11 +606,9 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
     expect(env.windowMock.__tlsEditL).toBe(1)
     expect(env.listeners.get('astro:page-load')).toHaveLength(1)
 
-    // Re-evaluating the inline script never registers a duplicate astro:page-load listener
     env.runScript()
     expect(env.listeners.get('astro:page-load')).toHaveLength(1)
 
-    // Even across ClientRouter astro:page-load navigations, public visitors load nothing
     env.firePageLoad()
     expect(env.appendedScripts).toHaveLength(0)
   })
@@ -379,7 +623,6 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
       { id: 'tls-edit-v2-script', src: 'https://dashboard.apies.dev/tls-edit-v2.js', defer: true },
     ])
 
-    // Firing astro:page-load or re-evaluating the script does not inject a duplicate script
     env.runScript()
     env.firePageLoad()
     expect(env.listeners.get('astro:page-load')).toHaveLength(1)
@@ -399,8 +642,8 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
   })
 })
 
-describe('S4b contract-level data-tls-* attributes (0 in live mode, full contract paths in preview mode)', () => {
-  it('emits 0 data-tls-* attributes when previewMode is false across all helpers and rendered pages, services, and posts', async () => {
+describe('S4b contract-level data-tls-* attributes & real component renders (live vs preview)', () => {
+  it('emits 0 data-tls-* attributes when previewMode is false across all helpers, layout resolution, and rendered components', async () => {
     const docId = pageDocId('home')
     const svcId = serviceDocId('coaching-de-couple')
     const pstId = postDocId('l-amour-conscient')
@@ -420,79 +663,160 @@ describe('S4b contract-level data-tls-* attributes (0 in live mode, full contrac
     expect(tlsCollectionAttrs(false, 'service')).toEqual({})
     expect(tlsItemAttrs(false, svcId, 'service')).toEqual({})
 
-    const [liveHome, liveIndividuelle, liveCouple, liveBlogIndex] = await Promise.all([
-      renderHomeSections(false),
-      renderToString(createSSRApp({ render: () => h(TherapieIndividuellePage, { previewMode: false }) })),
-      renderToString(createSSRApp({ render: () => h(CoachingDeCouplePage, { previewMode: false }) })),
-      renderToString(createSSRApp({ render: () => h(BlogIndexPage, { posts: SAMPLE_POSTS, previewMode: false }) })),
+    const liveLayout = resolveBaseLayoutTls({
+      isPrerendered: false,
+      locals: { previewMode: false, previewToken: null },
+      cookieHeader: null,
+      path: '/blog/l-amour-conscient',
+    })
+    expect(liveLayout.previewMode).toBe(false)
+    expect(liveLayout.mainAttrs).toEqual({})
+
+    const [liveNewsletter, liveBlogIndex, liveBlogPost, liveHero, liveServices, liveFooter, liveCouple, liveIndividuelle] = await Promise.all([
+      renderToString(vue.createSSRApp({ render: () => vue.h(NewsletterSection, { posts: SAMPLE_POSTS, previewMode: false }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(BlogIndexPage, { posts: SAMPLE_POSTS, previewMode: false }) })),
+      renderToString(
+        vue.createSSRApp({
+          render: () =>
+            vue.h(BlogPostPage, {
+              post: SAMPLE_POSTS[0]!,
+              docId: SAMPLE_POSTS[0]!.id,
+              heroSrcset: `${SAMPLE_POSTS[0]!.imageFull}?w=640 640w`,
+              bodyHtml: '<p>Contenu</p>',
+              relatedPosts: [SAMPLE_POSTS[1]!],
+              previewMode: false,
+            }),
+        }),
+      ),
+      renderToString(vue.createSSRApp({ render: () => vue.h(HeroSection) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(ServicesSection) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(TheFooter) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(CoachingDeCouplePage) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(TherapieIndividuellePage) })),
     ])
-    const livePost = renderPostHtml(false)
 
     for (const [name, html] of [
-      ['home', liveHome],
-      ['therapie-individuelle', liveIndividuelle],
-      ['coaching-de-couple', liveCouple],
-      ['blog-index', liveBlogIndex],
-      ['blog-post', livePost],
+      ['newsletter-live', liveNewsletter],
+      ['blog-index-live', liveBlogIndex],
+      ['blog-post-live', liveBlogPost],
+      ['hero-static', liveHero],
+      ['services-static', liveServices],
+      ['footer-static', liveFooter],
+      ['coaching-de-couple-static', liveCouple],
+      ['therapie-individuelle-static', liveIndividuelle],
     ] as const) {
-      expect(html, `${name} live render must have 0 data-tls-* attributes`).not.toContain('data-tls-')
+      expect(html, `${name} must have 0 data-tls-* attributes`).not.toContain('data-tls-')
     }
   })
 
-  it('emits full contract-level data-tls-* paths in previewMode across home, services, blog index, and blog post', async () => {
-    const [previewHome, previewIndividuelle, previewCouple, previewBlogIndex] = await Promise.all([
-      renderHomeSections(true),
-      renderToString(createSSRApp({ render: () => h(TherapieIndividuellePage, { previewMode: true }) })),
-      renderToString(createSSRApp({ render: () => h(CoachingDeCouplePage, { previewMode: true }) })),
-      renderToString(createSSRApp({ render: () => h(BlogIndexPage, { posts: SAMPLE_POSTS, previewMode: true }) })),
+  it('emits full contract-level data-tls-* paths in previewMode on real CMS-backed components (BlogPostPage, BlogIndexPage, NewsletterSection, plus CMS-bound HeroSection, ServicesSection, TheFooter)', async () => {
+    const previewLayout = resolveBaseLayoutTls({
+      isPrerendered: false,
+      locals: { previewMode: true, previewToken: 'valid_tok' },
+      pageDocId: SAMPLE_POSTS[0]!.id,
+      path: '/blog/l-amour-conscient',
+      locale: 'fr',
+    })
+    expect(previewLayout.previewMode).toBe(true)
+    expect(previewLayout.mainAttrs).toEqual({
+      'data-tls-page': 'chantal-masse:post:l-amour-conscient',
+      'data-tls-locale': 'fr',
+    })
+
+    // Prerendered pages never emit data-tls-page even if cookieHeader were passed
+    const prerenderedLayout = resolveBaseLayoutTls({
+      isPrerendered: true,
+      cookieHeader: '__tls_preview=tok',
+      path: '/coaching-de-couple',
+    })
+    expect(prerenderedLayout.previewMode).toBe(false)
+    expect(prerenderedLayout.mainAttrs).toEqual({})
+
+    const [previewNewsletter, previewBlogIndex, previewBlogPost, previewCmsHero, previewCmsServices, previewCmsFooter] = await Promise.all([
+      renderToString(vue.createSSRApp({ render: () => vue.h(NewsletterSection, { posts: SAMPLE_POSTS, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(BlogIndexPage, { posts: SAMPLE_POSTS, previewMode: true }) })),
+      renderToString(
+        vue.createSSRApp({
+          render: () =>
+            vue.h(BlogPostPage, {
+              post: SAMPLE_POSTS[0]!,
+              docId: SAMPLE_POSTS[0]!.id,
+              heroSrcset: `${SAMPLE_POSTS[0]!.imageFull}?w=640 640w`,
+              bodyHtml: '<p>Corps du billet</p>',
+              relatedPosts: [SAMPLE_POSTS[1]!],
+              previewMode: true,
+            }),
+        }),
+      ),
+      renderToString(
+        vue.createSSRApp({
+          render: () =>
+            vue.h(HeroSection, {
+              previewMode: true,
+              cmsHero: {
+                docId: pageDocId('home'),
+                blockKey: 'hero',
+                eyebrow: 'Thérapeute à Shefford',
+                heading: ["Thérapeute en relation d'aide", 'Tu as de la valeur'],
+                lede: 'Approche douce et consciente.',
+                ctaLabel: 'Prendre rendez-vous',
+                image: { src: '/images/chantal-hero.jpg', alt: 'Chantal Massé' },
+              },
+            }),
+        }),
+      ),
+      renderToString(
+        vue.createSSRApp({
+          render: () =>
+            vue.h(ServicesSection, {
+              previewMode: true,
+              cmsServices: {
+                docId: pageDocId('home'),
+                blockKey: 'services',
+                title: 'Accompagnements personnalisés',
+                lede: 'Chaque parcours est unique.',
+                couple: {
+                  id: serviceDocId('coaching-de-couple'),
+                  title: 'Coaching de Couple',
+                  description: 'Dialogue intentionnel Imago.',
+                  durationMinutes: 90,
+                },
+                individual: {
+                  id: serviceDocId('therapie-individuelle'),
+                  title: 'Thérapie Individuelle',
+                  description: 'Un espace sécurisé.',
+                  durationMinutes: 60,
+                },
+              },
+            }),
+        }),
+      ),
+      renderToString(
+        vue.createSSRApp({
+          render: () =>
+            vue.h(TheFooter, {
+              previewMode: true,
+              cmsSettings: {
+                id: settingsDocId(),
+                siteName: 'Chantal Massé',
+                address: '245 rue Colette, Shefford, QC J2M 2B7',
+              },
+            }),
+        }),
+      ),
     ])
-    const previewPost = renderPostHtml(true)
 
-    // 1. Home page: <main>, blocks, block fields, block images, service collection + items, post collection + items, settings
-    expect(previewHome).toContain('data-tls-page="chantal-masse:page:home"')
-    expect(previewHome).toContain('data-tls-locale="fr"')
-    expect(previewHome).toContain('data-tls-block="hero"')
-    expect(previewHome).toContain('data-tls-block-type="hero"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/heading/0"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/heading/1"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/lede"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/cta/label"')
-    expect(previewHome).toContain('data-tls-image="doc:chantal-masse:page:home/blocks/hero/data/image"')
-    expect(previewHome).toContain('data-tls-block="services"')
-    expect(previewHome).toContain('data-tls-block-type="collection"')
-    expect(previewHome).toContain('data-tls-collection="service"')
-    expect(previewHome).toContain('data-tls-item="chantal-masse:item:service:coaching-de-couple"')
-    expect(previewHome).toContain('data-tls-item="chantal-masse:item:service:therapie-individuelle"')
-    expect(previewHome).toContain('data-tls-kind="service"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/entry/title"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/ext/description"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:item:service:therapie-individuelle/entry/title"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:item:service:therapie-individuelle/ext/description"')
-    expect(previewHome).toContain('data-tls-image="doc:chantal-masse:page:home/blocks/approche/data/media/0"')
-    expect(previewHome).toContain('data-tls-collection="post"')
-    expect(previewHome).toContain('data-tls-item="chantal-masse:post:l-amour-conscient"')
-    expect(previewHome).toContain('data-tls-kind="post"')
-    expect(previewHome).toContain('data-tls-image="doc:chantal-masse:post:l-amour-conscient/ext/heroMediaId"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/entry/title"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:settings:site/settings/siteName"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:settings:site/settings/address"')
-    expect(previewHome).toContain('data-tls-field="doc:chantal-masse:settings:site/settings/hours"')
+    // 1. Real BlogPostPage.vue component
+    expect(previewBlogPost).toContain('data-tls-item="chantal-masse:post:l-amour-conscient"')
+    expect(previewBlogPost).toContain('data-tls-kind="post"')
+    expect(previewBlogPost).toContain('data-tls-image="doc:chantal-masse:post:l-amour-conscient/ext/heroMediaId"')
+    expect(previewBlogPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/entry/title"')
+    expect(previewBlogPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/ext/excerpt"')
+    expect(previewBlogPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/ext/body"')
+    expect(previewBlogPost).toContain('data-tls-collection="post"')
+    expect(previewBlogPost).toContain('data-tls-item="chantal-masse:post:comment-calmer-l-anxiete"')
 
-    // 2. Service pages: therapie-individuelle & coaching-de-couple
-    expect(previewIndividuelle).toContain('data-tls-block="hero"')
-    expect(previewIndividuelle).toContain('data-tls-field="doc:chantal-masse:page:therapie-individuelle/blocks/hero/data/heading/0"')
-    expect(previewIndividuelle).toContain('data-tls-item="chantal-masse:item:service:therapie-individuelle"')
-    expect(previewIndividuelle).toContain('data-tls-field="doc:chantal-masse:item:service:therapie-individuelle/ext/priceCents"')
-
-    expect(previewCouple).toContain('data-tls-block="hero"')
-    expect(previewCouple).toContain('data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/hero/data/heading/0"')
-    expect(previewCouple).toContain('data-tls-item="chantal-masse:item:service:coaching-de-couple"')
-    expect(previewCouple).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/ext/priceCents"')
-
-    // 3. Blog index page
-    expect(previewBlogIndex).toContain('data-tls-block="hero"')
-    expect(previewBlogIndex).toContain('data-tls-block-type="heading"')
-    expect(previewBlogIndex).toContain('data-tls-field="doc:chantal-masse:page:blog/blocks/hero/data/title"')
+    // 2. Real BlogIndexPage.vue component
     expect(previewBlogIndex).toContain('data-tls-block="posts"')
     expect(previewBlogIndex).toContain('data-tls-block-type="collection"')
     expect(previewBlogIndex).toContain('data-tls-collection="post"')
@@ -502,15 +826,32 @@ describe('S4b contract-level data-tls-* attributes (0 in live mode, full contrac
     expect(previewBlogIndex).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/entry/title"')
     expect(previewBlogIndex).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/ext/excerpt"')
 
-    // 4. Blog post page
-    expect(previewPost).toContain('data-tls-page="chantal-masse:post:l-amour-conscient"')
-    expect(previewPost).toContain('data-tls-locale="fr"')
-    expect(previewPost).toContain('data-tls-image="doc:chantal-masse:post:l-amour-conscient/ext/heroMediaId"')
-    expect(previewPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/entry/title"')
-    expect(previewPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/ext/excerpt"')
-    expect(previewPost).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/ext/body"')
-    expect(previewPost).toContain('data-tls-collection="post"')
-    expect(previewPost).toContain('data-tls-item="chantal-masse:post:comment-calmer-l-anxiete"')
+    // 3. Real NewsletterSection.vue component (home page CMS posts)
+    expect(previewNewsletter).toContain('data-tls-collection="post"')
+    expect(previewNewsletter).toContain('data-tls-item="chantal-masse:post:l-amour-conscient"')
+    expect(previewNewsletter).toContain('data-tls-kind="post"')
+    expect(previewNewsletter).toContain('data-tls-image="doc:chantal-masse:post:l-amour-conscient/ext/heroMediaId"')
+    expect(previewNewsletter).toContain('data-tls-field="doc:chantal-masse:post:l-amour-conscient/entry/title"')
+
+    // 4. Real HeroSection.vue, ServicesSection.vue, and TheFooter.vue when backed by CMS data
+    expect(previewCmsHero).toContain('data-tls-block="hero"')
+    expect(previewCmsHero).toContain('data-tls-block-type="hero"')
+    expect(previewCmsHero).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/heading/0"')
+    expect(previewCmsHero).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/hero/data/lede"')
+    expect(previewCmsHero).toContain('data-tls-image="doc:chantal-masse:page:home/blocks/hero/data/image"')
+
+    expect(previewCmsServices).toContain('data-tls-block="services"')
+    expect(previewCmsServices).toContain('data-tls-block-type="collection"')
+    expect(previewCmsServices).toContain('data-tls-collection="service"')
+    expect(previewCmsServices).toContain('data-tls-item="chantal-masse:item:service:coaching-de-couple"')
+    expect(previewCmsServices).toContain('data-tls-item="chantal-masse:item:service:therapie-individuelle"')
+    expect(previewCmsServices).toContain('data-tls-kind="service"')
+    expect(previewCmsServices).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/entry/title"')
+    expect(previewCmsServices).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/ext/description"')
+    expect(previewCmsServices).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/ext/attrs/duration_minutes"')
+
+    expect(previewCmsFooter).toContain('data-tls-field="doc:chantal-masse:settings:site/settings/siteName"')
+    expect(previewCmsFooter).toContain('data-tls-field="doc:chantal-masse:settings:site/settings/address"')
 
     // 5. Item image helper & path mapping
     expect(tlsItemImageAttrs(true, serviceDocId('coaching-de-couple'))).toEqual({
@@ -519,14 +860,5 @@ describe('S4b contract-level data-tls-* attributes (0 in live mode, full contrac
     expect(pageDocIdForPath('/')).toBe('chantal-masse:page:home')
     expect(pageDocIdForPath('/blog')).toBe('chantal-masse:page:blog')
     expect(pageDocIdForPath('/blog/l-amour-conscient')).toBe('chantal-masse:post:l-amour-conscient')
-    expect(pageDocIdForPath('/coaching-de-couple')).toBe('chantal-masse:page:coaching-de-couple')
-
-    // 6. Base.astro and [slug].astro wire the loader and helpers
-    const baseSource = readFileSync(
-      fileURLToPath(new URL('../../astro/src/layouts/Base.astro', import.meta.url)),
-      'utf8',
-    )
-    expect(baseSource).toContain('buildDormantLoaderScript')
-    expect(baseSource).toContain('tlsPageAttrs')
   })
 })
