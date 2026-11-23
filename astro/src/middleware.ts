@@ -14,6 +14,7 @@ import {
   applyPreviewResponseHeaders,
   buildPreviewSetCookie,
   hasRawPreviewCookie,
+  PREVIEW_COOKIE,
   readPreviewCookie,
   SITE_ID,
   verifyPreviewToken,
@@ -72,14 +73,9 @@ export const onRequest = defineMiddleware(async (ctx: MiddlewareContext, next: (
   const hadPreviewCookie = hasRawPreviewCookie(cookieHeader)
   const secret = e.PREVIEW_SECRET || (typeof process !== 'undefined' ? process.env.PREVIEW_SECRET : undefined)
 
-  // Only trust `__tls_preview` (and bypass PAGE_CACHE) when verified:
-  // - With PREVIEW_SECRET configured: cryptographic HS256 JWT verification (`aud: "tls-preview"`, `site: "chantal-masse"`, `exp`).
-  // - Without PREVIEW_SECRET: fail closed whenever PAGE_CACHE is bound on the Worker so a crafted cookie can never bypass the cache.
-  const verified = rawCookie
-    ? (secret
-        ? await verifyPreviewToken(rawCookie, secret, SITE_ID)
-        : (!e.PAGE_CACHE && await verifyPreviewToken(rawCookie, null, SITE_ID)))
-    : false
+  // Only trust `__tls_preview` (and bypass PAGE_CACHE) when `PREVIEW_SECRET` is configured and the token
+  // passes cryptographic HS256 JWT verification (`aud: "tls-preview"`, `site: "chantal-masse"`, `exp`).
+  const verified = Boolean(rawCookie && secret && await verifyPreviewToken(rawCookie, secret, SITE_ID))
 
   const previewToken = verified ? rawCookie : null
   const previewMode = Boolean(previewToken)
@@ -90,7 +86,14 @@ export const onRequest = defineMiddleware(async (ctx: MiddlewareContext, next: (
   const clearCookie = hadPreviewCookie && !verified ? { isHttps } : undefined
 
   if (previewMode) {
-    return await headersFor(await next(), pathname, e, true)
+    const res = await next()
+    const activePreviewMode = Boolean(ctx.locals.previewMode)
+    const setCookies = typeof res.headers.getSetCookie === 'function'
+      ? res.headers.getSetCookie()
+      : [res.headers.get('set-cookie') ?? '']
+    const alreadyCleared = setCookies.some(c => c.includes(`${PREVIEW_COOKIE}=;`) && c.includes('Max-Age=0'))
+    const clearRejectedCookie = !activePreviewMode && !alreadyCleared ? { isHttps } : undefined
+    return await headersFor(res, pathname, e, activePreviewMode, clearRejectedCookie)
   }
 
   const kv = e.PAGE_CACHE

@@ -7,13 +7,11 @@ import BlogPostPage from '../../vue/pages/BlogPostPage.vue'
 import { allPosts, getPost, related } from '../../lib/blog'
 import { richTextToHtml } from '../../lib/richtext'
 import { SITE_URL } from '../../lib/seo'
-import { buildPreviewSetCookie, readPreviewCookie } from '../../lib/tls-edit-attrs'
+import { buildPreviewSetCookie } from '../../lib/tls-edit-attrs'
 
 export const prerender = false
 
-const previewToken = Astro.locals.previewToken !== undefined
-  ? Astro.locals.previewToken
-  : readPreviewCookie(Astro.request.headers.get('cookie'))
+const previewToken = Astro.locals.previewToken ?? null
 let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
 const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
 let cookieCleared = false

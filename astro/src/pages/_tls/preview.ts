@@ -66,11 +66,6 @@ export const GET: APIRoute = async ({ request }) => {
     return jsonResponse({ error: 'invalid_token' }, 400)
   }
 
-  const secret = getPreviewSecret()
-  if (!(await verifyPreviewToken(token, secret, SITE_ID))) {
-    return jsonResponse({ error: 'invalid_token' }, secret ? 401 : 400)
-  }
-
   const rawPath = url.searchParams.get('path')
   const validPath = validatePreviewPath(rawPath)
   if (!validPath) {
@@ -93,6 +88,14 @@ export const GET: APIRoute = async ({ request }) => {
   const location = `${target.pathname}${target.search}${target.hash}`
   if (!SAFE_PREVIEW_PATH_RE.test(location)) {
     return jsonResponse({ error: 'invalid_path' }, 400)
+  }
+
+  const secret = getPreviewSecret()?.trim()
+  if (!secret) {
+    return jsonResponse({ error: 'preview_not_configured' }, 503)
+  }
+  if (!(await verifyPreviewToken(token, secret, SITE_ID))) {
+    return jsonResponse({ error: 'invalid_token' }, 401)
   }
 
   const isHttps = isHttpsRequest(request, url)
@@ -132,9 +135,12 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   if (isValidPreviewToken(body.token)) {
-    const secret = getPreviewSecret()
+    const secret = getPreviewSecret()?.trim()
+    if (!secret) {
+      return jsonResponse({ error: 'preview_not_configured' }, 503)
+    }
     if (!(await verifyPreviewToken(body.token, secret, SITE_ID))) {
-      return jsonResponse({ error: 'invalid_token' }, secret ? 401 : 400)
+      return jsonResponse({ error: 'invalid_token' }, 401)
     }
     return jsonResponse(
       { ok: true, preview: true },

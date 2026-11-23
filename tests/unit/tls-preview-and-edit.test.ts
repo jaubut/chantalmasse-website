@@ -270,6 +270,33 @@ describe('S4b /_tls/preview handshake route & HS256 token verification', () => {
     expect(await verifyPreviewToken(expiredJwt, TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
     expect(await verifyPreviewToken('opaque_junk_token', TEST_PREVIEW_SECRET, 'chantal-masse', now)).toBe(false)
 
+    // Fails closed when PREVIEW_SECRET is unset or blank (both for 3-part JWTs and opaque strings)
+    expect(await verifyPreviewToken(validJwt, undefined, 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken(validJwt, null, 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken(validJwt, '   ', 'chantal-masse', now)).toBe(false)
+    expect(await verifyPreviewToken('opaque_junk_token', undefined, 'chantal-masse', now)).toBe(false)
+
+    // Without PREVIEW_SECRET configured, /_tls/preview GET and POST token handshakes fail closed with 503
+    const unconfiguredGetRes = await callApi(
+      previewGet,
+      new Request(`https://chantalmasse.com/_tls/preview?token=${encodeURIComponent(validJwt)}&path=/blog`),
+    )
+    expect(unconfiguredGetRes.status).toBe(503)
+    expect(unconfiguredGetRes.headers.get('set-cookie')).toBeNull()
+    expect(await unconfiguredGetRes.json()).toEqual({ error: 'preview_not_configured' })
+
+    const unconfiguredPostRes = await callApi(
+      previewPost,
+      new Request('https://chantalmasse.com/_tls/preview', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', origin: 'https://chantalmasse.com' },
+        body: JSON.stringify({ token: validJwt }),
+      }),
+    )
+    expect(unconfiguredPostRes.status).toBe(503)
+    expect(unconfiguredPostRes.headers.get('set-cookie')).toBeNull()
+    expect(await unconfiguredPostRes.json()).toEqual({ error: 'preview_not_configured' })
+
     // With PREVIEW_SECRET configured on the Worker, /_tls/preview refuses unsigned, expired, or wrong-site tokens
     mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
     for (const badTok of ['opaque_junk_token', wrongSiteJwt, wrongSecretJwt, expiredJwt]) {
@@ -303,41 +330,45 @@ describe('S4b /_tls/preview handshake route & HS256 token verification', () => {
   })
 
   it('sets __tls_preview cookie and 303-redirects to path preserving ?tls_edit=<editToken>', async () => {
+    mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
+    const validJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET)
     const req = new Request(
-      'https://chantalmasse.com/_tls/preview?token=prv_jwt_token_1&path=%2Fblog%2Fl-amour-conscient&tls_edit=edt_hmac_token_2',
+      `https://chantalmasse.com/_tls/preview?token=${encodeURIComponent(validJwt)}&path=%2Fblog%2Fl-amour-conscient&tls_edit=edt_hmac_token_2`,
     )
     const res = await callApi(previewGet, req)
     expect(res.status).toBe(303)
     expect(res.headers.get('location')).toBe('/blog/l-amour-conscient?tls_edit=edt_hmac_token_2')
     expect(res.headers.get('set-cookie')).toBe(
-      '__tls_preview=prv_jwt_token_1; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure',
+      `__tls_preview=${validJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure`,
     )
     expect(res.headers.get('cache-control')).toBe('no-store')
     expect(res.headers.get('referrer-policy')).toBe('no-referrer')
 
     // Default path `/` on http:// (no Secure attribute) and without tls_edit
-    const httpReq = new Request('http://localhost:4321/_tls/preview?token=prv_local_tok')
+    const httpReq = new Request(`http://localhost:4321/_tls/preview?token=${encodeURIComponent(validJwt)}`)
     const httpRes = await callApi(previewGet, httpReq)
     expect(httpRes.status).toBe(303)
     expect(httpRes.headers.get('location')).toBe('/')
     expect(httpRes.headers.get('set-cookie')).toBe(
-      '__tls_preview=prv_local_tok; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600',
+      `__tls_preview=${validJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600`,
     )
   })
 
   it('POST /_tls/preview refreshes or clears __tls_preview from same-origin fetch and rejects foreign Origin', async () => {
+    mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
+    const renewedJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET)
     const refreshRes = await callApi(
       previewPost,
       new Request('https://chantalmasse.com/_tls/preview', {
         method: 'POST',
         headers: { 'content-type': 'application/json', origin: 'https://chantalmasse.com' },
-        body: JSON.stringify({ token: 'renewed_preview_tok' }),
+        body: JSON.stringify({ token: renewedJwt }),
       }),
     )
     expect(refreshRes.status).toBe(200)
     expect(refreshRes.headers.get('cache-control')).toBe('no-store')
     expect(refreshRes.headers.get('set-cookie')).toBe(
-      '__tls_preview=renewed_preview_tok; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure',
+      `__tls_preview=${renewedJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=3600; Secure`,
     )
     expect(await refreshRes.json()).toEqual({ ok: true, preview: true })
 
@@ -448,6 +479,95 @@ describe('S4b real middleware onRequest, PAGE_CACHE shielding, and blog.ts 401/4
     expect(await previewRes.text()).toContain('draft blog')
     expect(previewRes.headers.get('cache-control')).toBe('private, no-store')
     expect(previewRes.headers.get('x-robots-tag')).toBe('noindex')
+
+    // 3. When PREVIEW_SECRET is unset (even without PAGE_CACHE), middleware fails closed and clears the cookie
+    delete mockWorkerEnv.PREVIEW_SECRET
+    delete mockWorkerEnv.PAGE_CACHE
+    const noSecretLocals: Record<string, unknown> = {}
+    const noSecretRes = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/blog'),
+        request: new Request('https://chantalmasse.com/blog', { headers: { cookie: `__tls_preview=${validJwt}` } }),
+        locals: noSecretLocals,
+      } as never,
+      async () => new Response('<!doctype html><html><body>live blog</body></html>', { headers: { 'content-type': 'text/html' } }),
+    )) as Response
+    expect(noSecretLocals.previewMode).toBe(false)
+    expect(noSecretLocals.previewToken).toBeNull()
+    expect(noSecretRes.headers.get('set-cookie')).toBe(
+      '__tls_preview=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure',
+    )
+    expect(noSecretRes.headers.get('cache-control')).toBeNull()
+  })
+
+  it('preserves cookie cleanup and NUXT_404_ROBOTS across 404 rewrites (and live fallback headers on 200) when CMS rejects a preview token', async () => {
+    mockWorkerEnv.PREVIEW_SECRET = TEST_PREVIEW_SECRET
+    const validJwt = await signPreviewToken('chantal-masse', TEST_PREVIEW_SECRET)
+
+    // 1. Draft-only slug rejected by CMS (401/403): onPreviewRejected flips locals.previewMode = false,
+    //    and Astro.rewrite('/404') returns a fresh 404 response that discarded Astro.response.headers.
+    const rewrite404Locals: Record<string, unknown> = {}
+    const rewrite404Res = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/blog/draft-only-post'),
+        request: new Request('https://chantalmasse.com/blog/draft-only-post', {
+          headers: { cookie: `__tls_preview=${validJwt}` },
+        }),
+        locals: rewrite404Locals,
+      } as never,
+      async () => {
+        rewrite404Locals.previewMode = false
+        rewrite404Locals.previewToken = null
+        return new Response('<!doctype html><html><body>404</body></html>', {
+          status: 404,
+          headers: { 'content-type': 'text/html' },
+        })
+      },
+    )) as Response
+
+    expect(rewrite404Res.status).toBe(404)
+    expect(rewrite404Res.headers.get('set-cookie')).toBe(
+      '__tls_preview=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure',
+    )
+    expect(rewrite404Res.headers.get('x-robots-tag')).toBe(
+      'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1',
+    )
+    expect(rewrite404Res.headers.get('cache-control')).toBeNull()
+
+    // 2. Published slug where CMS rejected preview token and fell back to 200 live content
+    //    (Astro.response.headers already contains the Max-Age=0 Set-Cookie):
+    //    must preserve live headers (not noindex/no-store) and must not duplicate Set-Cookie.
+    const fallback200Locals: Record<string, unknown> = {}
+    const fallback200Res = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/blog/l-amour-conscient'),
+        request: new Request('https://chantalmasse.com/blog/l-amour-conscient', {
+          headers: { cookie: `__tls_preview=${validJwt}` },
+        }),
+        locals: fallback200Locals,
+      } as never,
+      async () => {
+        fallback200Locals.previewMode = false
+        fallback200Locals.previewToken = null
+        return new Response('<!doctype html><html><body>live post</body></html>', {
+          status: 200,
+          headers: {
+            'content-type': 'text/html',
+            'set-cookie': buildPreviewSetCookie(null, true),
+          },
+        })
+      },
+    )) as Response
+
+    expect(fallback200Res.status).toBe(200)
+    expect(fallback200Res.headers.get('set-cookie')).toBe(
+      '__tls_preview=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Secure',
+    )
+    expect(fallback200Res.headers.get('x-robots-tag')).toBeNull()
+    expect(fallback200Res.headers.get('cache-control')).toBeNull()
   })
 
   it('preserves stronger X-Robots-Tag: noindex, nofollow on /annuler even in preview mode', async () => {
@@ -728,6 +848,17 @@ describe('S4b contract-level data-tls-* attributes & real component renders (liv
     })
     expect(prerenderedLayout.previewMode).toBe(false)
     expect(prerenderedLayout.mainAttrs).toEqual({})
+
+    // SSR layout resolution never falls back to unverified cookieHeader when locals.previewToken is undefined
+    const unverifiedCookieLayout = resolveBaseLayoutTls({
+      isPrerendered: false,
+      locals: {},
+      cookieHeader: '__tls_preview=unverified_cookie_tok',
+      path: '/blog',
+    })
+    expect(unverifiedCookieLayout.previewToken).toBeNull()
+    expect(unverifiedCookieLayout.previewMode).toBe(false)
+    expect(unverifiedCookieLayout.mainAttrs).toEqual({})
 
     const [previewNewsletter, previewBlogIndex, previewBlogPost, previewCmsHero, previewCmsServices, previewCmsFooter] = await Promise.all([
       renderToString(vue.createSSRApp({ render: () => vue.h(NewsletterSection, { posts: SAMPLE_POSTS, previewMode: true }) })),

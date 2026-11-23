@@ -119,9 +119,9 @@ export async function signPreviewToken(
 /**
  * Verifies a `__tls_preview` token:
  * - Always checks `isValidPreviewToken`.
- * - When `secret` (`PREVIEW_SECRET`) is configured, cryptographically verifies the HS256 signature
- *   via Web Crypto `crypto.subtle.verify` and checks `{ aud: "tls-preview", site: expectedSite, exp }`.
- * - When `secret` is not configured, still validates JWT claims if the token has dot-separated segments.
+ * - Fails closed (`false`) whenever `secret` (`PREVIEW_SECRET`) is not configured.
+ * - Cryptographically verifies the HS256 signature via Web Crypto `crypto.subtle.verify`
+ *   and checks `{ aud: "tls-preview", site: expectedSite, exp }`.
  */
 export async function verifyPreviewToken(
   token: unknown,
@@ -131,12 +131,7 @@ export async function verifyPreviewToken(
 ): Promise<boolean> {
   if (!isValidPreviewToken(token)) return false
   const trimmedSecret = secret?.trim()
-  if (!trimmedSecret) {
-    if (token.includes('.')) {
-      return parsePreviewJwtClaims(token, expectedSite, nowMs) !== null
-    }
-    return true
-  }
+  if (!trimmedSecret) return false
   const claims = parsePreviewJwtClaims(token, expectedSite, nowMs)
   if (!claims) return false
   const [hSeg, pSeg, sSeg] = token.split('.') as [string, string, string]
@@ -416,7 +411,7 @@ export function resolveBaseLayoutTls(input: ResolveBaseLayoutTlsInput): Resolved
   const isPrerendered = Boolean(input.isPrerendered)
   const previewToken = isPrerendered
     ? null
-    : (input.locals?.previewToken !== undefined ? input.locals.previewToken : readPreviewCookie(input.cookieHeader))
+    : (input.locals?.previewToken ?? null)
   const previewMode = input.previewModeProp ?? (isPrerendered ? false : (input.locals?.previewMode ?? Boolean(previewToken)))
   const resolvedPageDocId = input.pageDocId ?? pageDocIdForPath(input.path)
   const mainAttrs = tlsPageAttrs(previewMode, resolvedPageDocId, input.locale ?? DEFAULT_LOCALE)
