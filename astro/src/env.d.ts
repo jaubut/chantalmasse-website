@@ -3,3 +3,11 @@
 declare module 'cloudflare:workers' {
   export const env: Record<string, unknown>
 }
+
+declare namespace App {
+  interface Locals {
+    previewToken?: string | null
+    previewMode?: boolean
+    cfContext?: { waitUntil(p: Promise<unknown>): void }
+  }
+}

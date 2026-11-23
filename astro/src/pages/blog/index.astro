@@ -4,11 +4,31 @@ import Base from '../../layouts/Base.astro'
 import BlogIndexPage from '../../vue/pages/BlogIndexPage.vue'
 import { allPosts } from '../../lib/blog'
 import { HERO_IMAGE } from '../../lib/seo'
+import { buildPreviewSetCookie, pageDocId } from '../../lib/tls-edit-attrs'
 
 export const prerender = false
-const posts = await allPosts()
+
+const previewToken = Astro.locals.previewToken ?? null
+let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+
+const onPreviewRejected = (): void => {
+  previewMode = false
+  Astro.locals.previewMode = false
+  Astro.locals.previewToken = null
+  Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+}
+
+const posts = await allPosts({ previewToken, onPreviewRejected })
 const description = 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.'
 ---
-<Base title="Blogue — Chantal Massé" path="/blog" description={description} ogImage={HERO_IMAGE}>
-  <BlogIndexPage client:load posts={posts} />
+<Base
+  title="Blogue — Chantal Massé"
+  path="/blog"
+  description={description}
+  ogImage={HERO_IMAGE}
+  pageDocId={pageDocId('blog')}
+  previewMode={previewMode}
+>
+  <BlogIndexPage client:load posts={posts} {...(previewMode ? { previewMode: true } : {})} />
 </Base>

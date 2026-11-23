@@ -1,11 +1,21 @@
 <template>
-  <section id="hero" class="min-h-0 md:min-h-[921px] flex items-center overflow-hidden px-8 lg:px-20 pt-24 pb-16 bg-background">
+  <section
+    id="hero"
+    class="min-h-0 md:min-h-[921px] flex items-center overflow-hidden px-8 lg:px-20 pt-24 pb-16 bg-background"
+    v-bind="tlsBlockAttrs(hasCms, blockKey, 'hero')"
+  >
     <div class="max-w-screen-xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
       <!-- Left column -->
       <div class="order-1 lg:order-1 flex flex-col gap-8">
-        <span class="inline-flex w-fit items-center bg-secondary-fixed text-primary text-xs font-medium uppercase tracking-widest rounded-full px-4 py-2" data-animate>
+        <span
+          class="inline-flex w-fit items-center bg-secondary-fixed text-primary text-xs font-medium uppercase tracking-widest rounded-full px-4 py-2"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.eyebrow), docId, blockKey, 'eyebrow')"
+        >
+          <template v-if="cmsHero?.eyebrow">{{ cmsHero.eyebrow }}</template>
           <span
+            v-else
             ref="trackEl"
             class="relative inline-flex items-center overflow-hidden"
             :style="{ width: containerWidth ? containerWidth + 'px' : undefined, transition: 'width 600ms cubic-bezier(0.4, 0, 0.2, 1)' }"
@@ -31,64 +41,83 @@
             >{{ label }}</span>
           </span>
         </span>
-        <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight" data-animate>
-          Thérapeute en relation d'aide à
-          <span
-            class="italic relative inline-block cursor-default"
-            @mouseenter="showMap = true"
-            @mouseleave="showMap = false"
-          >
-            Shefford
-            <Transition
-              enter-active-class="transition duration-300 ease-out"
-              enter-from-class="opacity-0 translate-y-2 scale-95"
-              enter-to-class="opacity-100 translate-y-0 scale-100"
-              leave-active-class="transition duration-200 ease-in"
-              leave-from-class="opacity-100 translate-y-0 scale-100"
-              leave-to-class="opacity-0 translate-y-2 scale-95"
+        <h1
+          class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.heading?.[0]), docId, blockKey, 'heading/0')"
+        >
+          <template v-if="cmsHero?.heading?.[0]">{{ cmsHero.heading[0] }}</template>
+          <template v-else>
+            Thérapeute en relation d'aide à
+            <span
+              class="italic relative inline-block cursor-default"
+              @mouseenter="showMap = true"
+              @mouseleave="showMap = false"
             >
-              <div
-                v-show="showMap"
-                class="absolute left-0 top-full mt-3 z-50 w-72 rounded-2xl overflow-hidden border border-outline-variant/30 shadow-xl"
-                style="backdrop-filter: blur(12px); background: rgba(254,248,243,0.85);"
+              Shefford
+              <Transition
+                enter-active-class="transition duration-300 ease-out"
+                enter-from-class="opacity-0 translate-y-2 scale-95"
+                enter-to-class="opacity-100 translate-y-0 scale-100"
+                leave-active-class="transition duration-200 ease-in"
+                leave-from-class="opacity-100 translate-y-0 scale-100"
+                leave-to-class="opacity-0 translate-y-2 scale-95"
               >
-                <iframe
-                  v-if="mapLoaded"
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2800!2d-72.6488387!3d45.404327!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc9d1ac7d71487f%3A0x84ccdfbeea780ace!2sChantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d&#39;aide+et+coach+de+couples!5e0!3m2!1sfr!2sca"
-                  width="288"
-                  height="180"
-                  style="border:0;"
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                  title="Carte de Shefford, Québec"
-                />
-                <div v-else class="w-full h-[180px] bg-surface-container animate-pulse" />
-                <a
-                  href="https://www.google.com/maps/place/Chantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d'aide+et+coach+de+couples/@45.4043307,-72.6537096,17z"
-                  target="_blank"
-                  rel="noopener"
-                  class="block px-4 py-3 not-italic tracking-wide hover:bg-surface-container transition-colors"
+                <div
+                  v-show="showMap"
+                  class="absolute left-0 top-full mt-3 z-50 w-72 rounded-2xl overflow-hidden border border-outline-variant/30 shadow-xl"
+                  style="backdrop-filter: blur(12px); background: rgba(254,248,243,0.85);"
                 >
-                  <p class="font-body text-xs font-medium text-on-surface">245 rue Colette, Shefford</p>
-                </a>
-              </div>
-            </Transition>
-          </span>
+                  <iframe
+                    v-if="mapLoaded"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2800!2d-72.6488387!3d45.404327!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4cc9d1ac7d71487f%3A0x84ccdfbeea780ace!2sChantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d&#39;aide+et+coach+de+couples!5e0!3m2!1sfr!2sca"
+                    width="288"
+                    height="180"
+                    style="border:0;"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Carte de Shefford, Québec"
+                  />
+                  <div v-else class="w-full h-[180px] bg-surface-container animate-pulse" />
+                  <a
+                    href="https://www.google.com/maps/place/Chantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d'aide+et+coach+de+couples/@45.4043307,-72.6537096,17z"
+                    target="_blank"
+                    rel="noopener"
+                    class="block px-4 py-3 not-italic tracking-wide hover:bg-surface-container transition-colors"
+                  >
+                    <p class="font-body text-xs font-medium text-on-surface">245 rue Colette, Shefford</p>
+                  </a>
+                </div>
+              </Transition>
+            </span>
+          </template>
         </h1>
-        <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight" data-animate>
-          Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
+        <h2
+          class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.heading?.[1]), docId, blockKey, 'heading/1')"
+        >
+          <template v-if="cmsHero?.heading?.[1]">{{ cmsHero.heading[1] }}</template>
+          <template v-else>
+            Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
+          </template>
         </h2>
 
-        <p class="text-on-surface-variant text-xl max-w-lg font-light" data-animate>
-          Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.
+        <p
+          class="text-on-surface-variant text-xl max-w-lg font-light"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.lede), docId, blockKey, 'lede')"
+        >
+          {{ cmsHero?.lede ?? 'Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.' }}
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
             class="liquid-fill bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:text-on-secondary-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             data-booking-open
+            v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.ctaLabel), docId, blockKey, 'cta/label')"
           >
-            Prendre rendez-vous
+            {{ cmsHero?.ctaLabel ?? 'Prendre rendez-vous' }}
           </button>
           <a
             href="#services"
@@ -106,12 +135,13 @@
         <div class="aspect-[4/5] rounded-[2rem] overflow-hidden lg:translate-x-12 translate-y-4">
           <div class="blur-up w-full h-full">
           <img
-            src="/images/chantal-hero.jpg"
+            :src="cmsHero?.image?.src ?? '/images/chantal-hero.jpg'"
             sizes="(max-width: 1023px) 137vw, 690px"
-            srcset="/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w"
-            alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
+            :srcset="cmsHero?.image ? undefined : '/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w'"
+            :alt="cmsHero?.image?.alt ?? `Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford`"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"
+            v-bind="tlsBlockImageAttrs(Boolean(hasCms && cmsHero?.image), docId, blockKey, 'image')"
           />
           </div>
         </div>
@@ -122,8 +152,32 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import {
+  pageDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsBlockImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
+export interface CmsHeroBlockData {
+  docId?: string
+  blockKey?: string
+  eyebrow?: string
+  heading?: [string, string?]
+  lede?: string
+  ctaLabel?: string
+  image?: { src: string; alt?: string }
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsHero?: CmsHeroBlockData
+}>()
+
+const hasCms = computed(() => Boolean(props.previewMode && props.cmsHero))
+const docId = computed(() => props.cmsHero?.docId ?? pageDocId('home'))
+const blockKey = computed(() => props.cmsHero?.blockKey ?? 'hero')
 
 const showMap = ref(false)
 const mapLoaded = ref(false)

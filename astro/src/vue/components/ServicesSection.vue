@@ -1,29 +1,57 @@
 <template>
-  <section id="services" class="py-32 px-8 bg-surface-container-low">
+  <section
+    id="services"
+    class="py-32 px-8 bg-surface-container-low"
+    v-bind="tlsBlockAttrs(hasCms, blockKey, 'collection')"
+  >
     <div class="max-w-screen-xl mx-auto">
 
       <!-- Header -->
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-16">
-        <h2 class="font-headline text-5xl text-primary italic" data-animate>
-          Accompagnements personnalisés
+        <h2
+          class="font-headline text-5xl text-primary italic"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsServices?.title), docId, blockKey, 'title')"
+        >
+          {{ cmsServices?.title ?? 'Accompagnements personnalisés' }}
         </h2>
-        <p class="text-on-surface-variant max-w-sm font-light" data-animate>
-          Chaque parcours est unique. Je vous accompagne là où vous en êtes, avec douceur et présence.
+        <p
+          class="text-on-surface-variant max-w-sm font-light"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsServices?.lede), docId, blockKey, 'lede')"
+        >
+          {{ cmsServices?.lede ?? 'Chaque parcours est unique. Je vous accompagne là où vous en êtes, avec douceur et présence.' }}
         </p>
       </div>
 
       <!-- Cards grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        v-bind="tlsCollectionAttrs(hasCms, 'service')"
+      >
 
         <!-- Couple Coaching -->
-        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
+        <div
+          class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow soft-lift"
+          data-animate
+          v-bind="tlsItemAttrs(Boolean(hasCms && cmsServices?.couple), coupleId, 'service')"
+        >
           <div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
           </div>
-          <h3 class="font-headline text-3xl text-primary mb-2">Coaching de Couple</h3>
-          <p class="font-headline italic text-on-surface-variant mb-6">90 minutes de dialogue</p>
-          <p class="text-on-surface-variant font-light mb-6">
-            Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde.
+          <h3
+            class="font-headline text-3xl text-primary mb-2"
+            v-bind="tlsEntryFieldAttrs(Boolean(hasCms && cmsServices?.couple), coupleId, 'title')"
+          >{{ cmsServices?.couple?.title ?? 'Coaching de Couple' }}</h3>
+          <p
+            class="font-headline italic text-on-surface-variant mb-6"
+            v-bind="tlsExtFieldAttrs(Boolean(hasCms && cmsServices?.couple?.durationMinutes != null), coupleId, 'attrs/duration_minutes')"
+          >{{ cmsServices?.couple?.durationMinutes != null ? `${cmsServices.couple.durationMinutes} minutes de dialogue` : '90 minutes de dialogue' }}</p>
+          <p
+            class="text-on-surface-variant font-light mb-6"
+            v-bind="tlsExtFieldAttrs(Boolean(hasCms && cmsServices?.couple), coupleId, 'description')"
+          >
+            {{ cmsServices?.couple?.description ?? 'Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde.' }}
           </p>
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-surface-variant font-light">
@@ -52,14 +80,27 @@
         </div>
 
         <!-- Individual Therapy -->
-        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
+        <div
+          class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow soft-lift"
+          data-animate
+          v-bind="tlsItemAttrs(Boolean(hasCms && cmsServices?.individual), individualId, 'service')"
+        >
           <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:person" class="text-2xl text-primary" />
           </div>
-          <h3 class="font-headline text-3xl text-on-primary mb-2">Thérapie Individuelle</h3>
-          <p class="font-headline italic text-on-primary-container mb-6">60 minutes pour soi</p>
-          <p class="text-on-primary-container font-light mb-6">
-            Un espace sécurisé pour explorer vos patterns relationnels, vos blessures d'attachement et vos ressources intérieures.
+          <h3
+            class="font-headline text-3xl text-on-primary mb-2"
+            v-bind="tlsEntryFieldAttrs(Boolean(hasCms && cmsServices?.individual), individualId, 'title')"
+          >{{ cmsServices?.individual?.title ?? 'Thérapie Individuelle' }}</h3>
+          <p
+            class="font-headline italic text-on-primary-container mb-6"
+            v-bind="tlsExtFieldAttrs(Boolean(hasCms && cmsServices?.individual?.durationMinutes != null), individualId, 'attrs/duration_minutes')"
+          >{{ cmsServices?.individual?.durationMinutes != null ? `${cmsServices.individual.durationMinutes} minutes pour soi` : '60 minutes pour soi' }}</p>
+          <p
+            class="text-on-primary-container font-light mb-6"
+            v-bind="tlsExtFieldAttrs(Boolean(hasCms && cmsServices?.individual), individualId, 'description')"
+          >
+            {{ cmsServices?.individual?.description ?? "Un espace sécurisé pour explorer vos patterns relationnels, vos blessures d'attachement et vos ressources intérieures." }}
           </p>
           <ul class="space-y-3 mb-10">
             <li class="flex items-center gap-3 text-on-primary-container font-light">
@@ -210,9 +251,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Icon from '../Icon.vue'
 import { useBooking } from '../composables/useBooking'
+import {
+  pageDocId,
+  serviceDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+} from '../../lib/tls-edit-attrs'
+
+export interface CmsServiceCard {
+  id?: string
+  title: string
+  description: string
+  durationMinutes?: number | null
+  priceCents?: number | null
+}
+
+export interface CmsServicesSectionData {
+  docId?: string
+  blockKey?: string
+  title?: string
+  lede?: string
+  couple?: CmsServiceCard
+  individual?: CmsServiceCard
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsServices?: CmsServicesSectionData
+}>()
+
+const hasCms = computed(() => Boolean(props.previewMode && props.cmsServices))
+const docId = computed(() => props.cmsServices?.docId ?? pageDocId('home'))
+const blockKey = computed(() => props.cmsServices?.blockKey ?? 'services')
+const coupleId = computed(() => props.cmsServices?.couple?.id ?? serviceDocId('coaching-de-couple'))
+const individualId = computed(() => props.cmsServices?.individual?.id ?? serviceDocId('therapie-individuelle'))
 
 const showIndividualModal = ref(false)
 const showCoupleModal = ref(false)

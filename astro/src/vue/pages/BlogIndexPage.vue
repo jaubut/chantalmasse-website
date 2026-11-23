@@ -39,14 +39,21 @@
       </div>
     </section>
 
-    <!-- Posts grid -->
-    <section class="px-8 lg:px-20 pb-24">
-      <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <!-- Posts grid (read from the TLS CMS via allPosts) -->
+    <section
+      class="px-8 lg:px-20 pb-24"
+      v-bind="tlsBlockAttrs(on, 'posts', 'collection')"
+    >
+      <div
+        class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        v-bind="tlsCollectionAttrs(on, 'post')"
+      >
         <a
           v-for="post in filteredPosts"
           :key="post.slug"
           :href="`/blog/${post.slug}`"
           class="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden editorial-shadow hover:shadow-lg transition-shadow duration-300"
+          v-bind="tlsItemAttrs(on, resolvePostId(post), 'post')"
         >
           <!-- Image -->
           <div class="aspect-[16/9] overflow-hidden">
@@ -54,6 +61,7 @@
               :src="post.image"
               :alt="post.title"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              v-bind="tlsPostHeroImageAttrs(on, resolvePostId(post))"
             />
           </div>
 
@@ -70,12 +78,18 @@
             </div>
 
             <!-- Title -->
-            <h2 class="font-headline text-xl text-primary leading-snug group-hover:text-primary-container transition-colors">
+            <h2
+              class="font-headline text-xl text-primary leading-snug group-hover:text-primary-container transition-colors"
+              v-bind="tlsEntryFieldAttrs(on, resolvePostId(post), 'title')"
+            >
               {{ post.title }}
             </h2>
 
             <!-- Excerpt -->
-            <p class="text-on-surface-variant text-sm font-light leading-relaxed flex-1 line-clamp-3">
+            <p
+              class="text-on-surface-variant text-sm font-light leading-relaxed flex-1 line-clamp-3"
+              v-bind="tlsExtFieldAttrs(on, resolvePostId(post), 'excerpt')"
+            >
               {{ post.excerpt }}
             </p>
 
@@ -102,9 +116,20 @@
 <script setup lang="ts">
 // pages/blog/index.vue (Nuxt) as an island: the category filter is client state. Posts come from the CMS (src/lib/blog.ts).
 import { computed, ref } from 'vue'
-import type { BlogPost } from '../../lib/blog'
+import type { BlogPost } from '../../lib/cms-client'
+import {
+  postDocId,
+  tlsBlockAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+  tlsPostHeroImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
-const props = defineProps<{ posts: BlogPost[] }>()
+const props = defineProps<{ posts: Array<BlogPost & { id?: string }>, previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const categoryLabels: Record<string, string> = {
   couple: 'Couple',

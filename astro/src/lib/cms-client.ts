@@ -37,6 +37,20 @@ export interface PostDoc extends PostSummary { type: 'post', seo: Seo, body: Ric
 export interface PostList { items: PostSummary[], page: number, limit: number, total: number, pages: number }
 export interface CmsResult<T> { data: T, meta: { version: number, tags: string[] } }
 
+export interface BlogPost {
+  id: string
+  slug: string
+  path: string
+  title: string
+  date: string
+  readTime: number | null
+  category: string
+  excerpt: string
+  image: string
+  /** Original size, for og:image. */
+  imageFull: string
+}
+
 export class CmsError extends Error {
   constructor(readonly status: number, message: string) {
     super(message)
@@ -48,19 +62,27 @@ export interface CmsClientOptions {
   /** Service binding fetch (env.CMS.fetch) or global fetch with an absolute baseUrl. */
   fetch: (req: Request) => Promise<Response>
   baseUrl?: string
+  /** Preview token (signed __tls_preview cookie value); switches stage to draft and sends `Authorization: Preview <token>`. */
+  previewToken?: string
 }
 
 export interface CmsClient {
-  getPage: (i: { path: string, locale: string }) => Promise<CmsResult<PostDoc | null>>
-  listPosts: (i: { locale: string, page?: number, limit?: number, category?: string, sort?: 'date_desc' | 'date_asc' | 'title' }) => Promise<CmsResult<PostList>>
+  getPage: (i: { path: string, locale: string, stage?: 'draft' | 'live' }) => Promise<CmsResult<PostDoc | null>>
+  listPosts: (i: { locale: string, page?: number, limit?: number, category?: string, sort?: 'date_desc' | 'date_asc' | 'title', stage?: 'draft' | 'live' }) => Promise<CmsResult<PostList>>
 }
 
 export function createCmsClient(opts: CmsClientOptions): CmsClient {
   const base = opts.baseUrl ?? 'https://cms.internal'
+  const stage: 'draft' | 'live' = opts.previewToken ? 'draft' : 'live'
   async function call<T>(name: string, input: Record<string, string | number | undefined>): Promise<CmsResult<T>> {
     const qs = new URLSearchParams(Object.entries(input).flatMap(([k, v]): Array<[string, string]> => (v === undefined ? [] : [[k, String(v)]])))
+    const headers: Record<string, string> = {
+      accept: 'application/json',
+      [CONTRACT_HEADER]: String(CONTRACT_VERSION),
+    }
+    if (opts.previewToken) headers.authorization = `Preview ${opts.previewToken}`
     const get = (): Promise<Response> => opts.fetch(new Request(`${base}/v2/sites/${opts.siteId}/${name}?${qs}`, {
-      headers: { accept: 'application/json', [CONTRACT_HEADER]: String(CONTRACT_VERSION) },
+      headers,
     }))
     // Reads are idempotent: one retry on a 5xx (a cold engine can answer 503/1102), as the dashboard's CMS proxy does.
     let res = await get()
@@ -72,7 +94,7 @@ export function createCmsClient(opts: CmsClientOptions): CmsClient {
     return body
   }
   return {
-    getPage: i => call('page', { ...i, stage: 'live' }),
-    listPosts: i => call('posts', { stage: 'live', ...i }),
+    getPage: i => call('page', { ...i, stage: opts.previewToken ? 'draft' : (i.stage ?? stage) }),
+    listPosts: i => call('posts', { ...i, stage: opts.previewToken ? 'draft' : (i.stage ?? stage) }),
   }
 }

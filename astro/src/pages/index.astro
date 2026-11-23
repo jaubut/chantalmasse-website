@@ -4,6 +4,7 @@ import Base from '../layouts/Base.astro'
 import { HERO_IMAGE, SITE_DESCRIPTION } from '../lib/seo'
 import { latestPosts, type BlogPost } from '../lib/blog'
 import { SKIP_CACHE } from '../lib/page-cache'
+import { buildPreviewSetCookie, pageDocId } from '../lib/tls-edit-attrs'
 import HeroSection from '../vue/components/HeroSection.vue'
 import ServicesSection from '../vue/components/ServicesSection.vue'
 import PhilosophySection from '../vue/components/PhilosophySection.vue'
@@ -14,11 +15,23 @@ import BookingSection from '../vue/components/BookingSection.vue'
 
 export const prerender = false
 
+const previewToken = Astro.locals.previewToken ?? null
+let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const homeDocId = pageDocId('home')
+const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+
+const onPreviewRejected = (): void => {
+  previewMode = false
+  Astro.locals.previewMode = false
+  Astro.locals.previewToken = null
+  Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+}
+
 // A CMS hiccup must not take the home page down: render it without the two cards, and keep it out of the page cache
 // so the next request tries again.
 let posts: BlogPost[] = []
 try {
-  posts = await latestPosts(2)
+  posts = await latestPosts(2, { previewToken, onPreviewRejected })
 } catch (err) {
   console.error('[home] latest posts unavailable', err)
   Astro.response.headers.set(SKIP_CACHE, '1')
@@ -29,6 +42,8 @@ try {
   path="/"
   description={SITE_DESCRIPTION}
   ogImage={HERO_IMAGE}
+  pageDocId={homeDocId}
+  previewMode={previewMode}
 >
   <div>
     {/* idle: the island only rotates the label and shows the map on hover; its CTA works before hydration
@@ -38,7 +53,7 @@ try {
     <PhilosophySection />
     <MethodsSection />
     <TestimonialsSection />
-    <NewsletterSection client:visible posts={posts} />
+    <NewsletterSection client:visible posts={posts} {...(previewMode ? { previewMode: true } : {})} />
     <BookingSection />
   </div>
 </Base>

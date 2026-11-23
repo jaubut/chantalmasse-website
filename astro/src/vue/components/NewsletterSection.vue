@@ -41,25 +41,34 @@
         <p v-if="error" role="alert" class="mt-3 text-sm text-red-400">{{ error }}</p>
       </div>
 
-      <!-- Right: blog cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" data-animate>
+      <!-- Right: blog cards (read from the TLS CMS via latestPosts) -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 gap-6"
+        data-animate
+        v-bind="tlsCollectionAttrs(on, 'post')"
+      >
 
         <a
           v-for="post in posts"
           :key="post.slug"
           :href="`/blog/${post.slug}`"
           class="bg-tertiary-container rounded-2xl overflow-hidden group soft-lift"
+          v-bind="tlsItemAttrs(on, resolvePostId(post), 'post')"
         >
           <div class="aspect-[4/3] overflow-hidden">
             <img
               :src="post.image"
               :alt="post.title"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              v-bind="tlsPostHeroImageAttrs(on, resolvePostId(post))"
             />
           </div>
           <div class="p-6">
             <span v-if="post.readTime != null" class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture {{ post.readTime }} min</span>
-            <h4 class="font-headline text-xl text-on-tertiary">{{ post.title }}</h4>
+            <h4
+              class="font-headline text-xl text-on-tertiary"
+              v-bind="tlsEntryFieldAttrs(on, resolvePostId(post), 'title')"
+            >{{ post.title }}</h4>
           </div>
         </a>
 
@@ -69,13 +78,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ofetch } from 'ofetch'
 import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
+import {
+  postDocId,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsItemAttrs,
+  tlsPostHeroImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
-defineProps<{
-  posts: { slug: string; title: string; image: string; readTime: number | null }[]
+const props = defineProps<{
+  posts: { id?: string; slug: string; title: string; image: string; readTime: number | null }[]
+  previewMode?: boolean
 }>()
+
+const on = computed(() => Boolean(props.previewMode))
+const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const email = ref('')
 const website = ref('')
