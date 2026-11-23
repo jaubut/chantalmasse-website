@@ -331,7 +331,8 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
 
     const code = buildDormantLoaderScript(publicOrigin)
     const runner = new Function('window', 'document', 'location', 'sessionStorage', 'history', code)
-    runner(windowMock, documentMock, loc, sessionStorageMock, historyMock)
+    const runScript = () => runner(windowMock, documentMock, loc, sessionStorageMock, historyMock)
+    runScript()
 
     return {
       code,
@@ -342,37 +343,46 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
       windowMock,
       historyMock,
       documentMock,
+      runScript,
       firePageLoad: () => {
         for (const fn of listeners.get('astro:page-load') ?? []) fn()
       },
     }
   }
 
-  it('stays compact (~450-650 B) and makes 0 requests / injects 0 scripts for public visitors', () => {
+  it('stays compact (<750 B), guards astro:page-load listener registration, and makes 0 requests / injects 0 scripts for public visitors', () => {
     const env = runLoaderEnv('https://chantalmasse.com/blog?utm_source=google')
     expect(env.code.length).toBeGreaterThan(350)
-    expect(env.code.length).toBeLessThan(650)
+    expect(env.code.length).toBeLessThan(750)
     expect(env.appendedScripts).toHaveLength(0)
     expect(env.historyMock.replaceState).not.toHaveBeenCalled()
     expect(env.windowMock.__tlsEditOrigin).toBeUndefined()
+    expect(env.windowMock.__tlsEditL).toBe(1)
+    expect(env.listeners.get('astro:page-load')).toHaveLength(1)
+
+    // Re-evaluating the inline script never registers a duplicate astro:page-load listener
+    env.runScript()
+    expect(env.listeners.get('astro:page-load')).toHaveLength(1)
 
     // Even across ClientRouter astro:page-load navigations, public visitors load nothing
     env.firePageLoad()
     expect(env.appendedScripts).toHaveLength(0)
   })
 
-  it('captures ?tls_edit into sessionStorage, strips it via history.replaceState, sets __tlsEditOrigin, and injects /tls-edit-v2.js once', () => {
+  it('captures ?tls_edit into sessionStorage, strips it via history.replaceState, sets __tlsEditOrigin, and injects <__tlsEditOrigin>/tls-edit-v2.js once', () => {
     const env = runLoaderEnv('https://chantalmasse.com/coaching-de-couple?tls_edit=edit_tok_abc&utm_campaign=spring#approche')
     expect(env.store.get('tls_edit_v2_token')).toBe('edit_tok_abc')
     expect(env.historyMock.replaceState).toHaveBeenCalledTimes(1)
     expect(env.loc.pathname + env.loc.search + env.loc.hash).toBe('/coaching-de-couple?utm_campaign=spring#approche')
     expect(env.windowMock.__tlsEditOrigin).toBe('https://dashboard.apies.dev')
     expect(env.appendedScripts).toEqual([
-      { id: 'tls-edit-v2-script', src: '/tls-edit-v2.js', defer: true },
+      { id: 'tls-edit-v2-script', src: 'https://dashboard.apies.dev/tls-edit-v2.js', defer: true },
     ])
 
-    // Firing astro:page-load does not inject a duplicate script when #tls-edit-v2-script is already present
+    // Firing astro:page-load or re-evaluating the script does not inject a duplicate script
+    env.runScript()
     env.firePageLoad()
+    expect(env.listeners.get('astro:page-load')).toHaveLength(1)
     expect(env.appendedScripts).toHaveLength(1)
   })
 
@@ -384,7 +394,7 @@ describe('S4b zero-cost dormant inline loader (~450 B)', () => {
     )
     expect(env.windowMock.__tlsEditOrigin).toBe('https://portal.apies.dev')
     expect(env.appendedScripts).toEqual([
-      { id: 'tls-edit-v2-script', src: '/tls-edit-v2.js', defer: true },
+      { id: 'tls-edit-v2-script', src: 'https://portal.apies.dev/tls-edit-v2.js', defer: true },
     ])
   })
 })
