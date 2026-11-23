@@ -1,11 +1,20 @@
 <template>
-  <section class="py-32 px-8 bg-tertiary text-on-tertiary">
+  <section
+    class="py-32 px-8 bg-tertiary text-on-tertiary"
+    v-bind="tlsBlockAttrs(on, 'infolettre', 'collection')"
+  >
     <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
       <!-- Left: form -->
       <div data-animate>
-        <h2 class="font-headline text-5xl mb-6">Pensées &amp; Réflexions</h2>
-        <p class="text-on-tertiary-container font-light text-lg mb-10 max-w-md">
+        <h2
+          class="font-headline text-5xl mb-6"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'infolettre', 'title')"
+        >Pensées &amp; Réflexions</h2>
+        <p
+          class="text-on-tertiary-container font-light text-lg mb-10 max-w-md"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'infolettre', 'lede')"
+        >
           Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.
         </p>
         <form class="flex flex-col gap-4" @submit.prevent="subscribe">
@@ -42,24 +51,33 @@
       </div>
 
       <!-- Right: blog cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6" data-animate>
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 gap-6"
+        data-animate
+        v-bind="tlsCollectionAttrs(on, 'post')"
+      >
 
         <a
           v-for="post in posts"
           :key="post.slug"
           :href="`/blog/${post.slug}`"
           class="bg-tertiary-container rounded-2xl overflow-hidden group soft-lift"
+          v-bind="tlsItemAttrs(on, resolvePostId(post), 'post')"
         >
           <div class="aspect-[4/3] overflow-hidden">
             <img
               :src="post.image"
               :alt="post.title"
               class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+              v-bind="tlsPostHeroImageAttrs(on, resolvePostId(post))"
             />
           </div>
           <div class="p-6">
             <span v-if="post.readTime != null" class="text-xs uppercase tracking-widest text-secondary-fixed-dim mb-3 block">Lecture {{ post.readTime }} min</span>
-            <h4 class="font-headline text-xl text-on-tertiary">{{ post.title }}</h4>
+            <h4
+              class="font-headline text-xl text-on-tertiary"
+              v-bind="tlsEntryFieldAttrs(on, resolvePostId(post), 'title')"
+            >{{ post.title }}</h4>
           </div>
         </a>
 
@@ -69,13 +87,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ofetch } from 'ofetch'
 import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
+import {
+  pageDocId,
+  postDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsItemAttrs,
+  tlsPostHeroImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
-defineProps<{
-  posts: { slug: string; title: string; image: string; readTime: number | null }[]
+const props = defineProps<{
+  posts: { id?: string; slug: string; title: string; image: string; readTime: number | null }[]
+  previewMode?: boolean
 }>()
+
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('home')
+const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const email = ref('')
 const website = ref('')

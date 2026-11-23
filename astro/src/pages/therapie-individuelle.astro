@@ -1,7 +1,14 @@
 ---
 import Base from '../layouts/Base.astro'
 import { HERO_IMAGE } from '../lib/seo'
+import { pageDocId, readPreviewCookie } from '../lib/tls-edit-attrs'
 import TherapieIndividuellePage from '../vue/pages/TherapieIndividuellePage.vue'
+
+export const prerender = false
+
+const previewToken = Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie'))
+const previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const docId = pageDocId('therapie-individuelle')
 ---
 <Base
   title="Thérapie individuelle à Shefford | Chantal Massé — Thérapeute en relation d'aide"
@@ -10,6 +17,8 @@ import TherapieIndividuellePage from '../vue/pages/TherapieIndividuellePage.vue'
   ogTitle="Thérapie individuelle à Shefford | Chantal Massé"
   ogDescription="Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance."
   ogImage={HERO_IMAGE}
+  pageDocId={docId}
+  previewMode={previewMode}
 >
-  <TherapieIndividuellePage />
+  <TherapieIndividuellePage previewMode={previewMode} />
 </Base>

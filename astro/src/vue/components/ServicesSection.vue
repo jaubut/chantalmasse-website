@@ -1,28 +1,56 @@
 <template>
-  <section id="services" class="py-32 px-8 bg-surface-container-low">
+  <section
+    id="services"
+    class="py-32 px-8 bg-surface-container-low"
+    v-bind="tlsBlockAttrs(on, 'services', 'collection')"
+  >
     <div class="max-w-screen-xl mx-auto">
 
       <!-- Header -->
       <div class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-16">
-        <h2 class="font-headline text-5xl text-primary italic" data-animate>
+        <h2
+          class="font-headline text-5xl text-primary italic"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'services', 'title')"
+        >
           Accompagnements personnalisés
         </h2>
-        <p class="text-on-surface-variant max-w-sm font-light" data-animate>
+        <p
+          class="text-on-surface-variant max-w-sm font-light"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'services', 'lede')"
+        >
           Chaque parcours est unique. Je vous accompagne là où vous en êtes, avec douceur et présence.
         </p>
       </div>
 
       <!-- Cards grid -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div
+        class="grid grid-cols-1 lg:grid-cols-2 gap-8"
+        v-bind="tlsCollectionAttrs(on, 'service')"
+      >
 
         <!-- Couple Coaching -->
-        <div class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
+        <div
+          class="group bg-surface-container-lowest p-12 rounded-[2.5rem] editorial-shadow soft-lift"
+          data-animate
+          v-bind="tlsItemAttrs(on, coupleId, 'service')"
+        >
           <div class="w-14 h-14 bg-secondary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:favorite" class="text-2xl text-secondary" />
           </div>
-          <h3 class="font-headline text-3xl text-primary mb-2">Coaching de Couple</h3>
-          <p class="font-headline italic text-on-surface-variant mb-6">90 minutes de dialogue</p>
-          <p class="text-on-surface-variant font-light mb-6">
+          <h3
+            class="font-headline text-3xl text-primary mb-2"
+            v-bind="tlsEntryFieldAttrs(on, coupleId, 'title')"
+          >Coaching de Couple</h3>
+          <p
+            class="font-headline italic text-on-surface-variant mb-6"
+            v-bind="tlsExtFieldAttrs(on, coupleId, 'attrs/duration_minutes')"
+          >90 minutes de dialogue</p>
+          <p
+            class="text-on-surface-variant font-light mb-6"
+            v-bind="tlsExtFieldAttrs(on, coupleId, 'description')"
+          >
             Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde.
           </p>
           <ul class="space-y-3 mb-10">
@@ -52,13 +80,26 @@
         </div>
 
         <!-- Individual Therapy -->
-        <div class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow soft-lift" data-animate>
+        <div
+          class="group bg-primary p-12 rounded-[2.5rem] editorial-shadow soft-lift"
+          data-animate
+          v-bind="tlsItemAttrs(on, individualId, 'service')"
+        >
           <div class="w-14 h-14 bg-primary-fixed rounded-xl flex items-center justify-center mb-8">
             <Icon icon="material-symbols:person" class="text-2xl text-primary" />
           </div>
-          <h3 class="font-headline text-3xl text-on-primary mb-2">Thérapie Individuelle</h3>
-          <p class="font-headline italic text-on-primary-container mb-6">60 minutes pour soi</p>
-          <p class="text-on-primary-container font-light mb-6">
+          <h3
+            class="font-headline text-3xl text-on-primary mb-2"
+            v-bind="tlsEntryFieldAttrs(on, individualId, 'title')"
+          >Thérapie Individuelle</h3>
+          <p
+            class="font-headline italic text-on-primary-container mb-6"
+            v-bind="tlsExtFieldAttrs(on, individualId, 'attrs/duration_minutes')"
+          >60 minutes pour soi</p>
+          <p
+            class="text-on-primary-container font-light mb-6"
+            v-bind="tlsExtFieldAttrs(on, individualId, 'description')"
+          >
             Un espace sécurisé pour explorer vos patterns relationnels, vos blessures d'attachement et vos ressources intérieures.
           </p>
           <ul class="space-y-3 mb-10">
@@ -210,9 +251,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import Icon from '../Icon.vue'
 import { useBooking } from '../composables/useBooking'
+import {
+  pageDocId,
+  serviceDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+} from '../../lib/tls-edit-attrs'
+
+const props = defineProps<{ previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('home')
+const coupleId = serviceDocId('coaching-de-couple')
+const individualId = serviceDocId('therapie-individuelle')
 
 const showIndividualModal = ref(false)
 const showCoupleModal = ref(false)

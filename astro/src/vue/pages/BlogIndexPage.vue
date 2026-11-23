@@ -1,15 +1,27 @@
 <template>
   <div class="min-h-screen bg-background">
     <!-- Header -->
-    <section class="px-8 lg:px-20 pt-32 pb-16">
+    <section
+      class="px-8 lg:px-20 pt-32 pb-16"
+      v-bind="tlsBlockAttrs(on, 'hero', 'heading')"
+    >
       <div class="max-w-screen-xl mx-auto">
-        <span class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2 mb-6">
+        <span
+          class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2 mb-6"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
+        >
           Ressources & Réflexions
         </span>
-        <h1 class="font-headline text-6xl lg:text-7xl text-primary leading-tight lg:leading-none tracking-tight max-w-2xl">
+        <h1
+          class="font-headline text-6xl lg:text-7xl text-primary leading-tight lg:leading-none tracking-tight max-w-2xl"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'title')"
+        >
           Le <span class="italic">blogue</span>
         </h1>
-        <p class="mt-6 text-on-surface-variant text-lg font-light max-w-xl">
+        <p
+          class="mt-6 text-on-surface-variant text-lg font-light max-w-xl"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+        >
           Des réflexions sur le mieux-être, les relations et la croissance personnelle.
         </p>
 
@@ -40,13 +52,20 @@
     </section>
 
     <!-- Posts grid -->
-    <section class="px-8 lg:px-20 pb-24">
-      <div class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section
+      class="px-8 lg:px-20 pb-24"
+      v-bind="tlsBlockAttrs(on, 'posts', 'collection')"
+    >
+      <div
+        class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        v-bind="tlsCollectionAttrs(on, 'post')"
+      >
         <a
           v-for="post in filteredPosts"
           :key="post.slug"
           :href="`/blog/${post.slug}`"
           class="group flex flex-col bg-surface-container-lowest rounded-2xl overflow-hidden editorial-shadow hover:shadow-lg transition-shadow duration-300"
+          v-bind="tlsItemAttrs(on, resolvePostId(post), 'post')"
         >
           <!-- Image -->
           <div class="aspect-[16/9] overflow-hidden">
@@ -54,6 +73,7 @@
               :src="post.image"
               :alt="post.title"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+              v-bind="tlsPostHeroImageAttrs(on, resolvePostId(post))"
             />
           </div>
 
@@ -70,12 +90,18 @@
             </div>
 
             <!-- Title -->
-            <h2 class="font-headline text-xl text-primary leading-snug group-hover:text-primary-container transition-colors">
+            <h2
+              class="font-headline text-xl text-primary leading-snug group-hover:text-primary-container transition-colors"
+              v-bind="tlsEntryFieldAttrs(on, resolvePostId(post), 'title')"
+            >
               {{ post.title }}
             </h2>
 
             <!-- Excerpt -->
-            <p class="text-on-surface-variant text-sm font-light leading-relaxed flex-1 line-clamp-3">
+            <p
+              class="text-on-surface-variant text-sm font-light leading-relaxed flex-1 line-clamp-3"
+              v-bind="tlsExtFieldAttrs(on, resolvePostId(post), 'excerpt')"
+            >
               {{ post.excerpt }}
             </p>
 
@@ -102,9 +128,23 @@
 <script setup lang="ts">
 // pages/blog/index.vue (Nuxt) as an island: the category filter is client state. Posts come from the CMS (src/lib/blog.ts).
 import { computed, ref } from 'vue'
-import type { BlogPost } from '../../lib/blog'
+import type { BlogPost } from '../../lib/cms-client'
+import {
+  pageDocId,
+  postDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+  tlsPostHeroImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
-const props = defineProps<{ posts: BlogPost[] }>()
+const props = defineProps<{ posts: Array<BlogPost & { id?: string }>, previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('blog')
+const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const categoryLabels: Record<string, string> = {
   couple: 'Couple',

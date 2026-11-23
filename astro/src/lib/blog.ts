@@ -2,38 +2,34 @@
 // on the next request, no rebuild. Posts are mapped to the fields the Nuxt Content pages used, so the components keep
 // their props. Locally, without the CMS service binding, CMS_BASE_URL points at a public-reads engine (staging).
 import { env } from 'cloudflare:workers'
-import { createCmsClient, type CmsClient, type PostDoc, type PostSummary } from './cms-client'
+import { createCmsClient, type BlogPost, type CmsClient, type PostDoc, type PostSummary } from './cms-client'
 
+export type { BlogPost }
 export const SITE_ID = 'chantal-masse'
 const LOCALE = 'fr'
 
 interface CmsEnv { CMS?: { fetch: (req: Request) => Promise<Response> }, CMS_BASE_URL?: string }
 
-export interface BlogPost {
-  slug: string
-  path: string
-  title: string
-  date: string
-  readTime: number | null
-  category: string
-  excerpt: string
-  image: string
-  /** Original size, for og:image. */
-  imageFull: string
+export interface BlogReadOpts {
+  previewToken?: string | null
 }
 
-let client: CmsClient | undefined
-function cms(): CmsClient {
-  if (client) return client
+let liveClient: CmsClient | undefined
+function cms(previewToken?: string | null): CmsClient {
+  if (!previewToken && liveClient) return liveClient
   const e = env as unknown as CmsEnv
-  if (e.CMS) client = createCmsClient({ siteId: SITE_ID, fetch: req => e.CMS!.fetch(req) })
-  else if (e.CMS_BASE_URL) client = createCmsClient({ siteId: SITE_ID, fetch: req => fetch(req), baseUrl: e.CMS_BASE_URL })
+  const token = previewToken || undefined
+  let c: CmsClient
+  if (e.CMS) c = createCmsClient({ siteId: SITE_ID, fetch: req => e.CMS!.fetch(req), previewToken: token })
+  else if (e.CMS_BASE_URL) c = createCmsClient({ siteId: SITE_ID, fetch: req => fetch(req), baseUrl: e.CMS_BASE_URL, previewToken: token })
   else throw new Error('No CMS: bind CMS (service binding to tls-cms SiteReads) or set CMS_BASE_URL')
-  return client
+  if (!token) liveClient = c
+  return c
 }
 
-function toPost(p: PostSummary): BlogPost {
+export function toPost(p: PostSummary): BlogPost {
   return {
+    id: p.id,
     slug: p.path.replace(/^\/blog\//, ''),
     path: p.path,
     title: p.title,
@@ -48,25 +44,26 @@ function toPost(p: PostSummary): BlogPost {
   }
 }
 
-/** Every published post, newest first (24 today; the contract pages by 50). */
-export async function allPosts(): Promise<BlogPost[]> {
+/** Every published post (or draft post in preview mode), newest first (24 today; the contract pages by 50). */
+export async function allPosts(opts?: BlogReadOpts): Promise<BlogPost[]> {
+  const client = cms(opts?.previewToken)
   const out: PostSummary[] = []
   for (let page = 1; ; page++) {
-    const { data } = await cms().listPosts({ locale: LOCALE, page, limit: 50, sort: 'date_desc' })
+    const { data } = await client.listPosts({ locale: LOCALE, page, limit: 50, sort: 'date_desc' })
     out.push(...data.items)
     if (page >= data.pages) break
   }
   return out.map(toPost)
 }
 
-export async function latestPosts(n: number): Promise<BlogPost[]> {
-  const { data } = await cms().listPosts({ locale: LOCALE, limit: n, sort: 'date_desc' })
+export async function latestPosts(n: number, opts?: BlogReadOpts): Promise<BlogPost[]> {
+  const { data } = await cms(opts?.previewToken).listPosts({ locale: LOCALE, limit: n, sort: 'date_desc' })
   return data.items.map(toPost)
 }
 
-export async function getPost(slug: string): Promise<{ post: BlogPost, doc: PostDoc } | null> {
+export async function getPost(slug: string, opts?: BlogReadOpts): Promise<{ post: BlogPost, doc: PostDoc } | null> {
   if (!/^[a-z0-9-]+$/.test(slug)) return null
-  const { data } = await cms().getPage({ path: `/blog/${slug}`, locale: LOCALE })
+  const { data } = await cms(opts?.previewToken).getPage({ path: `/blog/${slug}`, locale: LOCALE })
   if (!data || data.type !== 'post') return null
   return { post: toPost(data), doc: data }
 }

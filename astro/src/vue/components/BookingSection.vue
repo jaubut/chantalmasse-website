@@ -1,5 +1,9 @@
 <template>
-  <section id="booking" class="py-32 px-8 bg-background">
+  <section
+    id="booking"
+    class="py-32 px-8 bg-background"
+    v-bind="tlsBlockAttrs(on, 'booking', 'cta')"
+  >
     <div class="max-w-screen-xl mx-auto">
       <div class="bg-surface-container-low rounded-[3rem] p-8 lg:p-24 relative overflow-hidden">
 
@@ -10,7 +14,10 @@
 
           <!-- Left -->
           <div data-animate>
-            <h2 class="font-headline text-5xl italic text-primary mb-6">
+            <h2
+              class="font-headline text-5xl italic text-primary mb-6"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'booking', 'note')"
+            >
               Prêt à entamer cette démarche?
             </h2>
             <p class="text-on-surface-variant font-light text-lg mb-10">
@@ -37,13 +44,18 @@
             <button
               class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl liquid-fill [--fill:var(--color-primary-container)]"
               data-booking-open
+              v-bind="tlsBlockFieldAttrs(on, docId, 'booking', 'label')"
             >
               Réserver une séance
             </button>
           </div>
 
           <!-- Right: schedule card -->
-          <div class="bg-surface p-12 rounded-[2rem] editorial-shadow" data-animate>
+          <div
+            class="bg-surface p-12 rounded-[2rem] editorial-shadow"
+            data-animate
+            v-bind="tlsSettingsFieldAttrs(on, settingsId, 'hours')"
+          >
             <h4 class="font-headline text-2xl italic text-primary mb-8">Horaires habituels</h4>
             <div class="space-y-0">
               <div class="flex justify-between py-4 border-b border-outline-variant/20">
@@ -73,5 +85,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Icon from '../Icon.vue'
+import {
+  pageDocId,
+  settingsDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsSettingsFieldAttrs,
+} from '../../lib/tls-edit-attrs'
+
+const props = defineProps<{ previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('home')
+const settingsId = settingsDocId()
 </script>

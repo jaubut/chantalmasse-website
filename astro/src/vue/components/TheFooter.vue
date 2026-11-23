@@ -4,12 +4,17 @@
 
       <!-- Name + address -->
       <div class="flex flex-col gap-2">
-        <a href="/" class="font-headline italic text-2xl text-primary">Chantal Massé</a>
+        <a
+          href="/"
+          class="font-headline italic text-2xl text-primary"
+          v-bind="tlsSettingsFieldAttrs(on, settingsId, 'siteName')"
+        >Chantal Massé</a>
         <a
           href="https://www.google.com/maps/place/Chantal+Mass%C3%A9+th%C3%A9rapeute+en+relation+d'aide+et+coach+de+couples/@45.4043307,-72.6537096,17z"
           target="_blank"
           rel="noopener"
           class="text-base md:text-sm text-on-surface-variant hover:text-primary transition-colors tracking-wide"
+          v-bind="tlsSettingsFieldAttrs(on, settingsId, 'address')"
         >245 rue Colette, Shefford, QC J2M 2B7</a>
         <button class="mt-2 w-fit min-h-[44px] px-8 py-3 rounded-xl font-semibold bg-primary text-on-primary hover:bg-primary-container transition-colors" data-contact-open>
           Me contacter
@@ -35,3 +40,12 @@
     </p>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { settingsDocId, tlsSettingsFieldAttrs } from '../../lib/tls-edit-attrs'
+
+const props = defineProps<{ previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const settingsId = settingsDocId()
+</script>

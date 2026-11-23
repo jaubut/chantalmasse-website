@@ -1,7 +1,14 @@
 ---
 import Base from '../layouts/Base.astro'
 import { HERO_IMAGE } from '../lib/seo'
+import { pageDocId, readPreviewCookie } from '../lib/tls-edit-attrs'
 import CoachingDeCouplePage from '../vue/pages/CoachingDeCouplePage.vue'
+
+export const prerender = false
+
+const previewToken = Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie'))
+const previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const docId = pageDocId('coaching-de-couple')
 ---
 <Base
   preloadItalic
@@ -11,6 +18,8 @@ import CoachingDeCouplePage from '../vue/pages/CoachingDeCouplePage.vue'
   ogTitle="Coaching de couple à Shefford | Chantal Massé"
   ogDescription="Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance."
   ogImage={HERO_IMAGE}
+  pageDocId={docId}
+  previewMode={previewMode}
 >
-  <CoachingDeCouplePage />
+  <CoachingDeCouplePage previewMode={previewMode} />
 </Base>

@@ -1,10 +1,18 @@
 <template>
-  <section id="hero" class="min-h-0 md:min-h-[921px] flex items-center overflow-hidden px-8 lg:px-20 pt-24 pb-16 bg-background">
+  <section
+    id="hero"
+    class="min-h-0 md:min-h-[921px] flex items-center overflow-hidden px-8 lg:px-20 pt-24 pb-16 bg-background"
+    v-bind="tlsBlockAttrs(on, 'hero', 'hero')"
+  >
     <div class="max-w-screen-xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
       <!-- Left column -->
       <div class="order-1 lg:order-1 flex flex-col gap-8">
-        <span class="inline-flex w-fit items-center bg-secondary-fixed text-primary text-xs font-medium uppercase tracking-widest rounded-full px-4 py-2" data-animate>
+        <span
+          class="inline-flex w-fit items-center bg-secondary-fixed text-primary text-xs font-medium uppercase tracking-widest rounded-full px-4 py-2"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
+        >
           <span
             ref="trackEl"
             class="relative inline-flex items-center overflow-hidden"
@@ -31,7 +39,11 @@
             >{{ label }}</span>
           </span>
         </span>
-        <h1 class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight" data-animate>
+        <h1
+          class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'heading/0')"
+        >
           Thérapeute en relation d'aide à
           <span
             class="italic relative inline-block cursor-default"
@@ -75,11 +87,19 @@
             </Transition>
           </span>
         </h1>
-        <h2 class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight" data-animate>
+        <h2
+          class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'heading/1')"
+        >
           Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
         </h2>
 
-        <p class="text-on-surface-variant text-xl max-w-lg font-light" data-animate>
+        <p
+          class="text-on-surface-variant text-xl max-w-lg font-light"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+        >
           Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.
         </p>
 
@@ -87,6 +107,7 @@
           <button
             class="liquid-fill bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:text-on-secondary-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             data-booking-open
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'cta/label')"
           >
             Prendre rendez-vous
           </button>
@@ -112,6 +133,7 @@
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
             style="filter: grayscale(20%);"
+            v-bind="tlsBlockImageAttrs(on, docId, 'hero', 'image')"
           />
           </div>
         </div>
@@ -122,8 +144,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import {
+  pageDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsBlockImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
+const props = defineProps<{ previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('home')
 
 const showMap = ref(false)
 const mapLoaded = ref(false)

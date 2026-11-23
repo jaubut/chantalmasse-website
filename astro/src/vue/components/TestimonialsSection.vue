@@ -1,9 +1,16 @@
 <template>
-  <section class="py-32 px-8 overflow-hidden bg-background">
+  <section
+    class="py-32 px-8 overflow-hidden bg-background"
+    v-bind="tlsBlockAttrs(on, 'temoignages', 'list')"
+  >
     <div class="max-w-screen-xl mx-auto">
 
       <div class="text-center mb-16">
-        <h2 class="font-headline text-5xl text-primary italic" data-animate>Témoignages</h2>
+        <h2
+          class="font-headline text-5xl text-primary italic"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', 'title')"
+        >Témoignages</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -16,12 +23,21 @@
           data-animate
         >
           <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-6">"</p>
-          <p class="text-on-surface text-lg leading-relaxed mb-8">
+          <p
+            class="text-on-surface text-lg leading-relaxed mb-8"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/body`)"
+          >
             {{ t.quote }}
           </p>
           <div>
-            <p class="font-semibold text-primary">{{ t.name }}</p>
-            <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
+            <p
+              class="font-semibold text-primary"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/title`)"
+            >{{ t.name }}</p>
+            <p
+              class="text-sm text-on-surface-variant font-light"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/subtitle`)"
+            >{{ t.context }}</p>
           </div>
         </div>
 
@@ -43,6 +59,12 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { pageDocId, tlsBlockAttrs, tlsBlockFieldAttrs } from '../../lib/tls-edit-attrs'
+
+const props = defineProps<{ previewMode?: boolean }>()
+const on = computed(() => Boolean(props.previewMode))
+const docId = pageDocId('home')
 
 const testimonials = [
   {

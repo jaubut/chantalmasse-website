@@ -6,6 +6,13 @@ import { ClientRouter } from 'astro:transitions'
 import { Font } from 'astro:assets'
 import '../styles/main.css'
 import { head, type Seo } from '../lib/seo'
+import {
+  buildDormantLoaderScript,
+  DEFAULT_LOCALE,
+  pageDocIdForPath,
+  readPreviewCookie,
+  tlsPageAttrs,
+} from '../lib/tls-edit-attrs'
 import IntroLoader from '../components/IntroLoader.astro'
 import TheNav from '../vue/components/TheNav.vue'
 import TheFooter from '../vue/components/TheFooter.vue'
@@ -25,13 +32,39 @@ interface Props extends Seo {
    * renders its own service-aware bar, and the layout one (no #hero there, so shown at once) sat on top of it and opened
    * booking without the service. Nuxt's app.vue had the same bug on /prendre-rendez-vous. */
   hideBookingBar?: boolean
+  /** CMS document id (`chantal-masse:page:<handle>` or `chantal-masse:post:<slug>`) for `data-tls-page` in preview mode. */
+  pageDocId?: string
+  /** Content locale for `data-tls-locale` in preview mode (defaults to 'fr'). */
+  locale?: string
+  /** Override preview mode detection (defaults to checking `Astro.locals.previewMode` or `__tls_preview` cookie). */
+  previewMode?: boolean
 }
-const { minimalNav = false, bare = false, preloadItalic = false, hideBookingBar = false, ...seo } = Astro.props
+const {
+  minimalNav = false,
+  bare = false,
+  preloadItalic = false,
+  hideBookingBar = false,
+  pageDocId,
+  locale = DEFAULT_LOCALE,
+  previewMode: previewModeProp,
+  ...seo
+} = Astro.props
 const bookingBar = !minimalNav && !hideBookingBar
 const h = head(seo)
 // Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
 const path = Astro.url.pathname.replace(/\.html$/, '')
 const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
+const previewToken = Astro.isPrerendered
+  ? null
+  : (Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie')))
+const previewMode = previewModeProp ?? (Astro.isPrerendered ? false : (Astro.locals.previewMode ?? Boolean(previewToken)))
+if (previewMode && !Astro.isPrerendered) {
+  Astro.response.headers.set('Cache-Control', 'private, no-store')
+  Astro.response.headers.set('X-Robots-Tag', 'noindex')
+}
+const resolvedPageDocId = pageDocId ?? pageDocIdForPath(seo.path || path)
+const mainAttrs = tlsPageAttrs(previewMode, resolvedPageDocId, locale)
+const loaderScript = buildDormantLoaderScript(import.meta.env.PUBLIC_TLS_EDIT_ORIGIN as string | undefined)
 ---
 <!doctype html>
 <html lang="fr">
@@ -39,6 +72,8 @@ const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{h.title}</title>
+    {/* Zero-cost dormant on-site editor loader (~450 B): strips ?tls_edit before analytics runs; 0 requests for public visitors. */}
+    <script is:inline set:html={loaderScript} />
     {/* Intro loader: first visit of the session only, never with reduced motion. Runs pre-paint. */}
     <script is:inline>try{if(!sessionStorage.getItem('cm-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches){document.documentElement.classList.add('cm-intro');sessionStorage.setItem('cm-intro','1')}}catch(e){}</script>
     {/* GA4 (also loads the linked Ads tag) and the Meta pixel queue their calls here; the libraries load after the CSS
@@ -62,13 +97,13 @@ const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
     {bare ? <slot /> : (
     <div>
       <TheNav client:load path={path} minimalNav={minimalNav} />
-      <main>
+      <main {...mainAttrs}>
         <slot />
       </main>
       {/* After <main> (it's a fixed overlay, z-index 100): the first paint then holds the hero too, instead of the
           overlay alone with the hero one frame later (the later paint became the LCP). */}
       <IntroLoader />
-      <TheFooter />
+      <TheFooter previewMode={previewMode} />
       {bookingBar && <BookingStickyBar client:idle revealAfterSelector="#hero" />}
       <BookingModal client:only="vue" />
       {/* client:only: the modals Teleport to <body>, which server rendering drops; closed at load, nothing to prerender. */}

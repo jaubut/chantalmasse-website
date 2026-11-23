@@ -4,11 +4,22 @@ import Base from '../../layouts/Base.astro'
 import BlogIndexPage from '../../vue/pages/BlogIndexPage.vue'
 import { allPosts } from '../../lib/blog'
 import { HERO_IMAGE } from '../../lib/seo'
+import { pageDocId, readPreviewCookie } from '../../lib/tls-edit-attrs'
 
 export const prerender = false
-const posts = await allPosts()
+
+const previewToken = Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie'))
+const previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const posts = await allPosts({ previewToken })
 const description = 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.'
 ---
-<Base title="Blogue — Chantal Massé" path="/blog" description={description} ogImage={HERO_IMAGE}>
-  <BlogIndexPage client:load posts={posts} />
+<Base
+  title="Blogue — Chantal Massé"
+  path="/blog"
+  description={description}
+  ogImage={HERO_IMAGE}
+  pageDocId={pageDocId('blog')}
+  previewMode={previewMode}
+>
+  <BlogIndexPage client:load posts={posts} {...(previewMode ? { previewMode: true } : {})} />
 </Base>

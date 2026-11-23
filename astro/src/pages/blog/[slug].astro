@@ -6,14 +6,25 @@ import BlogNewsletterForm from '../../vue/components/BlogNewsletterForm.vue'
 import { allPosts, getPost, related } from '../../lib/blog'
 import { richTextToHtml } from '../../lib/richtext'
 import { SITE_URL } from '../../lib/seo'
+import {
+  readPreviewCookie,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+  tlsPostHeroImageAttrs,
+} from '../../lib/tls-edit-attrs'
 
 export const prerender = false
 
+const previewToken = Astro.locals.previewToken ?? readPreviewCookie(Astro.request.headers.get('cookie'))
+const previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+
 const slug = Astro.params.slug ?? ''
-const found = await getPost(slug)
+const found = await getPost(slug, { previewToken })
 if (!found) return Astro.rewrite('/404')
 const { post, doc } = found
-const rel = related(post, await allPosts())
+const rel = related(post, await allPosts({ previewToken }))
 const body = richTextToHtml(doc.body)
 const title = `${post.title} — Chantal Massé`
 // The hero is the LCP: sized per screen (the engine resizes and picks AVIF/WebP), preloaded from <head>.
@@ -25,10 +36,19 @@ function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('fr-CA', { timeZone: 'UTC', year: 'numeric', month: 'long', day: 'numeric' })
 }
 ---
-<Base title={title} path={`/blog/${post.slug}`} ogType="article" ogImage={ogImage} emptyDescription>
+<Base
+  title={title}
+  path={`/blog/${post.slug}`}
+  ogType="article"
+  ogImage={ogImage}
+  emptyDescription
+  pageDocId={doc.id}
+  locale={doc.locale}
+  previewMode={previewMode}
+>
   {post.imageFull && <link slot="head" rel="preload" as="image" href={post.image} imagesrcset={heroSrcset} imagesizes="100vw" fetchpriority="high" />}
   <div class="min-h-screen bg-background">
-    <article>
+    <article {...tlsItemAttrs(previewMode, doc.id, 'post')}>
       <!-- Hero image -->
       <div class="w-full aspect-[21/9] overflow-hidden">
         <img
@@ -38,6 +58,7 @@ function formatDate(dateStr: string): string {
           fetchpriority="high"
           alt={post.title}
           class="w-full h-full object-cover"
+          {...tlsPostHeroImageAttrs(previewMode, doc.id)}
         />
       </div>
 
@@ -52,11 +73,17 @@ function formatDate(dateStr: string): string {
             <span class="text-xs text-on-surface-variant font-light">{formatDate(post.date)}</span>
           </div>
 
-          <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-tight lg:leading-none tracking-tight mb-6">
+          <h1
+            class="font-headline text-4xl lg:text-6xl text-primary leading-tight lg:leading-none tracking-tight mb-6"
+            {...tlsEntryFieldAttrs(previewMode, doc.id, 'title')}
+          >
             {post.title}
           </h1>
 
-          <p class="text-on-surface-variant text-xl font-light leading-relaxed border-l-4 border-primary-fixed pl-6">
+          <p
+            class="text-on-surface-variant text-xl font-light leading-relaxed border-l-4 border-primary-fixed pl-6"
+            {...tlsExtFieldAttrs(previewMode, doc.id, 'excerpt')}
+          >
             {post.excerpt}
           </p>
         </div>
@@ -65,7 +92,8 @@ function formatDate(dateStr: string): string {
       <!-- Post body -->
       <div class="px-8 lg:px-20 pb-24">
         <div class="max-w-3xl mx-auto">
-          <div class="prose prose-lg max-w-none
+          <div
+            class="prose prose-lg max-w-none
 
             prose-p:text-on-surface-variant prose-p:font-light prose-p:leading-[1.85] prose-p:text-[1.0625rem]
 
@@ -93,7 +121,9 @@ function formatDate(dateStr: string): string {
 
             prose-code:text-primary prose-code:bg-surface-container prose-code:px-1.5
             prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-medium
-            prose-code:before:content-none prose-code:after:content-none">
+            prose-code:before:content-none prose-code:after:content-none"
+            {...tlsExtFieldAttrs(previewMode, doc.id, 'body')}
+          >
             <Fragment set:html={body} />
           </div>
 
@@ -140,26 +170,34 @@ function formatDate(dateStr: string): string {
       {rel.length > 0 && (<div class="px-8 lg:px-20 py-20 bg-surface-container-low">
         <div class="max-w-screen-xl mx-auto">
           <p class="text-xs uppercase tracking-widest text-on-surface-variant font-light mb-10">À lire aussi</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" {...tlsCollectionAttrs(previewMode, 'post')}>
             {rel.map(r => (<a
               href={`/blog/${r.slug}`}
               class="group bg-background rounded-2xl overflow-hidden hover:shadow-lg transition-shadow"
+              {...tlsItemAttrs(previewMode, r.id, 'post')}
             >
               <div class="aspect-[16/9] overflow-hidden">
                 <img
                   src={r.image}
                   alt={r.title}
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  {...tlsPostHeroImageAttrs(previewMode, r.id)}
                 />
               </div>
               <div class="p-6">
                 <span class="text-xs uppercase tracking-widest text-on-secondary-container bg-secondary-fixed rounded-full px-3 py-1 mb-4 inline-block">
                   {r.category}
                 </span>
-                <h3 class="font-headline text-xl text-primary leading-snug mb-2 group-hover:underline decoration-primary-fixed underline-offset-2">
+                <h3
+                  class="font-headline text-xl text-primary leading-snug mb-2 group-hover:underline decoration-primary-fixed underline-offset-2"
+                  {...tlsEntryFieldAttrs(previewMode, r.id, 'title')}
+                >
                   {r.title}
                 </h3>
-                <p class="text-sm text-on-surface-variant font-light line-clamp-2">{r.excerpt}</p>
+                <p
+                  class="text-sm text-on-surface-variant font-light line-clamp-2"
+                  {...tlsExtFieldAttrs(previewMode, r.id, 'excerpt')}
+                >{r.excerpt}</p>
               </div>
             </a>))}
           </div>
