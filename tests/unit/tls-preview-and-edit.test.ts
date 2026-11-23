@@ -1,4 +1,5 @@
 /// <reference path="../../astro/src/env.d.ts" />
+/// <reference path="./astro-middleware-shim.d.ts" />
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -7,10 +8,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as vue from 'vue'
 import { compileScript, compileTemplate, parse } from 'vue/compiler-sfc'
 import { renderToString } from 'vue/server-renderer'
-
-declare module 'astro:middleware' {
-  export function defineMiddleware<T>(fn: T): T
-}
 
 const mockWorkerEnv = vi.hoisted(() => ({} as Record<string, unknown>))
 
