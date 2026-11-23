@@ -1,6 +1,6 @@
 /// <reference path="../../astro/src/env.d.ts" />
 /// <reference path="./astro-middleware-shim.d.ts" />
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ts from 'typescript'
@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import * as vue from 'vue'
 import { compileScript, compileTemplate, parse } from 'vue/compiler-sfc'
 import { renderToString } from 'vue/server-renderer'
+import astroConfig from '../../astro/astro.config.mjs'
 
 const mockWorkerEnv = vi.hoisted(() => ({} as Record<string, unknown>))
 
@@ -211,6 +212,45 @@ afterEach(() => {
 })
 
 describe('S4b /_tls/preview handshake route & HS256 token verification', () => {
+  it('registers /_tls/preview via injectRoute in astro/astro.config.mjs (since Astro ignores _-prefixed directories in src/pages/)', async () => {
+    interface InjectedRoute {
+      pattern: string
+      entrypoint: string
+      prerender?: boolean
+    }
+    interface AstroIntegrationLike {
+      name: string
+      hooks?: {
+        'astro:config:setup'?: (opts: { injectRoute: (route: InjectedRoute) => void }) => void | Promise<void>
+      }
+    }
+    const injectedRoutes: InjectedRoute[] = []
+    const integrations = (astroConfig.integrations ?? []) as unknown as AstroIntegrationLike[]
+    const previewIntegration = integrations.find(
+      i => Boolean(i && typeof i === 'object' && !Array.isArray(i) && i.name === 'tls-preview-route'),
+    )
+    expect(previewIntegration).toBeDefined()
+    const setupHook = previewIntegration?.hooks?.['astro:config:setup']
+    expect(typeof setupHook).toBe('function')
+    await setupHook!({
+      injectRoute: (route: InjectedRoute) => {
+        injectedRoutes.push(route)
+      },
+    })
+
+    expect(injectedRoutes).toEqual([
+      {
+        pattern: '/_tls/preview',
+        entrypoint: './src/pages/_tls/preview.ts',
+        prerender: false,
+      },
+    ])
+
+    const astroRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../astro')
+    const previewEntrypoint = resolve(astroRoot, './src/pages/_tls/preview.ts')
+    expect(existsSync(previewEntrypoint)).toBe(true)
+  })
+
   it('refuses open-redirect paths (//evil.com, external URLs, backslashes) with 400', async () => {
     const evilPaths = [
       '//evil.com',

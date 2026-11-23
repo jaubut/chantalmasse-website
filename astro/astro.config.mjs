@@ -27,6 +27,19 @@ export default defineConfig({
   integrations: [
     vue(),
     {
+      // Astro excludes `_`-prefixed directories in `src/pages/` from file-based routing, so register `/_tls/preview` explicitly.
+      name: 'tls-preview-route',
+      hooks: {
+        'astro:config:setup': ({ injectRoute }) => {
+          injectRoute({
+            pattern: '/_tls/preview',
+            entrypoint: './src/pages/_tls/preview.ts',
+            prerender: false,
+          })
+        },
+      },
+    },
+    {
       // The static /confirmer-inscription keeps Nuxt's `X-Robots-Tag: noindex, nofollow` (routeRules robots:false).
       name: 'robots-headers',
       hooks: {
