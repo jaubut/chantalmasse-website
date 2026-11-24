@@ -140,7 +140,6 @@
             :srcset="cmsHero?.image ? undefined : '/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w'"
             :alt="cmsHero?.image?.alt ?? `Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford`"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
-            style="filter: grayscale(20%);"
             v-bind="tlsBlockImageAttrs(Boolean(hasCms && cmsHero?.image), docId, blockKey, 'image')"
           />
           </div>

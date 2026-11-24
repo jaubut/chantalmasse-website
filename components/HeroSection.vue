@@ -111,7 +111,6 @@
             quality="75"
             alt="Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
-            style="filter: grayscale(20%);"
           />
           </div>
         </div>

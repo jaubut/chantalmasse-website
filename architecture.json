@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-17",
+  "generatedAt": "2026-11-24",
   "repo": "chantalmasse-website",
   "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Cloudflare Workers): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
   "targets": [
@@ -111,7 +111,7 @@
         },
         {
           "path": "components/HeroSection.vue",
-          "lines": 157,
+          "lines": 156,
           "kind": "component",
           "exports": [
             "HeroSection"
@@ -285,7 +285,7 @@
         },
         {
           "path": "components/booking/BookingModal.vue",
-          "lines": 409,
+          "lines": 394,
           "kind": "component",
           "exports": [
             "BookingModal"
@@ -307,8 +307,6 @@
           "sheets": 0,
           "externals": [
             "@iconify/vue",
-            "date-fns",
-            "date-fns/locale",
             "vue"
           ]
         },
@@ -337,7 +335,7 @@
         },
         {
           "path": "components/booking/IntakeForm.vue",
-          "lines": 331,
+          "lines": 340,
           "kind": "component",
           "exports": [
             "BookingIntakeForm"
@@ -363,12 +361,14 @@
         },
         {
           "path": "components/booking/MonthCalendar.vue",
-          "lines": 259,
+          "lines": 318,
           "kind": "component",
           "exports": [
             "BookingMonthCalendar"
           ],
-          "state": [],
+          "state": [
+            "inflight: Map"
+          ],
           "emits": [],
           "consumes": [],
           "endpoints": [],
@@ -376,7 +376,8 @@
             "/api/booking/availability"
           ],
           "imports": [
-            "components/booking/ServiceSelector.vue"
+            "components/booking/ServiceSelector.vue",
+            "utils/bookingHelpers.ts"
           ],
           "listeners": [
             "onMounted"
@@ -412,7 +413,7 @@
         },
         {
           "path": "components/booking/TimeSlotPicker.vue",
-          "lines": 104,
+          "lines": 96,
           "kind": "component",
           "exports": [
             "BookingTimeSlotPicker"
@@ -665,7 +666,7 @@
         },
         {
           "path": "nuxt.config.ts",
-          "lines": 187,
+          "lines": 196,
           "kind": "config",
           "exports": [],
           "state": [],
@@ -1159,6 +1160,23 @@
           ]
         },
         {
+          "path": "scripts/check-urls.ts",
+          "lines": 136,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "ownOrigins: Set"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "scripts/ga4-audit-part2.ts",
           "lines": 78,
           "kind": "script",
@@ -1251,6 +1269,41 @@
           ]
         },
         {
+          "path": "scripts/load-test-availability.ts",
+          "lines": 59,
+          "kind": "script",
+          "exports": [],
+          "state": [
+            "statuses: Map",
+            "cache: Map",
+            "let next",
+            "let firstError"
+          ],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "scripts/parity-crawl.ts",
+          "lines": 116,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "scripts/typecheck-baseline.ts",
           "lines": 100,
           "kind": "script",
@@ -1267,11 +1320,11 @@
         },
         {
           "path": "server/api/booking/availability.get.ts",
-          "lines": 86,
+          "lines": 81,
           "kind": "server-api",
           "exports": [],
           "state": [
-            "cache: Map"
+            "computed: Map"
           ],
           "emits": [],
           "consumes": [],
@@ -1284,7 +1337,7 @@
           ],
           "apiCalls": [],
           "imports": [
-            "server/utils/googleCalendar.ts",
+            "server/utils/bookingCache.ts",
             "utils/bookingHelpers.ts"
           ],
           "listeners": [],
@@ -1322,7 +1375,7 @@
         },
         {
           "path": "server/api/booking/cancel.post.ts",
-          "lines": 133,
+          "lines": 136,
           "kind": "server-api",
           "exports": [],
           "state": [],
@@ -1338,6 +1391,7 @@
           "apiCalls": [],
           "imports": [
             "server/utils/googleCalendar.ts",
+            "server/utils/bookingCache.ts",
             "server/utils/emailTemplates.ts",
             "server/utils/sms.ts"
           ],
@@ -1351,7 +1405,7 @@
         },
         {
           "path": "server/api/booking/create.post.ts",
-          "lines": 296,
+          "lines": 301,
           "kind": "server-api",
           "exports": [],
           "state": [],
@@ -1367,6 +1421,7 @@
           "apiCalls": [],
           "imports": [
             "server/utils/googleCalendar.ts",
+            "server/utils/bookingCache.ts",
             "server/utils/emailTemplates.ts",
             "server/utils/sms.ts",
             "server/utils/metaCapi.ts",
@@ -1507,7 +1562,7 @@
         },
         {
           "path": "server/shims/googleapis-calendar.ts",
-          "lines": 144,
+          "lines": 163,
           "kind": "server-lib",
           "exports": [
             "JWT",
@@ -1522,7 +1577,8 @@
           "endpoints": [],
           "apiCalls": [],
           "imports": [
-            "server/utils/googlePrivateKey.ts"
+            "server/utils/googlePrivateKey.ts",
+            "server/utils/bookingCache.ts"
           ],
           "listeners": [],
           "sheets": 0,
@@ -1544,6 +1600,32 @@
           "listeners": [],
           "sheets": 0,
           "externals": []
+        },
+        {
+          "path": "server/utils/bookingCache.ts",
+          "lines": 80,
+          "kind": "server-lib",
+          "exports": [
+            "BookingKv",
+            "CacheStatus",
+            "bookingKv",
+            "getMonthBusy",
+            "invalidateMonth"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/googleCalendar.ts",
+            "utils/bookingHelpers.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": [
+            "h3"
+          ]
         },
         {
           "path": "server/utils/briefService.ts",
@@ -1596,15 +1678,17 @@
           "externals": []
         },
         {
-          "path": "server/utils/emailTemplates.ts",
-          "lines": 470,
+          "path": "server/utils/emailLayout.ts",
+          "lines": 111,
           "kind": "server-lib",
           "exports": [
-            "clientConfirmationEmail",
-            "clientCancellationEmail",
-            "therapistCancellationEmail",
-            "clientReminderEmail",
-            "therapistNotificationEmail"
+            "headline",
+            "lead",
+            "paragraph",
+            "link",
+            "details",
+            "button",
+            "brandEmail"
           ],
           "state": [],
           "emits": [],
@@ -1619,8 +1703,32 @@
           "externals": []
         },
         {
+          "path": "server/utils/emailTemplates.ts",
+          "lines": 186,
+          "kind": "server-lib",
+          "exports": [
+            "clientConfirmationEmail",
+            "clientCancellationEmail",
+            "therapistCancellationEmail",
+            "clientReminderEmail",
+            "therapistNotificationEmail"
+          ],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "server/utils/input.ts",
+            "server/utils/emailLayout.ts"
+          ],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
           "path": "server/utils/googleCalendar.ts",
-          "lines": 179,
+          "lines": 188,
           "kind": "server-lib",
           "exports": [
             "getCalendarClient",
@@ -1632,7 +1740,9 @@
             "cancelEventById",
             "markSmsReminderSent"
           ],
-          "state": [],
+          "state": [
+            "let client"
+          ],
           "emits": [],
           "consumes": [],
           "endpoints": [],
@@ -1843,7 +1953,7 @@
         },
         {
           "path": "utils/bookingHelpers.ts",
-          "lines": 276,
+          "lines": 284,
           "kind": "util",
           "exports": [
             "BOOKING_TIMEZONE",
@@ -1855,6 +1965,7 @@
             "generateSlotsForDate",
             "isSlotAvailable",
             "getAvailableDatesInMonth",
+            "formatSlotStart",
             "googleCalendarUrl",
             "generateICS"
           ],
@@ -2091,6 +2202,7 @@
           "callers": [
             "components/booking/BookingModal.vue",
             "components/booking/IntakeForm.vue",
+            "components/booking/MonthCalendar.vue",
             "components/booking/TimeSlotPicker.vue"
           ]
         },
@@ -2112,10 +2224,17 @@
             "components/booking/ConfirmationView.vue"
           ]
         },
+        "formatSlotStart": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "components/booking/MonthCalendar.vue"
+          ]
+        },
         "BOOKING_SERVICES": {
           "module": "utils/bookingServices.ts",
           "callers": [
-            "components/booking/ServiceSelector.vue"
+            "components/booking/ServiceSelector.vue",
+            "pages/prendre-rendez-vous.vue"
           ]
         },
         "JourneySection": {
@@ -2212,18 +2331,17 @@
             "trigger/review-request.ts"
           ]
         },
-        "getEventsForMonth": {
-          "module": "server/utils/googleCalendar.ts",
-          "callers": [
-            "server/api/booking/availability.get.ts",
-            "server/api/booking/create.post.ts"
-          ]
-        },
         "getAvailableDatesInMonth": {
           "module": "utils/bookingHelpers.ts",
           "callers": [
             "server/api/booking/availability.get.ts",
             "server/api/booking/create.post.ts"
+          ]
+        },
+        "getMonthBusy": {
+          "module": "server/utils/bookingCache.ts",
+          "callers": [
+            "server/api/booking/availability.get.ts"
           ]
         },
         "findEventByCancelToken": {
@@ -2237,6 +2355,13 @@
           "module": "server/utils/googleCalendar.ts",
           "callers": [
             "server/api/booking/cancel.post.ts"
+          ]
+        },
+        "invalidateMonth": {
+          "module": "server/utils/bookingCache.ts",
+          "callers": [
+            "server/api/booking/cancel.post.ts",
+            "server/api/booking/create.post.ts"
           ]
         },
         "clientCancellationEmail": {
@@ -2300,6 +2425,13 @@
             "server/api/booking/create.post.ts"
           ]
         },
+        "getEventsForMonth": {
+          "module": "server/utils/googleCalendar.ts",
+          "callers": [
+            "server/api/booking/create.post.ts",
+            "server/utils/bookingCache.ts"
+          ]
+        },
         "createBookingEvent": {
           "module": "server/utils/googleCalendar.ts",
           "callers": [
@@ -2340,6 +2472,7 @@
           "module": "server/utils/input.ts",
           "callers": [
             "server/api/contact.post.ts",
+            "server/utils/emailLayout.ts",
             "server/utils/emailTemplates.ts"
           ]
         },
@@ -2370,6 +2503,18 @@
             "server/api/newsletter/subscribe.post.ts"
           ]
         },
+        "BookingKv": {
+          "module": "server/utils/bookingCache.ts",
+          "callers": [
+            "server/shims/googleapis-calendar.ts"
+          ]
+        },
+        "CalendarEvent": {
+          "module": "utils/bookingHelpers.ts",
+          "callers": [
+            "server/utils/bookingCache.ts"
+          ]
+        },
         "buildWeeklyPrompt": {
           "module": "utils/agentPrompt.ts",
           "callers": [
@@ -2390,6 +2535,48 @@
         },
         "escapeAttribute": {
           "module": "server/utils/input.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "button": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "headline": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "lead": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "details": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "paragraph": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "link": {
+          "module": "server/utils/emailLayout.ts",
+          "callers": [
+            "server/utils/emailTemplates.ts"
+          ]
+        },
+        "brandEmail": {
+          "module": "server/utils/emailLayout.ts",
           "callers": [
             "server/utils/emailTemplates.ts"
           ]
@@ -2489,7 +2676,6 @@
         "date-fns": {
           "version": "4.4.0",
           "modules": [
-            "components/booking/BookingModal.vue",
             "components/booking/IntakeForm.vue",
             "components/booking/MonthCalendar.vue",
             "components/booking/TimeSlotPicker.vue",
@@ -2543,6 +2729,7 @@
         "h3": {
           "version": "1.15.11",
           "modules": [
+            "server/utils/bookingCache.ts",
             "server/utils/newsletterApi.ts"
           ]
         },

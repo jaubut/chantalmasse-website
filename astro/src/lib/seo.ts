@@ -3,7 +3,7 @@
 export const SITE_URL = 'https://chantalmasse.com'
 export const SITE_NAME = "Chantal Massé — Thérapeute en relation d'aide"
 export const SITE_DESCRIPTION = 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.'
-export const HERO_IMAGE = `${SITE_URL}/images/chantal-hero.jpg`
+export const HERO_IMAGE = `${SITE_URL}/images/chantal-og.jpg`
 const DEFAULT_ROBOTS = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
 
 export interface Seo {

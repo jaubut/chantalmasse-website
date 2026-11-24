@@ -6,9 +6,9 @@
       <div class="relative" data-animate>
         <div class="aspect-square rounded-full overflow-hidden w-4/5 mx-auto">
           <img
-            src="https://images.unsplash.com/photo-1726766406089-0308c800b6b2?w=600&q=80&auto=format&fit=crop"
-            alt="Approche thérapeutique"
-            class="w-full h-full object-cover"
+            src="/images/chantal-portrait-44.jpg"
+            alt="Chantal Massé, thérapeute en relation d'aide à Shefford"
+            class="w-full h-full object-cover object-[50%_22%]"
           />
         </div>
         <!-- Floating quote -->

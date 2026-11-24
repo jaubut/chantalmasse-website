@@ -22,7 +22,7 @@ useSeoMeta({
   ogTitle: 'Chantal Massé — Thérapeute en relation d\'aide à Shefford',
   description: 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.',
   ogDescription: 'Thérapie individuelle et coaching de couple à Shefford (Haute-Yamaska) et en vidéoconférence. Accompagnement bienveillant pour retrouver équilibre et sérénité.',
-  ogImage: `${siteUrl}/images/chantal-hero.jpg`,
+  ogImage: `${siteUrl}/images/chantal-og.jpg`,
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })

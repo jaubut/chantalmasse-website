@@ -17,7 +17,6 @@
               srcset="/images/hero/chantal-hero-615.webp 615w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1230.webp 1230w, /images/hero/chantal-hero-1754.webp 1754w"
               alt="Chantal Massé, thérapeute en relation d'aide"
               class="w-full h-full object-cover"
-              style="filter: grayscale(8%);"
               loading="eager"
               fetchpriority="high"
             />
