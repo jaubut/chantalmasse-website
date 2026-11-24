@@ -187,7 +187,7 @@ useSeoMeta({
   ogDescription: 'Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance.',
   // Absolute URL — Facebook + LinkedIn scrapers don't always resolve
   // relative paths reliably (they break in email previews + staging).
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })

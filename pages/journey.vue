@@ -12,7 +12,7 @@ useSeoMeta({
   ogTitle: 'Le parcours émotionnel — Chantal Massé',
   description: 'Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix.',
   ogDescription: 'Une expérience immersive pour comprendre le chemin thérapeutique — de la souffrance vers la paix.',
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })

@@ -23,7 +23,7 @@ useSeoMeta({
   ogTitle: 'Inscription confirmée — Chantal Massé',
   description: 'Merci pour votre inscription à l\'infolettre de Chantal Massé.',
   ogDescription: 'Merci pour votre inscription à l\'infolettre de Chantal Massé.',
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
   robots: 'noindex',

@@ -180,7 +180,7 @@ useSeoMeta({
   ogDescription: 'Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance.',
   // Absolute URL — Facebook + LinkedIn scrapers don't always resolve
   // relative paths reliably (they break in email previews + staging).
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })

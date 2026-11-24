@@ -149,7 +149,7 @@ useSeoMeta({
   ogTitle: 'Blogue — Chantal Massé',
   description: 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.',
   ogDescription: 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.',
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })

@@ -40,7 +40,7 @@ useSeoMeta({
   ogTitle: 'Mentions Légales — Chantal Massé',
   description: 'Mentions légales du site de Chantal Massé, thérapeute.',
   ogDescription: 'Mentions légales du site de Chantal Massé, thérapeute.',
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
 })
 

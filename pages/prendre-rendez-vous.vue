@@ -17,7 +17,6 @@
               quality="75"
               alt="Chantal Massé, thérapeute en relation d'aide"
               class="w-full h-full object-cover"
-              style="filter: grayscale(8%);"
               loading="eager"
               fetchpriority="high"
             />
@@ -308,7 +307,7 @@ useSeoMeta({
   ogTitle: 'Prendre rendez-vous avec Chantal Massé',
   ogDescription:
     'Réserve ta séance avec Chantal Massé, thérapeute en relation d\'aide à Shefford et en vidéoconférence.',
-  ogImage: 'https://chantalmasse.com/images/chantal-hero.jpg',
+  ogImage: 'https://chantalmasse.com/images/chantal-og.jpg',
   ogType: 'website',
   twitterCard: 'summary_large_image',
 })
