@@ -1,16 +1,29 @@
 <template>
   <div class="min-h-screen bg-background">
     <!-- Header -->
-    <section class="px-8 lg:px-20 pt-32 pb-16">
+    <section
+      class="px-8 lg:px-20 pt-32 pb-16"
+      v-bind="tlsBlockAttrs(on, 'hero', 'heading')"
+    >
       <div class="max-w-screen-xl mx-auto">
-        <span class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2 mb-6">
-          Ressources & Réflexions
+        <span
+          class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2 mb-6"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
+        >
+          {{ cmsHero?.eyebrow || 'Ressources & Réflexions' }}
         </span>
-        <h1 class="font-headline text-6xl lg:text-7xl text-primary leading-tight lg:leading-none tracking-tight max-w-2xl">
-          Le <span class="italic">blogue</span>
+        <h1
+          class="font-headline text-6xl lg:text-7xl text-primary leading-tight lg:leading-none tracking-tight max-w-2xl"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'title')"
+        >
+          <template v-if="cmsHero?.title">{{ cmsHero.title }}</template>
+          <template v-else>Le <span class="italic">blogue</span></template>
         </h1>
-        <p class="mt-6 text-on-surface-variant text-lg font-light max-w-xl">
-          Des réflexions sur le mieux-être, les relations et la croissance personnelle.
+        <p
+          class="mt-6 text-on-surface-variant text-lg font-light max-w-xl"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+        >
+          {{ cmsHero?.lede || 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.' }}
         </p>
 
         <!-- Filters -->
@@ -118,8 +131,10 @@
 import { computed, ref } from 'vue'
 import type { BlogPost } from '../../lib/cms-client'
 import {
+  pageDocId,
   postDocId,
   tlsBlockAttrs,
+  tlsBlockFieldAttrs,
   tlsCollectionAttrs,
   tlsEntryFieldAttrs,
   tlsExtFieldAttrs,
@@ -127,8 +142,20 @@ import {
   tlsPostHeroImageAttrs,
 } from '../../lib/tls-edit-attrs'
 
-const props = defineProps<{ posts: Array<BlogPost & { id?: string }>, previewMode?: boolean }>()
+export interface CmsBlogHeroData {
+  docId?: string
+  eyebrow?: string
+  title?: string
+  lede?: string
+}
+
+const props = defineProps<{
+  posts: Array<BlogPost & { id?: string }>
+  previewMode?: boolean
+  cmsHero?: CmsBlogHeroData
+}>()
 const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsHero?.docId || pageDocId('blog'))
 const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const categoryLabels: Record<string, string> = {

@@ -5,9 +5,12 @@
 import { ClientRouter } from 'astro:transitions'
 import { Font } from 'astro:assets'
 import '../styles/main.css'
+import { extractSiteSettings, getSettings, type CmsSiteSettingsData } from '../lib/cms-client'
+import { SKIP_CACHE } from '../lib/page-cache'
 import { head, type Seo } from '../lib/seo'
 import {
   applyPreviewResponseHeaders,
+  buildPreviewSetCookie,
   DEFAULT_LOCALE,
   resolveBaseLayoutTls,
 } from '../lib/tls-edit-attrs'
@@ -36,6 +39,8 @@ interface Props extends Seo {
   locale?: string
   /** Override preview mode detection (defaults to checking `Astro.locals.previewMode` or `__tls_preview` cookie). */
   previewMode?: boolean
+  /** Pre-fetched CMS site settings from the page (`null` when already fetched and absent). */
+  cmsSettings?: CmsSiteSettingsData | null
 }
 const {
   minimalNav = false,
@@ -45,6 +50,7 @@ const {
   pageDocId,
   locale = DEFAULT_LOCALE,
   previewMode: previewModeProp,
+  cmsSettings: cmsSettingsProp,
   ...seo
 } = Astro.props
 const bookingBar = !minimalNav && !hideBookingBar
@@ -52,7 +58,7 @@ const h = head(seo)
 // Prerendered pages see /journey.html (build.format 'file'); the nav compares against the route path.
 const path = Astro.url.pathname.replace(/\.html$/, '')
 const meta = bare ? h.meta.filter(m => m.property !== 'og:url') : h.meta
-const { previewMode, mainAttrs, loaderScript } = resolveBaseLayoutTls({
+const resolvedTls = resolveBaseLayoutTls({
   isPrerendered: Astro.isPrerendered,
   locals: Astro.locals,
   cookieHeader: Astro.isPrerendered ? null : Astro.request.headers.get('cookie'),
@@ -62,6 +68,28 @@ const { previewMode, mainAttrs, loaderScript } = resolveBaseLayoutTls({
   previewModeProp,
   editOrigin: import.meta.env.PUBLIC_TLS_EDIT_ORIGIN as string | undefined,
 })
+let previewMode = resolvedTls.previewMode
+let mainAttrs = resolvedTls.mainAttrs
+const { loaderScript } = resolvedTls
+
+let resolvedSettings: CmsSiteSettingsData | undefined = cmsSettingsProp ?? undefined
+if (!Astro.isPrerendered && !bare && cmsSettingsProp === undefined) {
+  const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+  const onPreviewRejected = (): void => {
+    previewMode = false
+    Astro.locals.previewMode = false
+    Astro.locals.previewToken = null
+    mainAttrs = {}
+    Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+  }
+  try {
+    resolvedSettings = extractSiteSettings(await getSettings({ locale, previewToken: resolvedTls.previewToken, onPreviewRejected }))
+  } catch (err) {
+    console.error('[layout] settings unavailable', err)
+    Astro.response.headers.set(SKIP_CACHE, '1')
+  }
+}
+
 if (previewMode && !Astro.isPrerendered) {
   applyPreviewResponseHeaders(Astro.response.headers, true)
 }
@@ -103,7 +131,7 @@ if (previewMode && !Astro.isPrerendered) {
       {/* After <main> (it's a fixed overlay, z-index 100): the first paint then holds the hero too, instead of the
           overlay alone with the hero one frame later (the later paint became the LCP). */}
       <IntroLoader />
-      <TheFooter />
+      <TheFooter {...(resolvedSettings ? { cmsSettings: resolvedSettings } : {})} {...(previewMode ? { previewMode: true } : {})} />
       {bookingBar && <BookingStickyBar client:idle revealAfterSelector="#hero" />}
       <BookingModal client:only="vue" />
       {/* client:only: the modals Teleport to <body>, which server rendering drops; closed at load, nothing to prerender. */}

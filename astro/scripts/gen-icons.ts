@@ -13,7 +13,7 @@ const files = (dir: string): string[] => readdirSync(dir).flatMap((f) => {
   return statSync(p).isDirectory() ? files(p) : /\.(vue|ts|astro)$/.test(f) ? [p] : []
 })
 const names = new Set<string>()
-for (const f of ['components', 'pages', 'utils', 'astro/src'].flatMap(files))
+for (const f of ['utils', 'astro/src'].flatMap(files))
   for (const m of readFileSync(f, 'utf8').matchAll(/\b(material-symbols|mdi):([a-z0-9-]+)/g)) names.add(`${m[1]}:${m[2]}`)
 
 const out: Record<string, string> = {}

@@ -1,7 +1,57 @@
 ---
 import Base from '../layouts/Base.astro'
+import {
+  extractServiceLandingCmsData,
+  extractSiteSettings,
+  getPage,
+  getSettings,
+  type CmsSiteSettingsData,
+  type PageDoc,
+} from '../lib/cms-client'
+import { SKIP_CACHE } from '../lib/page-cache'
 import { HERO_IMAGE } from '../lib/seo'
+import { buildPreviewSetCookie } from '../lib/tls-edit-attrs'
 import CoachingDeCouplePage from '../vue/pages/CoachingDeCouplePage.vue'
+
+export const prerender = false
+
+const previewToken = Astro.locals.previewToken ?? null
+let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+let cookieCleared = false
+
+const onPreviewRejected = (): void => {
+  previewMode = false
+  Astro.locals.previewMode = false
+  Astro.locals.previewToken = null
+  if (!cookieCleared) {
+    cookieCleared = true
+    Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+  }
+}
+
+const [pageResult, settingsResult] = await Promise.allSettled([
+  getPage('/coaching-de-couple', { previewToken, onPreviewRejected }),
+  getSettings({ previewToken, onPreviewRejected }),
+])
+
+let page: PageDoc | null = null
+if (pageResult.status === 'fulfilled') {
+  page = pageResult.value
+} else {
+  console.error('[coaching-de-couple] page blocks unavailable', pageResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+let siteSettings: CmsSiteSettingsData | undefined
+if (settingsResult.status === 'fulfilled') {
+  siteSettings = extractSiteSettings(settingsResult.value)
+} else {
+  console.error('[coaching-de-couple] settings unavailable', settingsResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+const cmsPage = extractServiceLandingCmsData(page, 'coaching-de-couple')
 ---
 <Base
   preloadItalic
@@ -11,6 +61,13 @@ import CoachingDeCouplePage from '../vue/pages/CoachingDeCouplePage.vue'
   ogTitle="Coaching de couple à Shefford | Chantal Massé"
   ogDescription="Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance."
   ogImage={HERO_IMAGE}
+  pageDocId={cmsPage.docId}
+  previewMode={previewMode}
+  cmsSettings={siteSettings ?? null}
 >
-  <CoachingDeCouplePage />
+  <CoachingDeCouplePage
+    {...(page ? { cmsPage } : {})}
+    {...(siteSettings ? { cmsSettings: siteSettings } : {})}
+    {...(previewMode ? { previewMode: true } : {})}
+  />
 </Base>

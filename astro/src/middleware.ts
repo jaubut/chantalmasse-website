@@ -5,8 +5,8 @@
 // - Preview mode (`__tls_preview` cookie): verified with `PREVIEW_SECRET` (HS256 JWT `aud: "tls-preview"`, `site: "chantal-masse"`)
 //   before setting `ctx.locals.previewToken` / `ctx.locals.previewMode = true` or bypassing the KV page cache. An unverified or
 //   expired cookie never skips the page cache and is cleared (`Max-Age=0`) on the response.
-// - The CMS-backed pages (/, /blog, /blog/<slug>, /sitemap.xml) go through the KV page cache (src/lib/page-cache.ts):
-//   a post published in the portal shows up within about a minute, with no rebuild.
+// - The CMS-backed pages (/, /coaching-de-couple, /therapie-individuelle, /prendre-rendez-vous, /blog, /blog/<slug>,
+//   /sitemap.xml) go through the KV page cache (src/lib/page-cache.ts): CMS edits publish within the 60s SWR window.
 import { defineMiddleware } from 'astro:middleware'
 import { cssFirst } from './lib/css-first.mjs'
 import { pageCache, SKIP_CACHE, type Kv } from './lib/page-cache'
@@ -20,7 +20,7 @@ import {
   verifyPreviewToken,
 } from './lib/tls-edit-attrs'
 
-const CACHED = /^\/(blog(\/[a-z0-9-]+)?|sitemap\.xml)?$/
+export const CACHED = /^\/(blog(\/[a-z0-9-]+)?|coaching-de-couple|therapie-individuelle|prendre-rendez-vous|sitemap\.xml)?$/
 const NUXT_404_ROBOTS = 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
 
 export interface WorkerEnv {

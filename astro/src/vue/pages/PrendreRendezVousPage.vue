@@ -5,6 +5,7 @@
       ref="heroEl"
       data-lp-hero
       class="relative px-6 pt-24 pb-16 md:pt-32 md:pb-24"
+      v-bind="tlsBlockAttrs(on, 'hero', 'hero')"
     >
       <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-center">
 
@@ -12,13 +13,14 @@
         <div class="order-2 md:order-1">
           <div class="aspect-[4/5] max-w-md mx-auto md:mx-0 rounded-[2rem] overflow-hidden">
             <img
-              src="/images/chantal-hero.jpg"
+              :src="heroImageSrc"
               sizes="(max-width: 767px) 137vw, 615px"
-              srcset="/images/hero/chantal-hero-615.webp 615w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1230.webp 1230w, /images/hero/chantal-hero-1754.webp 1754w"
-              alt="Chantal Massé, thérapeute en relation d'aide"
+              :srcset="heroImageSrcset"
+              :alt="heroImageAlt"
               class="w-full h-full object-cover"
               loading="eager"
               fetchpriority="high"
+              v-bind="tlsBlockImageAttrs(on, docId, 'hero', 'image')"
             />
           </div>
         </div>
@@ -28,19 +30,25 @@
           <!-- Trust pill -->
           <span
             class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-[11px] uppercase tracking-widest rounded-full px-4 py-2 mb-8"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
           >
-            13 ans de pratique · Shefford &amp; en vidéo
+            {{ cmsPage?.hero?.eyebrow || '13 ans de pratique · Shefford & en vidéo' }}
           </span>
 
           <!-- H1 -->
-          <h1 class="font-headline italic text-primary leading-[1.05] sm:leading-none text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl tracking-tight mb-6">
-            Réserve ta séance avec Chantal, en moins de 2 minutes.
+          <h1
+            class="font-headline italic text-primary leading-[1.05] sm:leading-none text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl tracking-tight mb-6"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'heading/0')"
+          >
+            {{ cmsPage?.hero?.heading?.[0] || 'Réserve ta séance avec Chantal, en moins de 2 minutes.' }}
           </h1>
 
           <!-- Subtitle -->
-          <p class="text-lg md:text-xl text-on-surface-variant leading-relaxed md:leading-7 max-w-xl mb-10">
-            Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec.
-            Disponibilités dans les 7 à 14 jours.
+          <p
+            class="text-lg md:text-xl text-on-surface-variant leading-relaxed md:leading-7 max-w-xl mb-10"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+          >
+            {{ cmsPage?.hero?.lede || "Thérapeute en relation d'aide à Shefford et en vidéoconférence partout au Québec. Disponibilités dans les 7 à 14 jours." }}
           </p>
 
           <!-- Service switcher -->
@@ -69,9 +77,10 @@
           <!-- Primary CTA -->
           <button
             class="w-full sm:w-auto bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'cta/label')"
             @click="openBooking('hero')"
           >
-            Prendre rendez-vous
+            {{ cmsPage?.hero?.ctaLabel || 'Prendre rendez-vous' }}
           </button>
 
         </div>
@@ -80,14 +89,20 @@
     </section>
 
     <!-- ── CE QUI T'ATTEND (3 steps) ───────────────────────────────────── -->
-    <section class="px-6 py-16 md:py-24 bg-surface-container-low">
+    <section
+      class="px-6 py-16 md:py-24 bg-surface-container-low"
+      v-bind="tlsBlockAttrs(on, 'etapes', 'list')"
+    >
       <div class="max-w-3xl mx-auto">
-        <h2 class="font-headline text-primary text-3xl md:text-4xl mb-10 md:mb-14">
-          Ce qui t'attend
+        <h2
+          class="font-headline text-primary text-3xl md:text-4xl mb-10 md:mb-14"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'etapes', 'title')"
+        >
+          {{ cmsPage?.etapes?.title || "Ce qui t'attend" }}
         </h2>
         <ol class="space-y-8 md:space-y-10">
           <li
-            v-for="(step, i) in STEPS"
+            v-for="(step, i) in resolvedSteps"
             :key="i"
             class="flex gap-5 md:gap-7"
           >
@@ -97,8 +112,14 @@
               {{ i + 1 }}
             </span>
             <div>
-              <p class="font-semibold text-primary text-lg mb-1">{{ step.title }}</p>
-              <p class="text-on-surface-variant leading-relaxed">{{ step.body }}</p>
+              <p
+                class="font-semibold text-primary text-lg mb-1"
+                v-bind="tlsBlockFieldAttrs(on, docId, 'etapes', `items/${i}/title`)"
+              >{{ step.title }}</p>
+              <p
+                class="text-on-surface-variant leading-relaxed"
+                v-bind="tlsBlockFieldAttrs(on, docId, 'etapes', `items/${i}/body`)"
+              >{{ step.body }}</p>
             </div>
           </li>
         </ol>
@@ -106,10 +127,16 @@
     </section>
 
     <!-- ── TESTIMONIALS ────────────────────────────────────────────────── -->
-    <section class="px-6 py-16 md:py-24">
+    <section
+      class="px-6 py-16 md:py-24"
+      v-bind="tlsBlockAttrs(on, 'temoignages', 'list')"
+    >
       <div class="max-w-3xl mx-auto">
-        <h2 class="font-headline text-primary italic text-3xl md:text-4xl mb-10 md:mb-14">
-          Ce que les autres disent.
+        <h2
+          class="font-headline text-primary italic text-3xl md:text-4xl mb-10 md:mb-14"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', 'title')"
+        >
+          {{ cmsPage?.temoignages?.title || 'Ce que les autres disent.' }}
         </h2>
         <div
           class="relative"
@@ -123,18 +150,27 @@
               :style="{ transform: `translateX(-${activeTestimonial * 100}%)` }"
             >
               <figure
-                v-for="t in TESTIMONIALS"
-                :key="t.name"
+                v-for="(t, i) in resolvedTestimonials"
+                :key="`${t.name}-${i}`"
                 class="shrink-0 w-full px-1"
               >
                 <div class="bg-surface-container-low p-8 md:p-10 rounded-[2rem] editorial-shadow">
                   <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
-                  <blockquote class="text-on-surface text-[17px] leading-relaxed mb-6 min-h-[9rem]">
+                  <blockquote
+                    class="text-on-surface text-[17px] leading-relaxed mb-6 min-h-[9rem]"
+                    v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/body`)"
+                  >
                     {{ t.quote }}
                   </blockquote>
                   <figcaption>
-                    <p class="font-semibold text-primary">{{ t.name }}</p>
-                    <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
+                    <p
+                      class="font-semibold text-primary"
+                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/title`)"
+                    >{{ t.name }}</p>
+                    <p
+                      class="text-sm text-on-surface-variant font-light"
+                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/subtitle`)"
+                    >{{ t.context }}</p>
                   </figcaption>
                 </div>
               </figure>
@@ -154,7 +190,7 @@
 
             <div class="flex items-center gap-2">
               <button
-                v-for="(_, i) in TESTIMONIALS"
+                v-for="(_, i) in resolvedTestimonials"
                 :key="i"
                 type="button"
                 :aria-label="`Voir témoignage ${i + 1}`"
@@ -206,21 +242,27 @@
     </section>
 
     <!-- ── FAQ ─────────────────────────────────────────────────────────── -->
-    <section class="px-6 py-16 md:py-24">
+    <section
+      class="px-6 py-16 md:py-24"
+      v-bind="tlsBlockAttrs(on, 'faq', 'list')"
+    >
       <div class="max-w-3xl mx-auto">
-        <h2 class="font-headline text-primary text-3xl md:text-4xl mb-10 md:mb-14">
-          Tes questions.
+        <h2
+          class="font-headline text-primary text-3xl md:text-4xl mb-10 md:mb-14"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'faq', 'title')"
+        >
+          {{ cmsPage?.faq?.title || 'Tes questions.' }}
         </h2>
         <div class="space-y-3">
           <details
-            v-for="(q, i) in FAQ"
+            v-for="(q, i) in resolvedFaq"
             :key="i"
             class="group bg-surface-container-low rounded-xl border border-outline-variant/40 open:editorial-shadow"
           >
             <summary
               class="cursor-pointer list-none flex items-center justify-between gap-4 px-5 md:px-6 py-4 md:py-5 font-semibold text-primary"
             >
-              <span>{{ q.question }}</span>
+              <span v-bind="tlsBlockFieldAttrs(on, docId, 'faq', `items/${i}/title`)">{{ q.question }}</span>
               <span
                 class="shrink-0 w-7 h-7 rounded-full bg-primary-fixed text-primary flex items-center justify-center transition-transform group-open:rotate-45"
               >
@@ -228,7 +270,7 @@
               </span>
             </summary>
             <div class="px-5 md:px-6 pb-5 md:pb-6 text-on-surface-variant leading-relaxed">
-              <p>{{ q.answer }}</p>
+              <p v-bind="tlsBlockFieldAttrs(on, docId, 'faq', `items/${i}/body`)">{{ q.answer }}</p>
             </div>
           </details>
         </div>
@@ -260,17 +302,27 @@
     </section>
 
     <!-- ── FINAL CTA ──────────────────────────────────────────────────── -->
-    <section class="px-6 py-20 md:py-28">
+    <section
+      class="px-6 py-20 md:py-28"
+      v-bind="tlsBlockAttrs(on, 'cta', 'cta')"
+    >
       <div class="max-w-2xl mx-auto text-center">
-        <p class="font-headline italic text-primary text-2xl md:text-3xl leading-snug md:leading-9 mb-8">
-          Le premier pas est le plus difficile.<br>
-          On commence quand tu es prêt·e.
+        <p
+          class="font-headline italic text-primary text-2xl md:text-3xl leading-snug md:leading-9 mb-8"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'cta', 'note')"
+        >
+          <template v-if="cmsPage?.cta?.note">{{ cmsPage.cta.note }}</template>
+          <template v-else>
+            Le premier pas est le plus difficile.<br>
+            On commence quand tu es prêt·e.
+          </template>
         </p>
         <button
           class="bg-primary text-on-primary px-12 py-5 rounded-xl font-semibold text-base hover:bg-primary-container transition-colors"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'cta', 'label')"
           @click="openBooking('final')"
         >
-          Prendre rendez-vous
+          {{ cmsPage?.cta?.label || 'Prendre rendez-vous' }}
         </button>
         <div class="mt-6">
           <button
@@ -293,12 +345,75 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { BOOKING_SERVICES, type BookingServiceId } from '~/utils/bookingServices'
 import { useTracking } from '~/composables/useTracking'
+import {
+  pageDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsBlockImageAttrs,
+} from '../../lib/tls-edit-attrs'
 import { useBooking } from '../composables/useBooking'
 import { useContact } from '../composables/useContact'
 import BookingStickyBar from '../components/BookingStickyBar.vue'
+
+export interface CmsBookingLpPageData {
+  docId?: string
+  hero?: {
+    eyebrow?: string
+    heading?: [string, string?]
+    lede?: string
+    ctaLabel?: string
+    image?: { src?: string; key?: string; alt?: string; srcset?: string }
+  }
+  etapes?: {
+    title?: string
+    items?: Array<{ title?: string; body?: string }>
+  }
+  temoignages?: {
+    title?: string
+    items?: Array<{ title?: string; subtitle?: string; body?: string }>
+  }
+  faq?: {
+    title?: string
+    items?: Array<{ title?: string; body?: string }>
+  }
+  cta?: {
+    note?: string
+    label?: string
+  }
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsPage?: CmsBookingLpPageData
+}>()
+
+const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsPage?.docId || pageDocId('prendre-rendez-vous'))
+
+const rawHeroImgSrc = computed(() => {
+  const raw = (props.cmsPage?.hero?.image?.src ?? props.cmsPage?.hero?.image?.key ?? '').trim()
+  if (!raw) return undefined
+  return (raw.startsWith('/') || /^https?:\/\//.test(raw)) ? raw : `/media/${raw.replace(/^\/+/, '')}`
+})
+const heroImageSrc = computed(() => rawHeroImgSrc.value ?? '/images/chantal-hero.jpg')
+const heroImageSrcset = computed(() => {
+  if (props.cmsPage?.hero?.image?.srcset) return props.cmsPage.hero.image.srcset
+  const src = rawHeroImgSrc.value
+  if (src && src.startsWith('/media/')) {
+    const base = src.split('?')[0]!
+    return [640, 960, 1280, 1920].map(w => `${base}?w=${w} ${w}w`).join(', ')
+  }
+  if (!src) {
+    return '/images/hero/chantal-hero-615.webp 615w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1230.webp 1230w, /images/hero/chantal-hero-1754.webp 1754w'
+  }
+  return undefined
+})
+const heroImageAlt = computed(
+  () => props.cmsPage?.hero?.image?.alt?.trim() || "Chantal Massé, thérapeute en relation d'aide",
+)
 
 const booking = useBooking()
 const contact = useContact()
@@ -328,6 +443,15 @@ const STEPS = [
   },
 ]
 
+const resolvedSteps = computed(() => {
+  const items = props.cmsPage?.etapes?.items
+  if (!items || items.length === 0) return STEPS
+  return STEPS.map((fb, i) => ({
+    title: items[i]?.title?.trim() || fb.title,
+    body: items[i]?.body?.trim() || fb.body,
+  }))
+})
+
 const TESTIMONIALS = [
   {
     quote:
@@ -348,6 +472,19 @@ const TESTIMONIALS = [
     context: 'En thérapie individuelle',
   },
 ]
+
+const resolvedTestimonials = computed(() => {
+  const items = props.cmsPage?.temoignages?.items
+  if (!items || items.length === 0) return TESTIMONIALS
+  return items.map((it, i) => {
+    const fb = TESTIMONIALS[i]
+    return {
+      quote: it.body?.trim() || fb?.quote || '',
+      name: it.title?.trim() || fb?.name || '',
+      context: it.subtitle?.trim() || fb?.context || '',
+    }
+  }).filter(t => t.quote && t.name)
+})
 
 const FAQ = [
   {
@@ -382,16 +519,27 @@ const FAQ = [
   },
 ]
 
+const resolvedFaq = computed(() => {
+  const items = props.cmsPage?.faq?.items
+  if (!items || items.length === 0) return FAQ
+  return FAQ.map((fb, i) => ({
+    question: items[i]?.title?.trim() || fb.question,
+    answer: items[i]?.body?.trim() || fb.answer,
+  }))
+})
+
 const activeTestimonial = ref(0)
 const pauseCarousel = ref(false)
 let carouselTimer: ReturnType<typeof setInterval> | null = null
 
 function nextTestimonial(): void {
-  activeTestimonial.value = (activeTestimonial.value + 1) % TESTIMONIALS.length
+  const len = resolvedTestimonials.value.length || 1
+  activeTestimonial.value = (activeTestimonial.value + 1) % len
 }
 
 function prevTestimonial(): void {
-  activeTestimonial.value = (activeTestimonial.value - 1 + TESTIMONIALS.length) % TESTIMONIALS.length
+  const len = resolvedTestimonials.value.length || 1
+  activeTestimonial.value = (activeTestimonial.value - 1 + len) % len
 }
 
 onMounted(() => {

@@ -2,23 +2,39 @@
   <div class="min-h-screen bg-background">
 
     <!-- Hero — matches search intent immediately -->
-    <section class="min-h-[85vh] flex items-center justify-center px-8 lg:px-20 pt-28 pb-16 bg-background">
+    <section
+      class="min-h-[85vh] flex items-center justify-center px-8 lg:px-20 pt-28 pb-16 bg-background"
+      v-bind="tlsBlockAttrs(on, 'hero', 'hero')"
+    >
       <div class="max-w-3xl mx-auto w-full flex flex-col items-center text-center gap-6">
-        <span class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2">
-          Coaching de couple — Shefford, en présentiel
+        <span
+          class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
+        >
+          {{ cmsPage?.hero?.eyebrow || 'Coaching de couple — Shefford, en présentiel' }}
         </span>
-        <h1 class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] lg:leading-none tracking-tight">
-          <span class="italic">Ce n'est pas un manque d'amour</span> qui sépare un couple, mais un manque d'outils.
+        <h1
+          class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] lg:leading-none tracking-tight"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'heading/0')"
+        >
+          <template v-if="cmsPage?.hero?.heading?.[0]">{{ cmsPage.hero.heading[0] }}</template>
+          <template v-else>
+            <span class="italic">Ce n'est pas un manque d'amour</span> qui sépare un couple, mais un manque d'outils.
+          </template>
         </h1>
-        <p class="text-on-surface-variant text-lg max-w-xl font-light">
-          Le coaching de couple, c'est apprendre à communiquer autrement. 90 minutes de dialogue intentionnel pour transformer les conflits en connexion.
+        <p
+          class="text-on-surface-variant text-lg max-w-xl font-light"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+        >
+          {{ cmsPage?.hero?.lede || "Le coaching de couple, c'est apprendre à communiquer autrement. 90 minutes de dialogue intentionnel pour transformer les conflits en connexion." }}
         </p>
         <div class="flex flex-col sm:flex-row gap-4 mt-2">
           <button
             class="bg-primary text-on-primary px-10 py-5 rounded-xl font-semibold text-center hover:bg-primary-container transition-colors"
             data-booking-open="couple"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'cta/label')"
           >
-            Réserver une séance — 160$
+            {{ cmsPage?.hero?.ctaLabel || 'Réserver une séance — 160$' }}
           </button>
           <a href="#approche" class="border border-outline-variant/40 px-10 py-5 rounded-xl text-center hover:bg-surface-container transition-colors font-light" style="background-color: rgba(254,248,243,0.4);">
             Comment ça fonctionne?
@@ -38,33 +54,59 @@
     </section>
 
     <!-- Pain points — what brings couples here -->
-    <section id="services" class="py-24 px-8 bg-surface-container-low">
+    <section
+      id="services"
+      class="py-24 px-8 bg-surface-container-low"
+      v-bind="tlsBlockAttrs(on, 'services', 'list')"
+    >
       <div class="max-w-screen-xl mx-auto">
-        <h2 class="font-headline text-4xl text-primary italic text-center mb-4">Tu te reconnais?</h2>
-        <p class="text-center text-on-surface-variant font-light max-w-xl mx-auto mb-16">
-          La plupart des couples qui me consultent vivent au moins une de ces situations.
+        <h2
+          class="font-headline text-4xl text-primary italic text-center mb-4"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'services', 'title')"
+        >{{ cmsPage?.services?.title || 'Tu te reconnais?' }}</h2>
+        <p
+          class="text-center text-on-surface-variant font-light max-w-xl mx-auto mb-16"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'services', 'intro')"
+        >
+          {{ cmsPage?.services?.intro || 'La plupart des couples qui me consultent vivent au moins une de ces situations.' }}
         </p>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div
-            v-for="pain in painPoints"
-            :key="pain.title"
+            v-for="(pain, i) in resolvedPainPoints"
+            :key="`${pain.title}-${i}`"
             class="bg-surface-container-lowest p-8 rounded-2xl"
           >
             <Icon :icon="pain.icon" class="text-2xl text-primary mb-4" />
-            <h3 class="font-semibold text-on-surface mb-2">{{ pain.title }}</h3>
-            <p class="text-on-surface-variant font-light text-sm leading-relaxed">{{ pain.desc }}</p>
+            <h3
+              class="font-semibold text-on-surface mb-2"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'services', `items/${i}/title`)"
+            >{{ pain.title }}</h3>
+            <p
+              class="text-on-surface-variant font-light text-sm leading-relaxed"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'services', `items/${i}/body`)"
+            >{{ pain.desc }}</p>
           </div>
         </div>
       </div>
     </section>
 
     <!-- Approach -->
-    <section id="approche" class="py-24 px-8 bg-background">
+    <section
+      id="approche"
+      class="py-24 px-8 bg-background"
+      v-bind="tlsBlockAttrs(on, 'approche', 'rich_text')"
+    >
       <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div>
-          <h2 class="font-headline text-4xl text-primary italic mb-6">Le dialogue intentionnel Imago</h2>
-          <p class="text-on-surface-variant font-light text-lg mb-6">
-            Le coaching est une approche orientée vers la solution. Au cours de chaque rencontre de 90 minutes, le couple est appelé à entrer en relation — se faire connaître l'un à l'autre — et non en réaction.
+          <h2
+            class="font-headline text-4xl text-primary italic mb-6"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'approche', 'title')"
+          >{{ cmsPage?.approche?.title || 'Le dialogue intentionnel Imago' }}</h2>
+          <p
+            class="text-on-surface-variant font-light text-lg mb-6"
+            v-bind="tlsBlockFieldAttrs(on, docId, 'approche', 'body')"
+          >
+            {{ cmsPage?.approche?.body || "Le coaching est une approche orientée vers la solution. Au cours de chaque rencontre de 90 minutes, le couple est appelé à entrer en relation — se faire connaître l'un à l'autre — et non en réaction." }}
           </p>
           <ul class="space-y-4 mb-8">
             <li v-for="step in steps" :key="step" class="flex items-start gap-3">
@@ -87,19 +129,35 @@
     </section>
 
     <!-- Testimonials — couple only -->
-    <section id="apropos" class="py-24 px-8 bg-surface-container-low">
+    <section
+      id="apropos"
+      class="py-24 px-8 bg-surface-container-low"
+      v-bind="tlsBlockAttrs(on, 'apropos', 'list')"
+    >
       <div class="max-w-screen-xl mx-auto">
-        <h2 class="font-headline text-4xl text-primary italic text-center mb-16">Ce que les couples en disent</h2>
+        <h2
+          class="font-headline text-4xl text-primary italic text-center mb-16"
+          v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', 'title')"
+        >{{ cmsPage?.apropos?.title || 'Ce que les couples en disent' }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div
-            v-for="t in coupleTestimonials"
-            :key="t.name"
+            v-for="(t, i) in resolvedTestimonials"
+            :key="`${t.name}-${i}`"
             class="bg-surface-container-lowest p-10 rounded-[2rem]"
           >
             <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
-            <p class="text-on-surface leading-relaxed mb-6">{{ t.quote }}</p>
-            <p class="font-semibold text-primary">{{ t.name }}</p>
-            <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
+            <p
+              class="text-on-surface leading-relaxed mb-6"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/body`)"
+            >{{ t.quote }}</p>
+            <p
+              class="font-semibold text-primary"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/title`)"
+            >{{ t.name }}</p>
+            <p
+              class="text-sm text-on-surface-variant font-light"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/subtitle`)"
+            >{{ t.context }}</p>
           </div>
         </div>
         <div class="text-center mt-10">
@@ -116,35 +174,57 @@
     </section>
 
     <!-- Pricing + CTA -->
-    <section class="py-24 px-8 bg-background">
+    <section
+      class="py-24 px-8 bg-background"
+      v-bind="tlsBlockAttrs(on, 'tarif', 'cta')"
+    >
       <div class="max-w-screen-xl mx-auto">
         <div class="bg-surface-container-low rounded-[3rem] p-8 lg:p-20 relative overflow-hidden">
           <Icon icon="material-symbols:favorite" class="absolute top-0 right-0 text-primary opacity-5 select-none pointer-events-none" style="width: 18rem; height: 18rem; transform: translate(20%, -15%);" />
 
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+          <div
+            class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10"
+            v-bind="tlsCollectionAttrs(on, 'service')"
+          >
             <div>
-              <h2 class="font-headline text-4xl italic text-primary mb-4">Prêt à retrouver la complicité?</h2>
+              <h2
+                class="font-headline text-4xl italic text-primary mb-4"
+                v-bind="tlsBlockFieldAttrs(on, docId, 'tarif', 'note')"
+              >{{ cmsPage?.tarif?.note || 'Prêt à retrouver la complicité?' }}</h2>
               <p class="text-on-surface-variant font-light text-lg mb-8">
                 La première séance est souvent la plus importante. C'est le moment où on établit un espace sécurisé pour le dialogue.
               </p>
               <button
                 class="bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl hover:scale-105 transition-transform"
                 data-booking-open="couple"
+                v-bind="tlsBlockFieldAttrs(on, docId, 'tarif', 'label')"
               >
-                Réserver une séance
+                {{ cmsPage?.tarif?.label || 'Réserver une séance' }}
               </button>
             </div>
 
-            <div class="bg-surface p-10 rounded-[2rem] editorial-shadow">
-              <h4 class="font-headline text-2xl italic text-primary mb-6">Coaching de couple</h4>
+            <div
+              class="bg-surface p-10 rounded-[2rem] editorial-shadow"
+              v-bind="tlsItemAttrs(on, serviceId, 'service')"
+            >
+              <h4
+                class="font-headline text-2xl italic text-primary mb-6"
+                v-bind="tlsEntryFieldAttrs(on, serviceId, 'title')"
+              >{{ cmsPage?.service?.title || 'Coaching de couple' }}</h4>
               <div class="space-y-4 mb-8">
                 <div class="flex justify-between py-3 border-b border-outline-variant/20">
                   <span class="text-on-surface">Durée</span>
-                  <span class="text-on-surface font-semibold">90 minutes</span>
+                  <span
+                    class="text-on-surface font-semibold"
+                    v-bind="tlsExtFieldAttrs(on, serviceId, 'attrs/duration_minutes')"
+                  >{{ cmsPage?.service?.durationMinutes != null ? `${cmsPage.service.durationMinutes} minutes` : '90 minutes' }}</span>
                 </div>
                 <div class="flex justify-between py-3 border-b border-outline-variant/20">
                   <span class="text-on-surface">Tarif</span>
-                  <span class="text-on-surface font-semibold">160$ / séance</span>
+                  <span
+                    class="text-on-surface font-semibold"
+                    v-bind="tlsExtFieldAttrs(on, serviceId, 'priceCents')"
+                  >{{ cmsPage?.service?.priceCents != null ? `${Math.round(cmsPage.service.priceCents / 100)}$ / séance` : '160$ / séance' }}</span>
                 </div>
                 <div class="flex justify-between py-3 border-b border-outline-variant/20">
                   <span class="text-on-surface">Format</span>
@@ -157,7 +237,7 @@
               </div>
               <div class="flex items-start gap-3 text-sm text-on-surface-variant">
                 <Icon icon="material-symbols:location-on" class="text-primary mt-0.5 shrink-0" />
-                <span>245 rue Colette, Shefford, QC J2M 2B7</span>
+                <span v-bind="tlsSettingsFieldAttrs(on, settingsId, 'address')">{{ cmsSettings?.address || '245 rue Colette, Shefford, QC J2M 2B7' }}</span>
               </div>
             </div>
           </div>
@@ -169,9 +249,66 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Icon from '../Icon.vue'
+import {
+  pageDocId,
+  serviceDocId,
+  settingsDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
+  tlsCollectionAttrs,
+  tlsEntryFieldAttrs,
+  tlsExtFieldAttrs,
+  tlsItemAttrs,
+  tlsSettingsFieldAttrs,
+} from '../../lib/tls-edit-attrs'
 
-const painPoints = [
+export interface CmsCouplePageData {
+  docId?: string
+  hero?: {
+    eyebrow?: string
+    heading?: [string, string?]
+    lede?: string
+    ctaLabel?: string
+  }
+  services?: {
+    title?: string
+    intro?: string
+    items?: Array<{ title?: string; body?: string }>
+  }
+  approche?: {
+    title?: string
+    body?: string
+  }
+  apropos?: {
+    title?: string
+    items?: Array<{ title?: string; subtitle?: string; body?: string }>
+  }
+  tarif?: {
+    note?: string
+    label?: string
+  }
+  service?: {
+    id?: string
+    title?: string
+    durationMinutes?: number | null
+    priceCents?: number | null
+  }
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsPage?: CmsCouplePageData
+  cmsSettings?: { id?: string; address?: string }
+}>()
+
+const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsPage?.docId || pageDocId('coaching-de-couple'))
+const serviceId = computed(() => props.cmsPage?.service?.id || serviceDocId('coaching-de-couple'))
+const settingsId = computed(() => props.cmsSettings?.id || settingsDocId())
+
+const DEFAULT_PAIN_POINTS = [
   {
     icon: 'material-symbols:replay',
     title: 'Les mêmes conflits reviennent',
@@ -204,6 +341,16 @@ const painPoints = [
   },
 ]
 
+const resolvedPainPoints = computed(() => {
+  const items = props.cmsPage?.services?.items
+  if (!items || items.length === 0) return DEFAULT_PAIN_POINTS
+  return DEFAULT_PAIN_POINTS.map((fb, i) => ({
+    icon: fb.icon,
+    title: items[i]?.title?.trim() || fb.title,
+    desc: items[i]?.body?.trim() || fb.desc,
+  }))
+})
+
 const steps = [
   'Un espace sans jugement où chacun peut s\'exprimer en toute sécurité',
   'Des outils de communication concrets que vous utilisez dès la première séance',
@@ -218,7 +365,7 @@ const outcomes = [
   'Un plan d\'action concret pour retrouver la complicité au quotidien',
 ]
 
-const coupleTestimonials = [
+const DEFAULT_COUPLE_TESTIMONIALS = [
   {
     quote: 'Nous avons beaucoup apprécié les séances de coaching de couple avec Chantal, car elle sait très bien établir une ambiance propice aux échanges. La communication se fait sans jugement et dans le respect. Son approche permet également de créer des ponts qui favorisent l\'ouverture, la compréhension et l\'acceptation. Nous recommandons sans réserve Chantal à tous ceux qui veulent réellement améliorer leur relation de couple.',
     name: 'Véronique & Dany',
@@ -231,4 +378,16 @@ const coupleTestimonials = [
   },
 ]
 
+const resolvedTestimonials = computed(() => {
+  const items = props.cmsPage?.apropos?.items
+  if (!items || items.length === 0) return DEFAULT_COUPLE_TESTIMONIALS
+  return items.map((it, i) => {
+    const fb = DEFAULT_COUPLE_TESTIMONIALS[i]
+    return {
+      quote: it.body?.trim() || fb?.quote || '',
+      name: it.title?.trim() || fb?.name || '',
+      context: it.subtitle?.trim() || fb?.context || '',
+    }
+  }).filter(t => t.quote && t.name)
+})
 </script>

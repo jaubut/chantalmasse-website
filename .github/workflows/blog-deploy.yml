@@ -82,9 +82,8 @@ jobs:
       issues: write # opens the smoke-failure issue
     env:
       CI: 'true'
-      NUXT_TELEMETRY_DISABLED: '1'
       # Build-time values only. Server secrets are NOT needed here: the build
-      # bakes them as "" and the Worker's NUXT_* secrets override them at runtime.
+      # bakes them as "" and the Worker's secrets override them at runtime.
       SITE_BASE_URL: https://chantalmasse.com
       BOOKING_TIMEZONE: America/Toronto
       BOOKING_ADVANCE_DAYS: '60'
@@ -115,7 +114,9 @@ jobs:
       - name: Install (frozen lockfile)
         run: bun install --frozen-lockfile
 
-      - name: Build (Cloudflare preset, as deployed)
+      - name: Build (Astro Cloudflare Worker, production env)
+        env:
+          CLOUDFLARE_ENV: production
         run: bun run build
 
       # The checkout is shallow and has no tags. Fetch the tag object the final lease names, and
@@ -134,7 +135,7 @@ jobs:
       - name: Deploy Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: npx --yes wrangler@4.165.0 deploy --config .output/server/wrangler.json --message "blog auto-deploy ${GITHUB_SHA::7}"
+        run: npx --yes wrangler@4.165.0 deploy --config astro/wrangler.jsonc --env production --message "blog auto-deploy ${GITHUB_SHA::7}"
 
       - name: Smoke (URL shape + new posts live + booking API)
         id: smoke

@@ -1,12 +1,21 @@
 <template>
-  <section class="py-32 px-8 bg-tertiary text-on-tertiary">
+  <section
+    class="py-32 px-8 bg-tertiary text-on-tertiary"
+    v-bind="tlsBlockAttrs(on, blockKey, 'collection')"
+  >
     <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
       <!-- Left: form -->
       <div data-animate>
-        <h2 class="font-headline text-5xl mb-6">Pensées &amp; Réflexions</h2>
-        <p class="text-on-tertiary-container font-light text-lg mb-10 max-w-md">
-          Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.
+        <h2
+          class="font-headline text-5xl mb-6"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'title')"
+        >{{ cmsNewsletter?.title || 'Pensées & Réflexions' }}</h2>
+        <p
+          class="text-on-tertiary-container font-light text-lg mb-10 max-w-md"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'lede')"
+        >
+          {{ cmsNewsletter?.lede || 'Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.' }}
         </p>
         <form class="flex flex-col gap-4" @submit.prevent="subscribe">
           <div class="flex flex-col sm:flex-row gap-4">
@@ -82,19 +91,32 @@ import { computed, ref } from 'vue'
 import { ofetch } from 'ofetch'
 import { NEWSLETTER_CONSENT_TEXT, NEWSLETTER_SUCCESS } from '~/utils/newsletterConsent'
 import {
+  pageDocId,
   postDocId,
+  tlsBlockAttrs,
+  tlsBlockFieldAttrs,
   tlsCollectionAttrs,
   tlsEntryFieldAttrs,
   tlsItemAttrs,
   tlsPostHeroImageAttrs,
 } from '../../lib/tls-edit-attrs'
 
+export interface CmsNewsletterBlockData {
+  docId?: string
+  blockKey?: string
+  title?: string
+  lede?: string
+}
+
 const props = defineProps<{
   posts: { id?: string; slug: string; title: string; image: string; readTime: number | null }[]
   previewMode?: boolean
+  cmsNewsletter?: CmsNewsletterBlockData
 }>()
 
 const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsNewsletter?.docId || pageDocId('home'))
+const blockKey = computed(() => props.cmsNewsletter?.blockKey || 'infolettre')
 const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const email = ref('')

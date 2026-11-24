@@ -1,7 +1,57 @@
 ---
 import Base from '../layouts/Base.astro'
+import {
+  extractServiceLandingCmsData,
+  extractSiteSettings,
+  getPage,
+  getSettings,
+  type CmsSiteSettingsData,
+  type PageDoc,
+} from '../lib/cms-client'
+import { SKIP_CACHE } from '../lib/page-cache'
 import { HERO_IMAGE } from '../lib/seo'
+import { buildPreviewSetCookie } from '../lib/tls-edit-attrs'
 import TherapieIndividuellePage from '../vue/pages/TherapieIndividuellePage.vue'
+
+export const prerender = false
+
+const previewToken = Astro.locals.previewToken ?? null
+let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
+const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+let cookieCleared = false
+
+const onPreviewRejected = (): void => {
+  previewMode = false
+  Astro.locals.previewMode = false
+  Astro.locals.previewToken = null
+  if (!cookieCleared) {
+    cookieCleared = true
+    Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+  }
+}
+
+const [pageResult, settingsResult] = await Promise.allSettled([
+  getPage('/therapie-individuelle', { previewToken, onPreviewRejected }),
+  getSettings({ previewToken, onPreviewRejected }),
+])
+
+let page: PageDoc | null = null
+if (pageResult.status === 'fulfilled') {
+  page = pageResult.value
+} else {
+  console.error('[therapie-individuelle] page blocks unavailable', pageResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+let siteSettings: CmsSiteSettingsData | undefined
+if (settingsResult.status === 'fulfilled') {
+  siteSettings = extractSiteSettings(settingsResult.value)
+} else {
+  console.error('[therapie-individuelle] settings unavailable', settingsResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+const cmsPage = extractServiceLandingCmsData(page, 'therapie-individuelle')
 ---
 <Base
   title="Thérapie individuelle à Shefford | Chantal Massé — Thérapeute en relation d'aide"
@@ -10,6 +60,13 @@ import TherapieIndividuellePage from '../vue/pages/TherapieIndividuellePage.vue'
   ogTitle="Thérapie individuelle à Shefford | Chantal Massé"
   ogDescription="Un espace sécurisé pour explorer ce qui te fait mal et cheminer vers un mieux-être. Réserve ta séance."
   ogImage={HERO_IMAGE}
+  pageDocId={cmsPage.docId}
+  previewMode={previewMode}
+  cmsSettings={siteSettings ?? null}
 >
-  <TherapieIndividuellePage />
+  <TherapieIndividuellePage
+    {...(page ? { cmsPage } : {})}
+    {...(siteSettings ? { cmsSettings: siteSettings } : {})}
+    {...(previewMode ? { previewMode: true } : {})}
+  />
 </Base>
