@@ -44,8 +44,8 @@
         { "binding": "BOOKING_CACHE", "id": "e71462224c254ab5a42b710bc086ca2a" },
         { "binding": "PAGE_CACHE", "id": "e71462224c254ab5a42b710bc086ca2a" }
       ],
-      // BLOCKER before cutover: there is no production tls-cms yet (cms/worker/wrangler.jsonc only deploys --env staging).
-      // Point this at the production engine once it exists with the chantal-masse D1; never at staging.
+      // Production TLS CMS read API (cms-client): binds `CMS` to the production `tls-cms` Worker (`SiteReads` entrypoint,
+      // provisioned with the `chantal-masse` D1 database and R2 media bucket in jaubut/tls-dashboard-v2#498).
       "services": [{ "binding": "CMS", "service": "tls-cms", "entrypoint": "SiteReads" }],
       "version_metadata": { "binding": "CF_VERSION" },
       "vars": {}

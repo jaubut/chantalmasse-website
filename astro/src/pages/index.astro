@@ -6,7 +6,7 @@ import {
   extractHomeCmsData,
   extractSiteSettings,
   getPage,
-  getSettings,
+  getRequestSettings,
   type CmsSiteSettingsData,
   type PageDoc,
 } from '../lib/cms-client'
@@ -43,7 +43,7 @@ const onPreviewRejected = (): void => {
 // PAGE_CACHE so the next request tries again.
 const [pageResult, settingsResult, postsResult] = await Promise.allSettled([
   getPage('/', { previewToken, onPreviewRejected }),
-  getSettings({ previewToken, onPreviewRejected }),
+  getRequestSettings(Astro.locals, { previewToken, onPreviewRejected }),
   latestPosts(2, { previewToken, onPreviewRejected }),
 ])
 
@@ -72,25 +72,26 @@ if (postsResult.status === 'fulfilled') {
 }
 
 const homeCms = extractHomeCmsData(page)
+const pagePreviewMode = Boolean(previewMode && page)
 ---
 <Base
   title="Chantal Massé — Thérapeute en relation d'aide à Shefford"
   path="/"
   description={SITE_DESCRIPTION}
   ogImage={HERO_IMAGE}
-  pageDocId={homeCms.docId}
+  pageDocId={page ? homeCms.docId : null}
   previewMode={previewMode}
   cmsSettings={siteSettings ?? null}
 >
   <div>
     {/* idle: the island only rotates the label and shows the map on hover; its CTA works before hydration
         (data-booking-open, src/lib/client.ts), so hydration stays off the first-paint path. */}
-    <HeroSection client:idle {...(homeCms.hero ? { cmsHero: homeCms.hero } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <ServicesSection {...(homeCms.services ? { cmsServices: homeCms.services } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <PhilosophySection {...(homeCms.philosophy ? { cmsPhilosophy: homeCms.philosophy } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <MethodsSection {...(homeCms.methods ? { cmsMethods: homeCms.methods } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <TestimonialsSection {...(homeCms.testimonials ? { cmsTestimonials: homeCms.testimonials } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <NewsletterSection client:visible posts={posts} {...(homeCms.newsletter ? { cmsNewsletter: homeCms.newsletter } : {})} {...(previewMode ? { previewMode: true } : {})} />
-    <BookingSection {...(homeCms.booking ? { cmsBooking: homeCms.booking } : {})} {...(siteSettings ? { cmsSettings: siteSettings } : {})} {...(previewMode ? { previewMode: true } : {})} />
+    <HeroSection client:idle {...(homeCms.hero ? { cmsHero: homeCms.hero } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <ServicesSection {...(homeCms.services ? { cmsServices: homeCms.services } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <PhilosophySection {...(homeCms.philosophy ? { cmsPhilosophy: homeCms.philosophy } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <MethodsSection {...(homeCms.methods ? { cmsMethods: homeCms.methods } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <TestimonialsSection {...(homeCms.testimonials ? { cmsTestimonials: homeCms.testimonials } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <NewsletterSection client:visible posts={posts} {...(homeCms.newsletter ? { cmsNewsletter: homeCms.newsletter } : {})} {...(previewMode ? { previewMode: true, pagePreviewMode } : {})} />
+    <BookingSection {...(homeCms.booking ? { cmsBooking: homeCms.booking } : {})} {...(siteSettings ? { cmsSettings: siteSettings } : {})} {...(previewMode ? { previewMode: true, pagePreviewMode } : {})} />
   </div>
 </Base>

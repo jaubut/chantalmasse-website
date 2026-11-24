@@ -1,7 +1,18 @@
 // cms-client for the TLS CMS read contract v1 (jaubut/tls-dashboard-v2 cms/contract.ts, `createCmsClient`): the subset
 // this site reads (posts, page, settings), vendored as plain types so the Worker bundle doesn't carry zod. The engine
 // validates what it serves (cms/read.ts parses rows against the contract on read); a contract major bump answers 426 here.
-import { pageDocId, serviceDocId, settingsDocId } from './tls-edit-attrs'
+import {
+  buildCmsMediaSrcset,
+  cleanCmsText,
+  CMS_MEDIA_WIDTHS,
+  pageDocId,
+  resolveCmsImage,
+  serviceDocId,
+  settingsDocId,
+  type ResolvedCmsImage,
+} from './tls-edit-attrs'
+
+export { buildCmsMediaSrcset, cleanCmsText, CMS_MEDIA_WIDTHS, resolveCmsImage, type ResolvedCmsImage }
 
 export const CONTRACT_VERSION = 1
 export const CONTRACT_HEADER = 'TLS-CMS-Contract'
@@ -362,70 +373,37 @@ export async function getSettings(opts?: CmsReadOpts): Promise<Settings | null> 
   })
 }
 
-// ---------- Media URL, RichText, and Block data extraction helpers ----------
-
-export const CMS_MEDIA_WIDTHS = [640, 960, 1280, 1920] as const
-
-export interface ResolvedCmsImage {
-  src: string
-  alt?: string
-  srcset?: string
+export interface RequestSettingsLocals {
+  cmsSettingsPromise?: Promise<Settings | null>
 }
 
 /**
- * Resolves a CMS `Image` or `MediaRef` (`{ src }`, `{ key }`, `{ mediaId }`, or string key) to a `/media/<key>` URL
- * (or preserves an existing `/images/...` or `https://...` path) and builds a responsive `/media/<key>?w=<w>` srcset.
+ * Memoizes `getSettings(opts)` per SSR request on `Astro.locals.cmsSettingsPromise` so page frontmatter and `Base.astro`
+ * never issue duplicate uncached settings reads on the same request.
  */
-export function resolveCmsImage(
-  img?: { src?: string | null, key?: string | null, mediaId?: string | null, alt?: string | null, srcset?: string | null } | string | null,
-  widths: readonly number[] = CMS_MEDIA_WIDTHS,
-): ResolvedCmsImage | undefined {
-  if (!img) return undefined
-  if (typeof img === 'string') {
-    const trimmed = img.trim()
-    if (!trimmed) return undefined
-    const src = (trimmed.startsWith('/') || /^https?:\/\//.test(trimmed))
-      ? trimmed
-      : `/media/${trimmed.replace(/^\/+/, '')}`
-    const srcset = buildCmsMediaSrcset(src, widths)
-    return { src, ...(srcset ? { srcset } : {}) }
+export function getRequestSettings(
+  locals: RequestSettingsLocals | undefined,
+  opts?: CmsReadOpts,
+): Promise<Settings | null> {
+  if (!locals) return getSettings(opts)
+  if (!locals.cmsSettingsPromise) {
+    locals.cmsSettingsPromise = getSettings(opts)
   }
-  const raw = (img.src ?? img.key ?? '').trim()
-  if (!raw) return undefined
-  const src = (raw.startsWith('/') || /^https?:\/\//.test(raw))
-    ? raw
-    : `/media/${raw.replace(/^\/+/, '')}`
-  const alt = typeof img.alt === 'string' && img.alt.trim() ? img.alt.trim() : undefined
-  const srcset = (typeof img.srcset === 'string' && img.srcset.trim())
-    ? img.srcset.trim()
-    : buildCmsMediaSrcset(src, widths)
-  return {
-    src,
-    ...(alt ? { alt } : {}),
-    ...(srcset ? { srcset } : {}),
-  }
+  return locals.cmsSettingsPromise
 }
 
-export function buildCmsMediaSrcset(
-  src?: string | null,
-  widths: readonly number[] = CMS_MEDIA_WIDTHS,
-): string | undefined {
-  if (!src || !src.startsWith('/media/')) return undefined
-  const base = src.split('?')[0]!
-  if (!base || base === '/media/') return undefined
-  return widths.map(w => `${base}?w=${w} ${w}w`).join(', ')
-}
+// ---------- RichText and Block data extraction helpers ----------
 
 export function richTextToPlain(doc?: RichText | string | null): string[] {
   if (!doc) return []
   if (typeof doc === 'string') {
-    const trimmed = doc.trim()
-    return trimmed ? [trimmed] : []
+    const cleaned = cleanCmsText(doc)
+    return cleaned ? [cleaned] : []
   }
   if (!Array.isArray(doc.content)) return []
   const inline = (c: Inline[] = []): string => c.map(n => (n.type === 'text' ? n.text : '\n')).join('').trim()
   return doc.content
-    .flatMap(b => (b.type === 'paragraph' || b.type === 'heading' ? [inline(b.content)] : []))
+    .flatMap(b => (b.type === 'paragraph' || b.type === 'heading' ? [cleanCmsText(inline(b.content)) ?? ''] : []))
     .filter(Boolean)
 }
 
@@ -605,8 +583,11 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
   // 1. Hero block ('hero')
   const heroBlock = findBlock(blocks, 'hero', 'hero')
   const heroImg = resolveCmsImage(heroBlock?.data?.image)
-  const h0 = heroBlock?.data?.heading?.[0]?.trim()
-  const h1 = heroBlock?.data?.heading?.[1]?.trim()
+  const h0 = cleanCmsText(heroBlock?.data?.heading?.[0])
+  const h1 = cleanCmsText(heroBlock?.data?.heading?.[1])
+  const heroEyebrow = cleanCmsText(heroBlock?.data?.eyebrow)
+  const heroLede = cleanCmsText(heroBlock?.data?.lede)
+  const heroCtaLabel = cleanCmsText(heroBlock?.data?.cta?.label)
   const heroHeading: [string, string?] | undefined = h0
     ? (h1 ? [h0, h1] : [h0])
     : (h1 ? ['', h1] : undefined)
@@ -614,10 +595,10 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
     ? {
         docId,
         blockKey: heroBlock.key,
-        ...(heroBlock.data.eyebrow?.trim() ? { eyebrow: heroBlock.data.eyebrow.trim() } : {}),
+        ...(heroEyebrow ? { eyebrow: heroEyebrow } : {}),
         ...(heroHeading ? { heading: heroHeading } : {}),
-        ...(heroBlock.data.lede?.trim() ? { lede: heroBlock.data.lede.trim() } : {}),
-        ...(heroBlock.data.cta?.label?.trim() ? { ctaLabel: heroBlock.data.cta.label.trim() } : {}),
+        ...(heroLede ? { lede: heroLede } : {}),
+        ...(heroCtaLabel ? { ctaLabel: heroCtaLabel } : {}),
         ...(heroImg ? { image: heroImg } : {}),
       }
     : undefined
@@ -630,8 +611,8 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
     : collectServiceItems(blocks)
   const coupleItem = findServiceItem(serviceItems, 'coaching-de-couple')
   const individualItem = findServiceItem(serviceItems, 'therapie-individuelle')
-  const svcTitle = (servicesColl?.data?.title ?? servicesColl?.data?.options?.title ?? servicesHeading?.data?.title)?.trim()
-  const svcLede = (servicesColl?.data?.lede ?? servicesColl?.data?.options?.lede ?? servicesHeading?.data?.lede)?.trim()
+  const svcTitle = cleanCmsText(servicesColl?.data?.title ?? servicesColl?.data?.options?.title ?? servicesHeading?.data?.title)
+  const svcLede = cleanCmsText(servicesColl?.data?.lede ?? servicesColl?.data?.options?.lede ?? servicesHeading?.data?.lede)
   const services = (servicesColl || servicesHeading || coupleItem || individualItem)
     ? {
         docId,
@@ -642,8 +623,8 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
           ? {
               couple: {
                 id: coupleItem.id || serviceDocId('coaching-de-couple'),
-                title: coupleItem.title,
-                description: coupleItem.description,
+                title: cleanCmsText(coupleItem.title) ?? coupleItem.title,
+                description: cleanCmsText(coupleItem.description) ?? coupleItem.description,
                 durationMinutes: typeof coupleItem.attrs?.duration_minutes === 'number' ? coupleItem.attrs.duration_minutes : null,
                 priceCents: coupleItem.priceCents,
               },
@@ -653,8 +634,8 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
           ? {
               individual: {
                 id: individualItem.id || serviceDocId('therapie-individuelle'),
-                title: individualItem.title,
-                description: individualItem.description,
+                title: cleanCmsText(individualItem.title) ?? individualItem.title,
+                description: cleanCmsText(individualItem.description) ?? individualItem.description,
                 durationMinutes: typeof individualItem.attrs?.duration_minutes === 'number' ? individualItem.attrs.duration_minutes : null,
                 priceCents: individualItem.priceCents,
               },
@@ -667,12 +648,14 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
   const approcheBlock = findBlock(blocks, 'approche', 'rich_text')
   const approcheParagraphs = richTextToPlain(approcheBlock?.data?.body)
   const approcheImg = resolveCmsImage(approcheBlock?.data?.media?.[0])
+  const approcheEyebrow = cleanCmsText(approcheBlock?.data?.eyebrow)
+  const approcheTitle = cleanCmsText(approcheBlock?.data?.title)
   const philosophy = approcheBlock
     ? {
         docId,
         blockKey: approcheBlock.key,
-        ...(approcheBlock.data.eyebrow?.trim() ? { eyebrow: approcheBlock.data.eyebrow.trim() } : {}),
-        ...(approcheBlock.data.title?.trim() ? { title: approcheBlock.data.title.trim() } : {}),
+        ...(approcheEyebrow ? { eyebrow: approcheEyebrow } : {}),
+        ...(approcheTitle ? { title: approcheTitle } : {}),
         ...(approcheParagraphs.length > 0 ? { paragraphs: approcheParagraphs } : {}),
         ...(approcheImg ? { image: approcheImg } : {}),
       }
@@ -680,19 +663,26 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
 
   // 4. Methods block ('apropos', list)
   const aproposBlock = findBlock(blocks, 'apropos', 'list')
+  const aproposTitle = cleanCmsText(aproposBlock?.data?.title)
+  const aproposIntro = cleanCmsText(aproposBlock?.data?.intro)
   const methods = aproposBlock
     ? {
         docId,
         blockKey: aproposBlock.key,
-        ...(aproposBlock.data.title?.trim() ? { title: aproposBlock.data.title.trim() } : {}),
-        ...(aproposBlock.data.intro?.trim() ? { intro: aproposBlock.data.intro.trim() } : {}),
+        ...(aproposTitle ? { title: aproposTitle } : {}),
+        ...(aproposIntro ? { intro: aproposIntro } : {}),
         ...(Array.isArray(aproposBlock.data.items) && aproposBlock.data.items.length > 0
           ? {
-              items: aproposBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.subtitle?.trim() ? { subtitle: it.subtitle.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: aproposBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const s = cleanCmsText(it.subtitle)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(s ? { subtitle: s } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
@@ -700,18 +690,24 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
 
   // 5. Testimonials block ('temoignages', list)
   const temoignagesBlock = findBlock(blocks, 'temoignages', 'list')
+  const temoignagesTitle = cleanCmsText(temoignagesBlock?.data?.title)
   const testimonials = temoignagesBlock
     ? {
         docId,
         blockKey: temoignagesBlock.key,
-        ...(temoignagesBlock.data.title?.trim() ? { title: temoignagesBlock.data.title.trim() } : {}),
+        ...(temoignagesTitle ? { title: temoignagesTitle } : {}),
         ...(Array.isArray(temoignagesBlock.data.items) && temoignagesBlock.data.items.length > 0
           ? {
-              items: temoignagesBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.subtitle?.trim() ? { subtitle: it.subtitle.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: temoignagesBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const s = cleanCmsText(it.subtitle)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(s ? { subtitle: s } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
@@ -720,8 +716,8 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
   // 6. Newsletter block ('infolettre', collection or heading)
   const infoColl = findBlock(blocks, 'infolettre', 'collection')
   const infoHeading = findBlock(blocks, 'infolettre', 'heading')
-  const infoTitle = (infoColl?.data?.title ?? infoColl?.data?.options?.title ?? infoHeading?.data?.title)?.trim()
-  const infoLede = (infoColl?.data?.lede ?? infoColl?.data?.options?.lede ?? infoHeading?.data?.lede)?.trim()
+  const infoTitle = cleanCmsText(infoColl?.data?.title ?? infoColl?.data?.options?.title ?? infoHeading?.data?.title)
+  const infoLede = cleanCmsText(infoColl?.data?.lede ?? infoColl?.data?.options?.lede ?? infoHeading?.data?.lede)
   const newsletter = (infoColl || infoHeading)
     ? {
         docId,
@@ -733,12 +729,14 @@ export function extractHomeCmsData(page?: PageDoc | null): ExtractedHomeCmsData 
 
   // 7. Booking block ('booking', cta)
   const bookingBlock = findBlock(blocks, 'booking', 'cta')
+  const bookingNote = cleanCmsText(bookingBlock?.data?.note)
+  const bookingLabel = cleanCmsText(bookingBlock?.data?.label)
   const booking = bookingBlock
     ? {
         docId,
         blockKey: bookingBlock.key,
-        ...(bookingBlock.data.note?.trim() ? { note: bookingBlock.data.note.trim() } : {}),
-        ...(bookingBlock.data.label?.trim() ? { label: bookingBlock.data.label.trim() } : {}),
+        ...(bookingNote ? { note: bookingNote } : {}),
+        ...(bookingLabel ? { label: bookingLabel } : {}),
       }
     : undefined
 
@@ -799,30 +797,39 @@ export function extractServiceLandingCmsData(
 
   const heroBlock = findBlock(blocks, 'hero', 'hero')
   const heroImg = resolveCmsImage(heroBlock?.data?.image)
-  const h0 = heroBlock?.data?.heading?.[0]?.trim()
-  const h1 = heroBlock?.data?.heading?.[1]?.trim()
+  const h0 = cleanCmsText(heroBlock?.data?.heading?.[0])
+  const h1 = cleanCmsText(heroBlock?.data?.heading?.[1])
+  const heroEyebrow = cleanCmsText(heroBlock?.data?.eyebrow)
+  const heroLede = cleanCmsText(heroBlock?.data?.lede)
+  const heroCtaLabel = cleanCmsText(heroBlock?.data?.cta?.label)
   const heroHeading: [string, string?] | undefined = h0 ? (h1 ? [h0, h1] : [h0]) : undefined
   const hero = heroBlock
     ? {
-        ...(heroBlock.data.eyebrow?.trim() ? { eyebrow: heroBlock.data.eyebrow.trim() } : {}),
+        ...(heroEyebrow ? { eyebrow: heroEyebrow } : {}),
         ...(heroHeading ? { heading: heroHeading } : {}),
-        ...(heroBlock.data.lede?.trim() ? { lede: heroBlock.data.lede.trim() } : {}),
-        ...(heroBlock.data.cta?.label?.trim() ? { ctaLabel: heroBlock.data.cta.label.trim() } : {}),
+        ...(heroLede ? { lede: heroLede } : {}),
+        ...(heroCtaLabel ? { ctaLabel: heroCtaLabel } : {}),
         ...(heroImg ? { image: heroImg } : {}),
       }
     : undefined
 
   const servicesBlock = findBlock(blocks, 'services', 'list')
+  const servicesTitle = cleanCmsText(servicesBlock?.data?.title)
+  const servicesIntro = cleanCmsText(servicesBlock?.data?.intro)
   const services = servicesBlock
     ? {
-        ...(servicesBlock.data.title?.trim() ? { title: servicesBlock.data.title.trim() } : {}),
-        ...(servicesBlock.data.intro?.trim() ? { intro: servicesBlock.data.intro.trim() } : {}),
+        ...(servicesTitle ? { title: servicesTitle } : {}),
+        ...(servicesIntro ? { intro: servicesIntro } : {}),
         ...(Array.isArray(servicesBlock.data.items) && servicesBlock.data.items.length > 0
           ? {
-              items: servicesBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: servicesBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
@@ -830,44 +837,55 @@ export function extractServiceLandingCmsData(
 
   const approcheBlock = findBlock(blocks, 'approche', 'rich_text')
   const approcheParagraphs = richTextToPlain(approcheBlock?.data?.body)
+  const approcheTitle = cleanCmsText(approcheBlock?.data?.title)
   const approche = approcheBlock
     ? {
-        ...(approcheBlock.data.title?.trim() ? { title: approcheBlock.data.title.trim() } : {}),
+        ...(approcheTitle ? { title: approcheTitle } : {}),
         ...(approcheParagraphs[0] ? { body: approcheParagraphs[0], paragraphs: approcheParagraphs } : {}),
       }
     : undefined
 
   const aproposBlock = findBlock(blocks, 'apropos', 'list')
+  const aproposTitle = cleanCmsText(aproposBlock?.data?.title)
   const apropos = aproposBlock
     ? {
-        ...(aproposBlock.data.title?.trim() ? { title: aproposBlock.data.title.trim() } : {}),
+        ...(aproposTitle ? { title: aproposTitle } : {}),
         ...(Array.isArray(aproposBlock.data.items) && aproposBlock.data.items.length > 0
           ? {
-              items: aproposBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.subtitle?.trim() ? { subtitle: it.subtitle.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: aproposBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const s = cleanCmsText(it.subtitle)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(s ? { subtitle: s } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
     : undefined
 
   const tarifBlock = findBlock(blocks, 'tarif', 'cta')
+  const tarifNote = cleanCmsText(tarifBlock?.data?.note)
+  const tarifLabel = cleanCmsText(tarifBlock?.data?.label)
   const tarif = tarifBlock
     ? {
-        ...(tarifBlock.data.note?.trim() ? { note: tarifBlock.data.note.trim() } : {}),
-        ...(tarifBlock.data.label?.trim() ? { label: tarifBlock.data.label.trim() } : {}),
+        ...(tarifNote ? { note: tarifNote } : {}),
+        ...(tarifLabel ? { label: tarifLabel } : {}),
       }
     : undefined
 
   const allServices = collectServiceItems(blocks)
   const serviceItem = findServiceItem(allServices, handle)
+  const svcItemTitle = cleanCmsText(serviceItem?.title)
+  const svcItemDesc = cleanCmsText(serviceItem?.description)
   const service = serviceItem
     ? {
         id: serviceItem.id || serviceDocId(handle),
-        ...(serviceItem.title?.trim() ? { title: serviceItem.title.trim() } : {}),
-        ...(serviceItem.description?.trim() ? { description: serviceItem.description.trim() } : {}),
+        ...(svcItemTitle ? { title: svcItemTitle } : {}),
+        ...(svcItemDesc ? { description: svcItemDesc } : {}),
         durationMinutes: typeof serviceItem.attrs?.duration_minutes === 'number' ? serviceItem.attrs.duration_minutes : null,
         priceCents: serviceItem.priceCents,
       }
@@ -917,70 +935,91 @@ export function extractBookingLpCmsData(page?: PageDoc | null): ExtractedBooking
 
   const heroBlock = findBlock(blocks, 'hero', 'hero')
   const heroImg = resolveCmsImage(heroBlock?.data?.image)
-  const h0 = heroBlock?.data?.heading?.[0]?.trim()
-  const h1 = heroBlock?.data?.heading?.[1]?.trim()
+  const h0 = cleanCmsText(heroBlock?.data?.heading?.[0])
+  const h1 = cleanCmsText(heroBlock?.data?.heading?.[1])
+  const heroEyebrow = cleanCmsText(heroBlock?.data?.eyebrow)
+  const heroLede = cleanCmsText(heroBlock?.data?.lede)
+  const heroCtaLabel = cleanCmsText(heroBlock?.data?.cta?.label)
   const heroHeading: [string, string?] | undefined = h0 ? (h1 ? [h0, h1] : [h0]) : undefined
   const hero = heroBlock
     ? {
-        ...(heroBlock.data.eyebrow?.trim() ? { eyebrow: heroBlock.data.eyebrow.trim() } : {}),
+        ...(heroEyebrow ? { eyebrow: heroEyebrow } : {}),
         ...(heroHeading ? { heading: heroHeading } : {}),
-        ...(heroBlock.data.lede?.trim() ? { lede: heroBlock.data.lede.trim() } : {}),
-        ...(heroBlock.data.cta?.label?.trim() ? { ctaLabel: heroBlock.data.cta.label.trim() } : {}),
+        ...(heroLede ? { lede: heroLede } : {}),
+        ...(heroCtaLabel ? { ctaLabel: heroCtaLabel } : {}),
         ...(heroImg ? { image: heroImg } : {}),
       }
     : undefined
 
   const etapesBlock = findBlock(blocks, 'etapes', 'list')
+  const etapesTitle = cleanCmsText(etapesBlock?.data?.title)
   const etapes = etapesBlock
     ? {
-        ...(etapesBlock.data.title?.trim() ? { title: etapesBlock.data.title.trim() } : {}),
+        ...(etapesTitle ? { title: etapesTitle } : {}),
         ...(Array.isArray(etapesBlock.data.items) && etapesBlock.data.items.length > 0
           ? {
-              items: etapesBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: etapesBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
     : undefined
 
   const temoignagesBlock = findBlock(blocks, 'temoignages', 'list')
+  const temoignagesTitle = cleanCmsText(temoignagesBlock?.data?.title)
   const temoignages = temoignagesBlock
     ? {
-        ...(temoignagesBlock.data.title?.trim() ? { title: temoignagesBlock.data.title.trim() } : {}),
+        ...(temoignagesTitle ? { title: temoignagesTitle } : {}),
         ...(Array.isArray(temoignagesBlock.data.items) && temoignagesBlock.data.items.length > 0
           ? {
-              items: temoignagesBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.subtitle?.trim() ? { subtitle: it.subtitle.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: temoignagesBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const s = cleanCmsText(it.subtitle)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(s ? { subtitle: s } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
     : undefined
 
   const faqBlock = findBlock(blocks, 'faq', 'list')
+  const faqTitle = cleanCmsText(faqBlock?.data?.title)
   const faq = faqBlock
     ? {
-        ...(faqBlock.data.title?.trim() ? { title: faqBlock.data.title.trim() } : {}),
+        ...(faqTitle ? { title: faqTitle } : {}),
         ...(Array.isArray(faqBlock.data.items) && faqBlock.data.items.length > 0
           ? {
-              items: faqBlock.data.items.map(it => ({
-                ...(it.title?.trim() ? { title: it.title.trim() } : {}),
-                ...(it.body?.trim() ? { body: it.body.trim() } : {}),
-              })),
+              items: faqBlock.data.items.map((it) => {
+                const t = cleanCmsText(it.title)
+                const b = cleanCmsText(it.body)
+                return {
+                  ...(t ? { title: t } : {}),
+                  ...(b ? { body: b } : {}),
+                }
+              }),
             }
           : {}),
       }
     : undefined
 
   const ctaBlock = findBlock(blocks, 'cta', 'cta')
+  const ctaNote = cleanCmsText(ctaBlock?.data?.note)
+  const ctaLabel = cleanCmsText(ctaBlock?.data?.label)
   const cta = ctaBlock
     ? {
-        ...(ctaBlock.data.note?.trim() ? { note: ctaBlock.data.note.trim() } : {}),
-        ...(ctaBlock.data.label?.trim() ? { label: ctaBlock.data.label.trim() } : {}),
+        ...(ctaNote ? { note: ctaNote } : {}),
+        ...(ctaLabel ? { label: ctaLabel } : {}),
       }
     : undefined
 
@@ -997,6 +1036,9 @@ export function extractBookingLpCmsData(page?: PageDoc | null): ExtractedBooking
 export interface ExtractedBlogIndexCmsData {
   docId: string
   hero?: {
+    docId: string
+    blockKey: string
+    blockType: 'heading' | 'hero'
     eyebrow?: string
     title?: string
     lede?: string
@@ -1008,11 +1050,16 @@ export function extractBlogIndexCmsData(page?: PageDoc | null): ExtractedBlogInd
   const blocks = flattenPageBlocks(page)
   const heroHeading = findBlock(blocks, 'hero', 'heading')
   const heroBlock = findBlock(blocks, 'hero', 'hero')
-  const eyebrow = (heroHeading?.data?.eyebrow ?? heroBlock?.data?.eyebrow)?.trim()
-  const title = (heroHeading?.data?.title ?? heroBlock?.data?.heading?.[0])?.trim()
-  const lede = (heroHeading?.data?.lede ?? heroBlock?.data?.lede)?.trim()
+  const blockType: 'heading' | 'hero' = heroHeading ? 'heading' : (heroBlock ? 'hero' : 'heading')
+  const blockKey = heroHeading?.key ?? heroBlock?.key ?? 'hero'
+  const eyebrow = cleanCmsText(heroHeading?.data?.eyebrow ?? heroBlock?.data?.eyebrow)
+  const title = cleanCmsText(heroHeading?.data?.title ?? heroBlock?.data?.heading?.[0])
+  const lede = cleanCmsText(heroHeading?.data?.lede ?? heroBlock?.data?.lede)
   const hero = (heroHeading || heroBlock)
     ? {
+        docId,
+        blockKey,
+        blockType,
         ...(eyebrow ? { eyebrow } : {}),
         ...(title ? { title } : {}),
         ...(lede ? { lede } : {}),

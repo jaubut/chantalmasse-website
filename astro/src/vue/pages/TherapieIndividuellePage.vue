@@ -17,7 +17,7 @@
           class="font-headline text-4xl lg:text-6xl text-primary leading-[1.08] lg:leading-none tracking-tight"
           v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'heading/0')"
         >
-          <template v-if="cmsPage?.hero?.heading?.[0]">{{ cmsPage.hero.heading[0] }}</template>
+          <template v-if="customHeading0">{{ customHeading0 }}</template>
           <template v-else>
             Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir.
           </template>
@@ -141,22 +141,22 @@
         >{{ cmsPage?.apropos?.title || "Ce qu'elles en disent" }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div
-            v-for="(t, i) in resolvedTestimonials"
-            :key="`${t.name}-${i}`"
+            v-for="t in resolvedTestimonials"
+            :key="`${t.name}-${t.origIndex}`"
             class="bg-surface-container-lowest p-10 rounded-[2rem]"
           >
             <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
             <p
               class="text-on-surface leading-relaxed mb-6"
-              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/body`)"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${t.origIndex}/body`)"
             >{{ t.quote }}</p>
             <p
               class="font-semibold text-primary"
-              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/title`)"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${t.origIndex}/title`)"
             >{{ t.name }}</p>
             <p
               class="text-sm text-on-surface-variant font-light"
-              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${i}/subtitle`)"
+              v-bind="tlsBlockFieldAttrs(on, docId, 'apropos', `items/${t.origIndex}/subtitle`)"
             >{{ t.context }}</p>
           </div>
         </div>
@@ -259,6 +259,7 @@
 import { computed } from 'vue'
 import Icon from '../Icon.vue'
 import {
+  cleanCmsText,
   pageDocId,
   serviceDocId,
   settingsDocId,
@@ -282,6 +283,12 @@ const on = computed(() => Boolean(props.previewMode))
 const docId = computed(() => props.cmsPage?.docId || pageDocId('therapie-individuelle'))
 const serviceId = computed(() => props.cmsPage?.service?.id || serviceDocId('therapie-individuelle'))
 const settingsId = computed(() => props.cmsSettings?.id || settingsDocId())
+
+const DEFAULT_INDIVIDUAL_H0 = 'Tu as de la valeur — ne laisse pas ta souffrance te définir.'
+const customHeading0 = computed(() => {
+  const h = cleanCmsText(props.cmsPage?.hero?.heading?.[0])
+  return h && h !== DEFAULT_INDIVIDUAL_H0 ? h : undefined
+})
 
 const DEFAULT_PAIN_POINTS = [
   {
@@ -319,11 +326,15 @@ const DEFAULT_PAIN_POINTS = [
 const resolvedPainPoints = computed(() => {
   const items = props.cmsPage?.services?.items
   if (!items || items.length === 0) return DEFAULT_PAIN_POINTS
-  return DEFAULT_PAIN_POINTS.map((fb, i) => ({
-    icon: fb.icon,
-    title: items[i]?.title?.trim() || fb.title,
-    desc: items[i]?.body?.trim() || fb.desc,
-  }))
+  return items.map((it, i) => {
+    const fb = DEFAULT_PAIN_POINTS[i]
+    const iconFb = DEFAULT_PAIN_POINTS[i % DEFAULT_PAIN_POINTS.length]!
+    return {
+      icon: iconFb.icon,
+      title: it?.title?.trim() || fb?.title || '',
+      desc: it?.body?.trim() || fb?.desc || '',
+    }
+  })
 })
 
 const steps = [
@@ -355,14 +366,18 @@ const DEFAULT_INDIVIDUAL_TESTIMONIALS = [
 
 const resolvedTestimonials = computed(() => {
   const items = props.cmsPage?.apropos?.items
-  if (!items || items.length === 0) return DEFAULT_INDIVIDUAL_TESTIMONIALS
-  return items.map((it, i) => {
+  if (!items || items.length === 0) {
+    return DEFAULT_INDIVIDUAL_TESTIMONIALS.map((t, i) => ({ ...t, origIndex: i }))
+  }
+  const mapped = items.map((it, i) => {
     const fb = DEFAULT_INDIVIDUAL_TESTIMONIALS[i]
     return {
+      origIndex: i,
       quote: it.body?.trim() || fb?.quote || '',
       name: it.title?.trim() || fb?.name || '',
       context: it.subtitle?.trim() || fb?.context || '',
     }
-  }).filter(t => t.quote && t.name)
+  })
+  return on.value ? mapped : mapped.filter(t => t.quote && t.name)
 })
 </script>

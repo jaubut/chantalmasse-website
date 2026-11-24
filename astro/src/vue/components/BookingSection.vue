@@ -2,7 +2,7 @@
   <section
     id="booking"
     class="py-32 px-8 bg-background"
-    v-bind="tlsBlockAttrs(on, blockKey, 'cta')"
+    v-bind="tlsBlockAttrs(pageOn, blockKey, 'cta')"
   >
     <div class="max-w-screen-xl mx-auto">
       <div class="bg-surface-container-low rounded-[3rem] p-8 lg:p-24 relative overflow-hidden">
@@ -16,7 +16,7 @@
           <div data-animate>
             <h2
               class="font-headline text-5xl italic text-primary mb-6"
-              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'note')"
+              v-bind="tlsBlockFieldAttrs(pageOn, docId, blockKey, 'note')"
             >
               {{ cmsBooking?.note || 'Prêt à entamer cette démarche?' }}
             </h2>
@@ -44,7 +44,7 @@
             <button
               class="inline-block bg-primary text-on-primary px-12 py-6 rounded-2xl font-bold text-xl liquid-fill [--fill:var(--color-primary-container)]"
               data-booking-open
-              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'label')"
+              v-bind="tlsBlockFieldAttrs(pageOn, docId, blockKey, 'label')"
             >
               {{ cmsBooking?.label || 'Réserver une séance' }}
             </button>
@@ -99,13 +99,18 @@ export interface CmsBookingSettingsData {
   hours?: Array<{ label: string; value: string }>
 }
 
-const props = defineProps<{
-  previewMode?: boolean
-  cmsBooking?: CmsBookingBlockData
-  cmsSettings?: CmsBookingSettingsData
-}>()
+const props = withDefaults(
+  defineProps<{
+    previewMode?: boolean
+    pagePreviewMode?: boolean
+    cmsBooking?: CmsBookingBlockData
+    cmsSettings?: CmsBookingSettingsData
+  }>(),
+  { pagePreviewMode: undefined },
+)
 
 const on = computed(() => Boolean(props.previewMode))
+const pageOn = computed(() => Boolean(props.pagePreviewMode ?? props.previewMode))
 const docId = computed(() => props.cmsBooking?.docId || pageDocId('home'))
 const blockKey = computed(() => props.cmsBooking?.blockKey || 'booking')
 const settingsId = computed(() => props.cmsSettings?.id || settingsDocId())

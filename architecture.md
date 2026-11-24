@@ -28,7 +28,7 @@ chantalmasse.com — French-language marketing and booking site for Chantal Mass
 | `scripts/ads-add-sitelinks.ts` | 161 | script | 0 |  |
 | `scripts/investigate-recent-bookings.ts` | 161 | script | 0 | state: MALE_NAMES: Set, FEMALE_NAMES: Set |
 | `server/utils/chantalSessionRules.ts` | 157 | server-lib | 9 |  |
-| `scripts/check-urls.ts` | 136 | script | 0 | state: ownOrigins: Set |
+| `scripts/check-urls.ts` | 153 | script | 0 | state: ownOrigins: Set |
 | `server/api/booking/cancel.post.ts` | 136 | server-api | 0 | route: POST /api/booking/cancel |
 | `utils/journey-data.ts` | 133 | util | 5 |  |
 | `scripts/ads-refresh-individuelle-copy.ts` | 126 | script | 0 |  |

@@ -31,6 +31,7 @@ import {
   extractServiceLandingCmsData,
   extractSiteSettings,
   getPage,
+  getRequestSettings,
   getSettings,
   resolveCmsImage,
   type PageDoc,
@@ -1383,5 +1384,205 @@ describe('S4b contract-level data-tls-* attributes & real component renders (liv
     expect(hiccupRes.status).toBe(200)
     expect(hiccupRes.headers.has(SKIP_CACHE)).toBe(false)
     expect(kvPut).not.toHaveBeenCalled()
+  })
+
+  it('supports dynamic CMS list lengths, preserves testimonial origIndex across filtering, binds blog hero vs heading blockType, and memoizes getRequestSettings on locals', async () => {
+    // 1. Dynamic list lengths: 2 items (< default 6) and 7 items (> default 6, cycling icons) on CoachingDeCouplePage & PrendreRendezVousPage
+    const couple7ItemsHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(CoachingDeCouplePage, {
+            previewMode: true,
+            cmsPage: {
+              docId: 'chantal-masse:page:coaching-de-couple',
+              services: {
+                title: '7 Situations CMS',
+                items: Array.from({ length: 7 }, (_, i) => ({
+                  title: `Douleur CMS #${i + 1}`,
+                  body: `Description douleur #${i + 1}`,
+                })),
+              },
+              apropos: {
+                // Item 2 (index 2, past DEFAULT_COUPLE_TESTIMONIALS length 2) has empty body/title; item 3 (index 3) is complete
+                items: [
+                  { title: 'Couple 1', subtitle: 'Couple', body: 'Citation 1' },
+                  { title: 'Couple 2', subtitle: 'Couple', body: 'Citation 2' },
+                  { title: '', subtitle: '', body: '' },
+                  { title: 'Couple 4', subtitle: 'Couple', body: 'Citation 4' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(couple7ItemsHtml).toContain('Douleur CMS #7')
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/services/data/items/6/title"',
+    )
+    // In previewMode, incomplete item at index 2 is NOT filtered out, and item at index 3 keeps items/3/*
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/apropos/data/items/2/body"',
+    )
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/apropos/data/items/3/title"',
+    )
+
+    // In live mode (previewMode: false), incomplete item at index 2 IS filtered out while Couple 4 still renders
+    const coupleLiveFilteredHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(CoachingDeCouplePage, {
+            previewMode: false,
+            cmsPage: {
+              docId: 'chantal-masse:page:coaching-de-couple',
+              services: {
+                items: [
+                  { title: 'Seule situation 1', body: 'Desc 1' },
+                  { title: 'Seule situation 2', body: 'Desc 2' },
+                ],
+              },
+              apropos: {
+                items: [
+                  { title: 'Couple 1', subtitle: 'Couple', body: 'Citation 1' },
+                  { title: 'Couple 2', subtitle: 'Couple', body: 'Citation 2' },
+                  { title: '', subtitle: '', body: '' },
+                  { title: 'Couple 4', subtitle: 'Couple', body: 'Citation 4' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(coupleLiveFilteredHtml).toContain('Seule situation 1')
+    expect(coupleLiveFilteredHtml).toContain('Seule situation 2')
+    expect(coupleLiveFilteredHtml).not.toContain('La distance s&#39;est installée')
+    expect(coupleLiveFilteredHtml).toContain('Couple 4')
+
+    // 2. Dynamic steps (4 items) and FAQ (2 items) on PrendreRendezVousPage
+    const bookingLpDynamicHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(PrendreRendezVousPage, {
+            previewMode: true,
+            cmsPage: {
+              docId: 'chantal-masse:page:prendre-rendez-vous',
+              etapes: {
+                items: [
+                  { title: 'Étape 1', body: 'B1' },
+                  { title: 'Étape 2', body: 'B2' },
+                  { title: 'Étape 3', body: 'B3' },
+                  { title: 'Étape 4 Bonus', body: 'B4' },
+                ],
+              },
+              faq: {
+                items: [
+                  { title: 'Q1 CMS?', body: 'R1 CMS' },
+                  { title: 'Q2 CMS?', body: 'R2 CMS' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(bookingLpDynamicHtml).toContain('Étape 4 Bonus')
+    expect(bookingLpDynamicHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:prendre-rendez-vous/blocks/etapes/data/items/3/title"',
+    )
+    expect(bookingLpDynamicHtml).toContain('Q2 CMS?')
+    expect(bookingLpDynamicHtml).not.toContain('Quelle est ta formation?')
+
+    // 3. BlogIndexPage: blockType "hero" binds heading/0; blockType "heading" binds title; pagePreviewMode=false suppresses page block attrs while keeping post attrs
+    const blogWithHeroBlock = extractBlogIndexCmsData({
+      id: 'chantal-masse:page:blog',
+      type: 'page',
+      locale: 'fr',
+      fallbackFrom: null,
+      path: '/blog',
+      title: 'Blogue',
+      template: 'default',
+      seo: { title: 'Blogue', description: null, image: null, noindex: false, canonical: null },
+      updatedAt: '2026-11-24T00:00:00.000Z',
+      blocks: [
+        {
+          type: 'hero',
+          key: 'hero',
+          data: { eyebrow: 'Lectures', heading: ['Titre Hero Blogue'], lede: 'Lede Hero Blogue' },
+        },
+      ],
+    })
+    expect(blogWithHeroBlock.hero?.blockType).toBe('hero')
+    const blogHeroHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(BlogIndexPage, {
+            posts: SAMPLE_POSTS,
+            docId: blogWithHeroBlock.docId,
+            cmsHero: blogWithHeroBlock.hero,
+            previewMode: true,
+          }),
+      }),
+    )
+    expect(blogHeroHtml).toContain('data-tls-block="hero"')
+    expect(blogHeroHtml).toContain('data-tls-block-type="hero"')
+    expect(blogHeroHtml).toContain('data-tls-field="doc:chantal-masse:page:blog/blocks/hero/data/heading/0"')
+
+    const blogNoPageDocHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(BlogIndexPage, {
+            posts: SAMPLE_POSTS,
+            previewMode: true,
+            pagePreviewMode: false,
+          }),
+      }),
+    )
+    expect(blogNoPageDocHtml).not.toContain('data-tls-block="hero"')
+    expect(blogNoPageDocHtml).toContain('data-tls-collection="post"')
+    expect(blogNoPageDocHtml).toContain('data-tls-item="chantal-masse:post:l-amour-conscient"')
+
+    // 4. resolveBaseLayoutTls with pageDocId: null omits data-tls-page when getPage() returned 404
+    const missingPageLayout = resolveBaseLayoutTls({
+      isPrerendered: false,
+      locals: { previewMode: true, previewToken: 'valid_tok' },
+      pageDocId: null,
+      path: '/coaching-de-couple',
+    })
+    expect(missingPageLayout.previewMode).toBe(true)
+    expect(missingPageLayout.mainAttrs).toEqual({})
+
+    // 5. getRequestSettings memoizes per SSR request on Astro.locals
+    let settingsCalls = 0
+    mockWorkerEnv.CMS = {
+      fetch: vi.fn(async () => {
+        settingsCalls++
+        return new Response(
+          JSON.stringify({
+            data: {
+              locale: 'fr',
+              siteName: 'Chantal Massé Memo',
+              tagline: null,
+              phone: null,
+              email: null,
+              address: null,
+              hours: [],
+              socials: [],
+              logo: null,
+              defaultOgImage: null,
+              locales: [],
+            },
+            meta: { version: 1, tags: [] },
+          }),
+          { status: 200 },
+        )
+      }),
+    }
+    const reqLocals: { cmsSettingsPromise?: Promise<Settings | null> } = {}
+    const [s1, s2] = await Promise.all([
+      getRequestSettings(reqLocals, { previewToken: 'tok_1' }),
+      getRequestSettings(reqLocals, { previewToken: 'tok_1' }),
+    ])
+    expect(settingsCalls).toBe(1)
+    expect(s1?.siteName).toBe('Chantal Massé Memo')
+    expect(s2?.siteName).toBe('Chantal Massé Memo')
   })
 })

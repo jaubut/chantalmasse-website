@@ -17,7 +17,7 @@
 
         <div
           v-for="(t, i) in resolvedTestimonials"
-          :key="`${t.name}-${i}`"
+          :key="`${t.name}-${t.origIndex}`"
           class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow soft-lift"
           :class="i === 1 || i === 2 ? 'lg:translate-y-8' : ''"
           data-animate
@@ -25,18 +25,18 @@
           <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-6">"</p>
           <p
             class="text-on-surface text-lg leading-relaxed mb-8"
-            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${i}/body`)"
+            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/body`)"
           >
             {{ t.quote }}
           </p>
           <div>
             <p
               class="font-semibold text-primary"
-              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${i}/title`)"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/title`)"
             >{{ t.name }}</p>
             <p
               class="text-sm text-on-surface-variant font-light"
-              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${i}/subtitle`)"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/subtitle`)"
             >{{ t.context }}</p>
           </div>
         </div>
@@ -103,14 +103,18 @@ const DEFAULT_TESTIMONIALS = [
 
 const resolvedTestimonials = computed(() => {
   const items = props.cmsTestimonials?.items
-  if (!items || items.length === 0) return DEFAULT_TESTIMONIALS
-  return items.map((it, i) => {
+  if (!items || items.length === 0) {
+    return DEFAULT_TESTIMONIALS.map((t, i) => ({ ...t, origIndex: i }))
+  }
+  const mapped = items.map((it, i) => {
     const fb = DEFAULT_TESTIMONIALS[i]
     return {
+      origIndex: i,
       quote: it.body?.trim() || fb?.quote || '',
       name: it.title?.trim() || fb?.name || '',
       context: it.subtitle?.trim() || fb?.context || '',
     }
-  }).filter(t => t.quote && t.name)
+  })
+  return on.value ? mapped : mapped.filter(t => t.quote && t.name)
 })
 </script>

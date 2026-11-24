@@ -7,7 +7,7 @@ import {
   extractBlogIndexCmsData,
   extractSiteSettings,
   getPage,
-  getSettings,
+  getRequestSettings,
   type CmsSiteSettingsData,
   type PageDoc,
 } from '../../lib/cms-client'
@@ -35,7 +35,7 @@ const onPreviewRejected = (): void => {
 const [postsResult, pageResult, settingsResult] = await Promise.allSettled([
   allPosts({ previewToken, onPreviewRejected }),
   getPage('/blog', { previewToken, onPreviewRejected }),
-  getSettings({ previewToken, onPreviewRejected }),
+  getRequestSettings(Astro.locals, { previewToken, onPreviewRejected }),
 ])
 
 let posts: BlogPost[] = []
@@ -63,6 +63,7 @@ if (settingsResult.status === 'fulfilled') {
 }
 
 const cmsBlog = extractBlogIndexCmsData(page)
+const pagePreviewMode = Boolean(previewMode && page)
 const description = 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.'
 ---
 <Base
@@ -70,14 +71,15 @@ const description = 'Des réflexions sur le mieux-être, les relations et la cro
   path="/blog"
   description={description}
   ogImage={HERO_IMAGE}
-  pageDocId={cmsBlog.docId}
+  pageDocId={page ? cmsBlog.docId : null}
   previewMode={previewMode}
   cmsSettings={siteSettings ?? null}
 >
   <BlogIndexPage
     client:load
     posts={posts}
+    docId={cmsBlog.docId}
     {...(cmsBlog.hero ? { cmsHero: cmsBlog.hero } : {})}
-    {...(previewMode ? { previewMode: true } : {})}
+    {...(previewMode ? { previewMode: true, pagePreviewMode } : {})}
   />
 </Base>

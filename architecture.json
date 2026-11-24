@@ -208,7 +208,7 @@
         },
         {
           "path": "scripts/check-urls.ts",
-          "lines": 136,
+          "lines": 153,
           "kind": "script",
           "exports": [],
           "state": [

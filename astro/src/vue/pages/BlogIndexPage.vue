@@ -3,25 +3,25 @@
     <!-- Header -->
     <section
       class="px-8 lg:px-20 pt-32 pb-16"
-      v-bind="tlsBlockAttrs(on, 'hero', 'heading')"
+      v-bind="tlsBlockAttrs(pageOn, heroBlockKey, heroBlockType)"
     >
       <div class="max-w-screen-xl mx-auto">
         <span
           class="inline-flex items-center bg-secondary-fixed text-on-secondary-container text-xs uppercase tracking-widest rounded-full px-4 py-2 mb-6"
-          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'eyebrow')"
+          v-bind="tlsBlockFieldAttrs(pageOn, docId, heroBlockKey, 'eyebrow')"
         >
           {{ cmsHero?.eyebrow || 'Ressources & Réflexions' }}
         </span>
         <h1
           class="font-headline text-6xl lg:text-7xl text-primary leading-tight lg:leading-none tracking-tight max-w-2xl"
-          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'title')"
+          v-bind="tlsBlockFieldAttrs(pageOn, docId, heroBlockKey, heroTitleField)"
         >
-          <template v-if="cmsHero?.title">{{ cmsHero.title }}</template>
+          <template v-if="customHeroTitle">{{ customHeroTitle }}</template>
           <template v-else>Le <span class="italic">blogue</span></template>
         </h1>
         <p
           class="mt-6 text-on-surface-variant text-lg font-light max-w-xl"
-          v-bind="tlsBlockFieldAttrs(on, docId, 'hero', 'lede')"
+          v-bind="tlsBlockFieldAttrs(pageOn, docId, heroBlockKey, 'lede')"
         >
           {{ cmsHero?.lede || 'Des réflexions sur le mieux-être, les relations et la croissance personnelle.' }}
         </p>
@@ -55,7 +55,7 @@
     <!-- Posts grid (read from the TLS CMS via allPosts) -->
     <section
       class="px-8 lg:px-20 pb-24"
-      v-bind="tlsBlockAttrs(on, 'posts', 'collection')"
+      v-bind="tlsBlockAttrs(pageOn, 'posts', 'collection')"
     >
       <div
         class="max-w-screen-xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -131,6 +131,7 @@
 import { computed, ref } from 'vue'
 import type { BlogPost } from '../../lib/cms-client'
 import {
+  cleanCmsText,
   pageDocId,
   postDocId,
   tlsBlockAttrs,
@@ -144,18 +145,33 @@ import {
 
 export interface CmsBlogHeroData {
   docId?: string
+  blockKey?: string
+  blockType?: 'heading' | 'hero'
   eyebrow?: string
   title?: string
   lede?: string
 }
 
-const props = defineProps<{
-  posts: Array<BlogPost & { id?: string }>
-  previewMode?: boolean
-  cmsHero?: CmsBlogHeroData
-}>()
+const props = withDefaults(
+  defineProps<{
+    posts: Array<BlogPost & { id?: string }>
+    previewMode?: boolean
+    pagePreviewMode?: boolean
+    docId?: string
+    cmsHero?: CmsBlogHeroData
+  }>(),
+  { pagePreviewMode: undefined },
+)
 const on = computed(() => Boolean(props.previewMode))
-const docId = computed(() => props.cmsHero?.docId || pageDocId('blog'))
+const pageOn = computed(() => Boolean(props.pagePreviewMode ?? props.previewMode))
+const docId = computed(() => props.docId || props.cmsHero?.docId || pageDocId('blog'))
+const heroBlockKey = computed(() => props.cmsHero?.blockKey || 'hero')
+const heroBlockType = computed<'heading' | 'hero'>(() => (props.cmsHero?.blockType === 'hero' ? 'hero' : 'heading'))
+const heroTitleField = computed(() => (heroBlockType.value === 'hero' ? 'heading/0' : 'title'))
+const customHeroTitle = computed(() => {
+  const t = cleanCmsText(props.cmsHero?.title)
+  return t && t !== 'Le blogue' ? t : undefined
+})
 const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)
 
 const categoryLabels: Record<string, string> = {

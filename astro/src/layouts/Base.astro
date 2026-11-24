@@ -5,7 +5,7 @@
 import { ClientRouter } from 'astro:transitions'
 import { Font } from 'astro:assets'
 import '../styles/main.css'
-import { extractSiteSettings, getSettings, type CmsSiteSettingsData } from '../lib/cms-client'
+import { extractSiteSettings, getRequestSettings, type CmsSiteSettingsData } from '../lib/cms-client'
 import { SKIP_CACHE } from '../lib/page-cache'
 import { head, type Seo } from '../lib/seo'
 import {
@@ -33,8 +33,8 @@ interface Props extends Seo {
    * renders its own service-aware bar, and the layout one (no #hero there, so shown at once) sat on top of it and opened
    * booking without the service. Nuxt's app.vue had the same bug on /prendre-rendez-vous. */
   hideBookingBar?: boolean
-  /** CMS document id (`chantal-masse:page:<handle>` or `chantal-masse:post:<slug>`) for `data-tls-page` in preview mode. */
-  pageDocId?: string
+  /** CMS document id (`chantal-masse:page:<handle>` or `chantal-masse:post:<slug>`) for `data-tls-page` in preview mode (`null` when the page doc was not found in CMS). */
+  pageDocId?: string | null
   /** Content locale for `data-tls-locale` in preview mode (defaults to 'fr'). */
   locale?: string
   /** Override preview mode detection (defaults to checking `Astro.locals.previewMode` or `__tls_preview` cookie). */
@@ -83,7 +83,9 @@ if (!Astro.isPrerendered && !bare && cmsSettingsProp === undefined) {
     Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
   }
   try {
-    resolvedSettings = extractSiteSettings(await getSettings({ locale, previewToken: resolvedTls.previewToken, onPreviewRejected }))
+    resolvedSettings = extractSiteSettings(
+      await getRequestSettings(Astro.locals, { locale, previewToken: resolvedTls.previewToken, onPreviewRejected }),
+    )
   } catch (err) {
     console.error('[layout] settings unavailable', err)
     Astro.response.headers.set(SKIP_CACHE, '1')

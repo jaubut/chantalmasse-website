@@ -46,7 +46,7 @@
           data-animate
           v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'heading/0')"
         >
-          <template v-if="cmsHero?.heading?.[0]">{{ cmsHero.heading[0] }}</template>
+          <template v-if="customHeading0">{{ customHeading0 }}</template>
           <template v-else>
             Thérapeute en relation d'aide à
             <span
@@ -97,7 +97,7 @@
           data-animate
           v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'heading/1')"
         >
-          <template v-if="cmsHero?.heading?.[1]">{{ cmsHero.heading[1] }}</template>
+          <template v-if="customHeading1">{{ customHeading1 }}</template>
           <template v-else>
             Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
           </template>
@@ -153,7 +153,9 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
+  cleanCmsText,
   pageDocId,
+  resolveCmsImage,
   tlsBlockAttrs,
   tlsBlockFieldAttrs,
   tlsBlockImageAttrs,
@@ -178,26 +180,28 @@ const on = computed(() => Boolean(props.previewMode))
 const docId = computed(() => props.cmsHero?.docId || pageDocId('home'))
 const blockKey = computed(() => props.cmsHero?.blockKey || 'hero')
 
-const rawHeroImgSrc = computed(() => {
-  const raw = (props.cmsHero?.image?.src ?? props.cmsHero?.image?.key ?? '').trim()
-  if (!raw) return undefined
-  return (raw.startsWith('/') || /^https?:\/\//.test(raw)) ? raw : `/media/${raw.replace(/^\/+/, '')}`
+const DEFAULT_H0 = "Thérapeute en relation d'aide à Shefford"
+const DEFAULT_H1 = 'Tu as de la valeur — ne laisse pas ta souffrance te définir et te voler ton présent.'
+const customHeading0 = computed(() => {
+  const h = cleanCmsText(props.cmsHero?.heading?.[0])
+  return h && h !== DEFAULT_H0 ? h : undefined
 })
-const heroImageSrc = computed(() => rawHeroImgSrc.value ?? '/images/chantal-hero.jpg')
+const customHeading1 = computed(() => {
+  const h = cleanCmsText(props.cmsHero?.heading?.[1])
+  return h && h !== DEFAULT_H1 ? h : undefined
+})
+
+const resolvedHeroImg = computed(() => resolveCmsImage(props.cmsHero?.image))
+const heroImageSrc = computed(() => resolvedHeroImg.value?.src ?? '/images/chantal-hero.jpg')
 const heroImageSrcset = computed(() => {
-  if (props.cmsHero?.image?.srcset) return props.cmsHero.image.srcset
-  const src = rawHeroImgSrc.value
-  if (src && src.startsWith('/media/')) {
-    const base = src.split('?')[0]!
-    return [640, 960, 1280, 1920].map(w => `${base}?w=${w} ${w}w`).join(', ')
-  }
-  if (!src) {
+  if (resolvedHeroImg.value?.srcset) return resolvedHeroImg.value.srcset
+  if (!resolvedHeroImg.value) {
     return '/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w'
   }
   return undefined
 })
 const heroImageAlt = computed(
-  () => props.cmsHero?.image?.alt?.trim() || "Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford",
+  () => resolvedHeroImg.value?.alt || "Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford",
 )
 
 const showMap = ref(false)

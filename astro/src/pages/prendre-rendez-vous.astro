@@ -4,7 +4,7 @@ import {
   extractBookingLpCmsData,
   extractSiteSettings,
   getPage,
-  getSettings,
+  getRequestSettings,
   type CmsSiteSettingsData,
   type PageDoc,
 } from '../lib/cms-client'
@@ -32,7 +32,7 @@ const onPreviewRejected = (): void => {
 
 const [pageResult, settingsResult] = await Promise.allSettled([
   getPage('/prendre-rendez-vous', { previewToken, onPreviewRejected }),
-  getSettings({ previewToken, onPreviewRejected }),
+  getRequestSettings(Astro.locals, { previewToken, onPreviewRejected }),
 ])
 
 let page: PageDoc | null = null
@@ -52,6 +52,7 @@ if (settingsResult.status === 'fulfilled') {
 }
 
 const cmsPage = extractBookingLpCmsData(page)
+const pagePreviewMode = Boolean(previewMode && page)
 ---
 <Base
   title="Prendre rendez-vous avec Chantal Massé"
@@ -60,13 +61,13 @@ const cmsPage = extractBookingLpCmsData(page)
   robots="noindex, nofollow"
   ogImage={HERO_IMAGE}
   minimalNav
-  pageDocId={cmsPage.docId}
+  pageDocId={page ? cmsPage.docId : null}
   previewMode={previewMode}
   cmsSettings={siteSettings ?? null}
 >
   <PrendreRendezVousPage
     client:load
     {...(page ? { cmsPage } : {})}
-    {...(previewMode ? { previewMode: true } : {})}
+    {...(pagePreviewMode ? { previewMode: true } : {})}
   />
 </Base>

@@ -61,6 +61,7 @@
 import { computed } from 'vue'
 import {
   pageDocId,
+  resolveCmsImage,
   tlsBlockAttrs,
   tlsBlockFieldAttrs,
   tlsBlockImageAttrs,
@@ -84,22 +85,10 @@ const on = computed(() => Boolean(props.previewMode))
 const docId = computed(() => props.cmsPhilosophy?.docId || pageDocId('home'))
 const blockKey = computed(() => props.cmsPhilosophy?.blockKey || 'approche')
 
-const rawImgSrc = computed(() => {
-  const raw = (props.cmsPhilosophy?.image?.src ?? props.cmsPhilosophy?.image?.key ?? '').trim()
-  if (!raw) return undefined
-  return (raw.startsWith('/') || /^https?:\/\//.test(raw)) ? raw : `/media/${raw.replace(/^\/+/, '')}`
-})
-const philosophyImageSrc = computed(() => rawImgSrc.value ?? '/images/chantal-portrait-44.jpg')
-const philosophyImageSrcset = computed(() => {
-  if (props.cmsPhilosophy?.image?.srcset) return props.cmsPhilosophy.image.srcset
-  const src = rawImgSrc.value
-  if (src && src.startsWith('/media/')) {
-    const base = src.split('?')[0]!
-    return [640, 960, 1280, 1920].map(w => `${base}?w=${w} ${w}w`).join(', ')
-  }
-  return undefined
-})
+const resolvedPhilosophyImg = computed(() => resolveCmsImage(props.cmsPhilosophy?.image))
+const philosophyImageSrc = computed(() => resolvedPhilosophyImg.value?.src ?? '/images/chantal-portrait-44.jpg')
+const philosophyImageSrcset = computed(() => resolvedPhilosophyImg.value?.srcset)
 const philosophyImageAlt = computed(
-  () => props.cmsPhilosophy?.image?.alt?.trim() || "Chantal Massé, thérapeute en relation d'aide à Shefford",
+  () => resolvedPhilosophyImg.value?.alt || "Chantal Massé, thérapeute en relation d'aide à Shefford",
 )
 </script>

@@ -4,7 +4,7 @@ import {
   extractServiceLandingCmsData,
   extractSiteSettings,
   getPage,
-  getSettings,
+  getRequestSettings,
   type CmsSiteSettingsData,
   type PageDoc,
 } from '../lib/cms-client'
@@ -32,7 +32,7 @@ const onPreviewRejected = (): void => {
 
 const [pageResult, settingsResult] = await Promise.allSettled([
   getPage('/coaching-de-couple', { previewToken, onPreviewRejected }),
-  getSettings({ previewToken, onPreviewRejected }),
+  getRequestSettings(Astro.locals, { previewToken, onPreviewRejected }),
 ])
 
 let page: PageDoc | null = null
@@ -52,6 +52,7 @@ if (settingsResult.status === 'fulfilled') {
 }
 
 const cmsPage = extractServiceLandingCmsData(page, 'coaching-de-couple')
+const pagePreviewMode = Boolean(previewMode && page)
 ---
 <Base
   preloadItalic
@@ -61,13 +62,13 @@ const cmsPage = extractServiceLandingCmsData(page, 'coaching-de-couple')
   ogTitle="Coaching de couple à Shefford | Chantal Massé"
   ogDescription="Une méthode structurée pour transformer les conflits répétitifs en opportunités de connexion profonde. Réservez votre séance."
   ogImage={HERO_IMAGE}
-  pageDocId={cmsPage.docId}
+  pageDocId={page ? cmsPage.docId : null}
   previewMode={previewMode}
   cmsSettings={siteSettings ?? null}
 >
   <CoachingDeCouplePage
     {...(page ? { cmsPage } : {})}
     {...(siteSettings ? { cmsSettings: siteSettings } : {})}
-    {...(previewMode ? { previewMode: true } : {})}
+    {...(pagePreviewMode ? { previewMode: true } : {})}
   />
 </Base>

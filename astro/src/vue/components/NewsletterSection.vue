@@ -1,7 +1,7 @@
 <template>
   <section
     class="py-32 px-8 bg-tertiary text-on-tertiary"
-    v-bind="tlsBlockAttrs(on, blockKey, 'collection')"
+    v-bind="tlsBlockAttrs(pageOn, blockKey, 'collection')"
   >
     <div class="max-w-screen-xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
@@ -9,11 +9,11 @@
       <div data-animate>
         <h2
           class="font-headline text-5xl mb-6"
-          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'title')"
+          v-bind="tlsBlockFieldAttrs(pageOn, docId, blockKey, 'title')"
         >{{ cmsNewsletter?.title || 'Pensées & Réflexions' }}</h2>
         <p
           class="text-on-tertiary-container font-light text-lg mb-10 max-w-md"
-          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'lede')"
+          v-bind="tlsBlockFieldAttrs(pageOn, docId, blockKey, 'lede')"
         >
           {{ cmsNewsletter?.lede || 'Recevez mensuellement des pistes de réflexion, des pratiques de pleine conscience et des ressources pour nourrir vos relations.' }}
         </p>
@@ -108,13 +108,18 @@ export interface CmsNewsletterBlockData {
   lede?: string
 }
 
-const props = defineProps<{
-  posts: { id?: string; slug: string; title: string; image: string; readTime: number | null }[]
-  previewMode?: boolean
-  cmsNewsletter?: CmsNewsletterBlockData
-}>()
+const props = withDefaults(
+  defineProps<{
+    posts: { id?: string; slug: string; title: string; image: string; readTime: number | null }[]
+    previewMode?: boolean
+    pagePreviewMode?: boolean
+    cmsNewsletter?: CmsNewsletterBlockData
+  }>(),
+  { pagePreviewMode: undefined },
+)
 
 const on = computed(() => Boolean(props.previewMode))
+const pageOn = computed(() => Boolean(props.pagePreviewMode ?? props.previewMode))
 const docId = computed(() => props.cmsNewsletter?.docId || pageDocId('home'))
 const blockKey = computed(() => props.cmsNewsletter?.blockKey || 'infolettre')
 const resolvePostId = (p: { id?: string; slug: string }): string => p.id || postDocId(p.slug)

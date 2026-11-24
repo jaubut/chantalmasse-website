@@ -150,26 +150,26 @@
               :style="{ transform: `translateX(-${activeTestimonial * 100}%)` }"
             >
               <figure
-                v-for="(t, i) in resolvedTestimonials"
-                :key="`${t.name}-${i}`"
+                v-for="t in resolvedTestimonials"
+                :key="`${t.name}-${t.origIndex}`"
                 class="shrink-0 w-full px-1"
               >
                 <div class="bg-surface-container-low p-8 md:p-10 rounded-[2rem] editorial-shadow">
                   <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-4">"</p>
                   <blockquote
                     class="text-on-surface text-[17px] leading-relaxed mb-6 min-h-[9rem]"
-                    v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/body`)"
+                    v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${t.origIndex}/body`)"
                   >
                     {{ t.quote }}
                   </blockquote>
                   <figcaption>
                     <p
                       class="font-semibold text-primary"
-                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/title`)"
+                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${t.origIndex}/title`)"
                     >{{ t.name }}</p>
                     <p
                       class="text-sm text-on-surface-variant font-light"
-                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${i}/subtitle`)"
+                      v-bind="tlsBlockFieldAttrs(on, docId, 'temoignages', `items/${t.origIndex}/subtitle`)"
                     >{{ t.context }}</p>
                   </figcaption>
                 </div>
@@ -350,6 +350,7 @@ import { BOOKING_SERVICES, type BookingServiceId } from '~/utils/bookingServices
 import { useTracking } from '~/composables/useTracking'
 import {
   pageDocId,
+  resolveCmsImage,
   tlsBlockAttrs,
   tlsBlockFieldAttrs,
   tlsBlockImageAttrs,
@@ -393,26 +394,17 @@ const props = defineProps<{
 const on = computed(() => Boolean(props.previewMode))
 const docId = computed(() => props.cmsPage?.docId || pageDocId('prendre-rendez-vous'))
 
-const rawHeroImgSrc = computed(() => {
-  const raw = (props.cmsPage?.hero?.image?.src ?? props.cmsPage?.hero?.image?.key ?? '').trim()
-  if (!raw) return undefined
-  return (raw.startsWith('/') || /^https?:\/\//.test(raw)) ? raw : `/media/${raw.replace(/^\/+/, '')}`
-})
-const heroImageSrc = computed(() => rawHeroImgSrc.value ?? '/images/chantal-hero.jpg')
+const resolvedHeroImg = computed(() => resolveCmsImage(props.cmsPage?.hero?.image))
+const heroImageSrc = computed(() => resolvedHeroImg.value?.src ?? '/images/chantal-hero.jpg')
 const heroImageSrcset = computed(() => {
-  if (props.cmsPage?.hero?.image?.srcset) return props.cmsPage.hero.image.srcset
-  const src = rawHeroImgSrc.value
-  if (src && src.startsWith('/media/')) {
-    const base = src.split('?')[0]!
-    return [640, 960, 1280, 1920].map(w => `${base}?w=${w} ${w}w`).join(', ')
-  }
-  if (!src) {
+  if (resolvedHeroImg.value?.srcset) return resolvedHeroImg.value.srcset
+  if (!resolvedHeroImg.value) {
     return '/images/hero/chantal-hero-615.webp 615w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1230.webp 1230w, /images/hero/chantal-hero-1754.webp 1754w'
   }
   return undefined
 })
 const heroImageAlt = computed(
-  () => props.cmsPage?.hero?.image?.alt?.trim() || "Chantal Massé, thérapeute en relation d'aide",
+  () => resolvedHeroImg.value?.alt || "Chantal Massé, thérapeute en relation d'aide",
 )
 
 const booking = useBooking()
@@ -446,10 +438,13 @@ const STEPS = [
 const resolvedSteps = computed(() => {
   const items = props.cmsPage?.etapes?.items
   if (!items || items.length === 0) return STEPS
-  return STEPS.map((fb, i) => ({
-    title: items[i]?.title?.trim() || fb.title,
-    body: items[i]?.body?.trim() || fb.body,
-  }))
+  return items.map((it, i) => {
+    const fb = STEPS[i]
+    return {
+      title: it?.title?.trim() || fb?.title || '',
+      body: it?.body?.trim() || fb?.body || '',
+    }
+  })
 })
 
 const TESTIMONIALS = [
@@ -475,15 +470,19 @@ const TESTIMONIALS = [
 
 const resolvedTestimonials = computed(() => {
   const items = props.cmsPage?.temoignages?.items
-  if (!items || items.length === 0) return TESTIMONIALS
-  return items.map((it, i) => {
+  if (!items || items.length === 0) {
+    return TESTIMONIALS.map((t, i) => ({ ...t, origIndex: i }))
+  }
+  const mapped = items.map((it, i) => {
     const fb = TESTIMONIALS[i]
     return {
+      origIndex: i,
       quote: it.body?.trim() || fb?.quote || '',
       name: it.title?.trim() || fb?.name || '',
       context: it.subtitle?.trim() || fb?.context || '',
     }
-  }).filter(t => t.quote && t.name)
+  })
+  return on.value ? mapped : mapped.filter(t => t.quote && t.name)
 })
 
 const FAQ = [
@@ -522,10 +521,13 @@ const FAQ = [
 const resolvedFaq = computed(() => {
   const items = props.cmsPage?.faq?.items
   if (!items || items.length === 0) return FAQ
-  return FAQ.map((fb, i) => ({
-    question: items[i]?.title?.trim() || fb.question,
-    answer: items[i]?.body?.trim() || fb.answer,
-  }))
+  return items.map((it, i) => {
+    const fb = FAQ[i]
+    return {
+      question: it?.title?.trim() || fb?.question || '',
+      answer: it?.body?.trim() || fb?.answer || '',
+    }
+  })
 })
 
 const activeTestimonial = ref(0)

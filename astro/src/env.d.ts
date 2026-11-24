@@ -8,6 +8,7 @@ declare namespace App {
   interface Locals {
     previewToken?: string | null
     previewMode?: boolean
+    cmsSettingsPromise?: Promise<import('./lib/cms-client').Settings | null>
     cfContext?: { waitUntil(p: Promise<unknown>): void }
   }
 }
