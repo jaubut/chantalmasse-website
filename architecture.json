@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-24",
+  "generatedAt": "2026-11-27",
   "repo": "chantalmasse-website",
   "intent": "chantalmasse.com — French-language marketing and booking site for Chantal Massé, therapist in Shefford (Nuxt, SSR on Cloudflare Workers): a single landing page composed of sections, service pages, blog content, appointment booking (availability, create, cancel) against her calendar, trigger.dev jobs for reminders, review requests and a weekly brief, newsletter and contact routes, PostHog tracking. Edited by Jeremie; the client sends copy. Correctness bar: a booking is created once and confirmed by email, cancel links are single-use, no client PII in logs, pages fast on mobile.",
   "targets": [
@@ -346,6 +346,23 @@
           "endpoints": [],
           "apiCalls": [],
           "imports": [],
+          "listeners": [],
+          "sheets": 0,
+          "externals": []
+        },
+        {
+          "path": "scripts/serve-astro-smoke.ts",
+          "lines": 401,
+          "kind": "script",
+          "exports": [],
+          "state": [],
+          "emits": [],
+          "consumes": [],
+          "endpoints": [],
+          "apiCalls": [],
+          "imports": [
+            "astro/src/lib/cms-client.ts"
+          ],
           "listeners": [],
           "sheets": 0,
           "externals": []
