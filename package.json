@@ -12,9 +12,8 @@
     "test:reminder": "esbuild --bundle --platform=node --format=esm --log-level=warning --alias:@trigger.dev/sdk/v3=./tests/stubs/trigger-sdk.ts --alias:googleapis=./tests/stubs/googleapis.ts --alias:twilio=./tests/stubs/twilio.ts --outfile=.test-out/booking-reminder.mjs tests/booking-reminder.test.ts && node .test-out/booking-reminder.mjs",
     "test:rules": "esbuild --bundle --platform=node --format=esm --log-level=warning --outfile=.test-out/session-rules.mjs tests/session-rules.test.ts && node .test-out/session-rules.mjs",
     "astro:build": "astro build --root astro",
-    "astro:deploy:preview": "bash astro/scripts/deploy-preview.sh",
     "test:smoke:astro": "playwright test -c playwright.astro.config.ts",
-    "parity": "bun scripts/parity-crawl.ts diff docs/migration-baseline/crawl.json https://chantalmasse-website-astro.jeremie-aubut.workers.dev --preview",
+    "parity": "bun scripts/parity-crawl.ts diff docs/migration-baseline/crawl.json https://chantalmasse.com",
     "astro:check": "astro sync --root astro && astro-check --root astro"
   },
   "dependencies": {
