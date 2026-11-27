@@ -21,8 +21,25 @@ vi.mock('cloudflare:workers', () => ({
 }))
 
 import { allPosts, getPost, latestPosts } from '../../astro/src/lib/blog'
-import { CONTRACT_HEADER, CONTRACT_VERSION, createCmsClient, type PostDoc, type PostSummary } from '../../astro/src/lib/cms-client'
-import type { Kv } from '../../astro/src/lib/page-cache'
+import {
+  CONTRACT_HEADER,
+  CONTRACT_VERSION,
+  createCmsClient,
+  extractBlogIndexCmsData,
+  extractBookingLpCmsData,
+  extractHomeCmsData,
+  extractServiceLandingCmsData,
+  extractSiteSettings,
+  getPage,
+  getRequestSettings,
+  getSettings,
+  resolveCmsImage,
+  type PageDoc,
+  type PostDoc,
+  type PostSummary,
+  type Settings,
+} from '../../astro/src/lib/cms-client'
+import { SKIP_CACHE, type Kv } from '../../astro/src/lib/page-cache'
 import * as tlsEditAttrs from '../../astro/src/lib/tls-edit-attrs'
 import {
   applyPreviewResponseHeaders,
@@ -53,9 +70,12 @@ import {
   validatePreviewPath,
   verifyPreviewToken,
 } from '../../astro/src/lib/tls-edit-attrs'
-import { headersFor, onRequest } from '../../astro/src/middleware'
+import { CACHED, headersFor, onRequest } from '../../astro/src/middleware'
 import { GET as previewGet, POST as previewPost } from '../../astro/src/pages/_tls/preview'
 import * as useBookingMod from '../../astro/src/vue/composables/useBooking'
+import * as useContactMod from '../../astro/src/vue/composables/useContact'
+import * as useTrackingMod from '../../composables/useTracking'
+import * as bookingServicesMod from '../../utils/bookingServices'
 import * as newsletterConsentMod from '../../utils/newsletterConsent'
 
 const callApi = (fn: (ctx: never) => Promise<Response> | Response, request: Request) =>
@@ -97,7 +117,10 @@ function loadVueSfc(relPathFromHere: string): vue.Component {
     if (spec === 'ofetch') return { ofetch: vi.fn() }
     if (spec.endsWith('tls-edit-attrs')) return tlsEditAttrs
     if (spec.endsWith('newsletterConsent')) return newsletterConsentMod
+    if (spec.endsWith('bookingServices')) return bookingServicesMod
     if (spec.endsWith('useBooking')) return useBookingMod
+    if (spec.endsWith('useContact')) return useContactMod
+    if (spec.endsWith('useTracking')) return useTrackingMod
     if (spec.endsWith('Icon.vue')) return { default: IconStub }
     if (spec.endsWith('.vue')) return { default: loadVueSfc(resolve(dirname(fullPath), spec)) }
     throw new Error(`Unexpected import in SFC test loader: ${spec}`)
@@ -122,12 +145,17 @@ function loadVueSfc(relPathFromHere: string): vue.Component {
 
 const HeroSection = loadVueSfc('../../astro/src/vue/components/HeroSection.vue')
 const ServicesSection = loadVueSfc('../../astro/src/vue/components/ServicesSection.vue')
+const PhilosophySection = loadVueSfc('../../astro/src/vue/components/PhilosophySection.vue')
+const MethodsSection = loadVueSfc('../../astro/src/vue/components/MethodsSection.vue')
+const TestimonialsSection = loadVueSfc('../../astro/src/vue/components/TestimonialsSection.vue')
 const NewsletterSection = loadVueSfc('../../astro/src/vue/components/NewsletterSection.vue')
+const BookingSection = loadVueSfc('../../astro/src/vue/components/BookingSection.vue')
 const TheFooter = loadVueSfc('../../astro/src/vue/components/TheFooter.vue')
 const BlogIndexPage = loadVueSfc('../../astro/src/vue/pages/BlogIndexPage.vue')
 const BlogPostPage = loadVueSfc('../../astro/src/vue/pages/BlogPostPage.vue')
 const CoachingDeCouplePage = loadVueSfc('../../astro/src/vue/pages/CoachingDeCouplePage.vue')
 const TherapieIndividuellePage = loadVueSfc('../../astro/src/vue/pages/TherapieIndividuellePage.vue')
+const PrendreRendezVousPage = loadVueSfc('../../astro/src/vue/pages/PrendreRendezVousPage.vue')
 
 const TEST_PREVIEW_SECRET = 'test-preview-secret-32-bytes-long!!'
 
@@ -1028,5 +1056,533 @@ describe('S4b contract-level data-tls-* attributes & real component renders (liv
     expect(pageDocIdForPath('/')).toBe('chantal-masse:page:home')
     expect(pageDocIdForPath('/blog')).toBe('chantal-masse:page:blog')
     expect(pageDocIdForPath('/blog/l-amour-conscient')).toBe('chantal-masse:post:l-amour-conscient')
+  })
+
+  it('fetches getPage() and getSettings() over SiteReads binding (draft + preview fallback, 404 resilience) and wires all pages, sections, and /media/<key> srcsets', async () => {
+    // 1. Middleware CACHED regex covers all SSR CMS-backed pages
+    for (const cachedPath of ['/', '/coaching-de-couple', '/therapie-individuelle', '/prendre-rendez-vous', '/blog', '/blog/l-amour-conscient', '/sitemap.xml']) {
+      expect(CACHED.test(cachedPath), `CACHED should match ${cachedPath}`).toBe(true)
+    }
+    for (const uncachedPath of ['/annuler', '/api/booking/availability', '/_tls/preview', '/media/sites/chantal-masse/media/a.jpg']) {
+      expect(CACHED.test(uncachedPath), `CACHED should not match ${uncachedPath}`).toBe(false)
+    }
+
+    // 2. getPage() and getSettings() over SiteReads with draft preview, 401 live fallback, and 404 null return
+    const homePageDoc: PageDoc = {
+      id: 'chantal-masse:page:home',
+      type: 'page',
+      locale: 'fr',
+      fallbackFrom: null,
+      path: '/',
+      title: 'Accueil',
+      template: 'default',
+      seo: { title: 'Accueil', description: null, image: null, noindex: false, canonical: null },
+      updatedAt: '2026-11-24T00:00:00.000Z',
+      blocks: [
+        {
+          type: 'hero',
+          key: 'hero',
+          data: {
+            eyebrow: 'Cabinet à Shefford',
+            heading: ["Thérapeute en relation d'aide CMS", 'Retrouve ta valeur'],
+            lede: 'Accompagnement conscient en Estrie.',
+            cta: { label: 'Réserver maintenant' },
+            image: {
+              src: '/media/sites/chantal-masse/media/hero-sha256.jpg',
+              alt: 'Portrait CMS Chantal',
+              width: 1760,
+              height: 2200,
+              focal: null,
+            },
+          },
+        },
+        {
+          type: 'collection',
+          key: 'services',
+          data: { kind: 'service', title: 'Nos services CMS', lede: 'Accompagnements sur mesure.' },
+          groups: [],
+          items: [
+            {
+              id: 'chantal-masse:item:service:coaching-de-couple',
+              handle: 'coaching-de-couple',
+              kind: 'service',
+              slug: 'coaching-de-couple',
+              title: 'Coaching de Couple CMS',
+              description: 'Dialogue Imago en présentiel.',
+              priceCents: 16500,
+              image: null,
+              available: true,
+              tags: [],
+              attrs: { duration_minutes: 90 },
+              links: {},
+            },
+            {
+              id: 'chantal-masse:item:service:therapie-individuelle',
+              handle: 'therapie-individuelle',
+              kind: 'service',
+              slug: 'therapie-individuelle',
+              title: 'Thérapie Individuelle CMS',
+              description: 'Relation d’aide individuelle.',
+              priceCents: 11000,
+              image: null,
+              available: true,
+              tags: [],
+              attrs: { duration_minutes: 60 },
+              links: {},
+            },
+          ],
+        },
+        {
+          type: 'rich_text',
+          key: 'approche',
+          data: {
+            eyebrow: '"Citation CMS philosophie"',
+            title: "L'amour conscient CMS",
+            body: {
+              type: 'doc',
+              content: [
+                { type: 'paragraph', content: [{ type: 'text', text: 'Premier paragraphe CMS philosophie.' }] },
+                { type: 'paragraph', content: [{ type: 'text', text: 'Deuxième paragraphe CMS philosophie.' }] },
+              ],
+            },
+            media: [{ key: 'sites/chantal-masse/media/portrait-44-sha.jpg', alt: 'Chantal portrait 44 CMS' }],
+          },
+        },
+        {
+          type: 'list',
+          key: 'apropos',
+          data: {
+            title: 'Qui je suis CMS',
+            intro: 'Intro parcours CMS.',
+            items: [
+              { _key: 'm1', title: 'Relations humaines CMS', body: 'Corps approche 1.' },
+              { _key: 'm2', title: 'Imago & Couple CMS', body: 'Corps approche 2.' },
+              { _key: 'm3', title: 'Neurosciences CMS', body: 'Corps approche 3.' },
+            ],
+          },
+        },
+        {
+          type: 'list',
+          key: 'temoignages',
+          data: {
+            title: 'Témoignages CMS',
+            items: [
+              { _key: 't1', title: 'Claire', subtitle: 'En thérapie individuelle', body: 'Super accompagnement avec Chantal.' },
+            ],
+          },
+        },
+        {
+          type: 'collection',
+          key: 'infolettre',
+          data: { kind: 'post', title: 'Infolettre CMS', lede: 'Inscrivez-vous chaque mois.' },
+          groups: [],
+          items: [],
+        },
+        {
+          type: 'cta',
+          key: 'booking',
+          data: { note: 'Prêt à réserver CMS?', label: 'Prendre RDV CMS' },
+        },
+      ],
+    }
+
+    const sampleSettings: Settings = {
+      locale: 'fr',
+      siteName: 'Chantal Massé CMS',
+      tagline: "Thérapeute en relation d'aide",
+      phone: '450-555-0199',
+      email: 'chantal.gmasse@gmail.com',
+      address: { street: '245 rue Colette', city: 'Shefford', region: 'QC', postalCode: 'J2M 2B7' },
+      hours: [
+        { label: 'Lundi — Mardi', value: '09:30 — 18:30' },
+        { label: 'Vendredi — Dimanche', value: 'Fermé' },
+      ],
+      socials: [],
+      logo: null,
+      defaultOgImage: null,
+      locales: [{ code: 'fr', label: 'Français', isDefault: true }],
+    }
+
+    const seenUrls: string[] = []
+    mockWorkerEnv.CMS = {
+      fetch: vi.fn(async (req: Request) => {
+        seenUrls.push(req.url)
+        const u = new URL(req.url)
+        if (u.searchParams.get('stage') === 'draft' && req.headers.get('authorization') === 'Preview bad_tok') {
+          return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401 })
+        }
+        if (u.pathname.endsWith('/settings')) {
+          return new Response(JSON.stringify({ data: sampleSettings, meta: { version: 1, tags: [] } }), { status: 200 })
+        }
+        if (u.pathname.endsWith('/page')) {
+          if (u.searchParams.get('path') === '/') {
+            return new Response(JSON.stringify({ data: homePageDoc, meta: { version: 1, tags: [] } }), { status: 200 })
+          }
+          return new Response(JSON.stringify({ data: null, meta: { version: 1, tags: [] } }), { status: 404 })
+        }
+        return new Response('not found', { status: 404 })
+      }),
+    }
+
+    let rejected = 0
+    const fetchedHome = await getPage('/', { previewToken: 'bad_tok', onPreviewRejected: () => { rejected++ } })
+    expect(rejected).toBe(1)
+    expect(fetchedHome?.id).toBe('chantal-masse:page:home')
+    expect(new URL(seenUrls[0]!).searchParams.get('stage')).toBe('draft')
+    expect(new URL(seenUrls[1]!).searchParams.get('stage')).toBe('live')
+
+    const missingPage = await getPage('/coaching-de-couple')
+    expect(missingPage).toBeNull()
+
+    const fetchedSettings = await getSettings({ previewToken: 'good_tok' })
+    expect(fetchedSettings?.siteName).toBe('Chantal Massé CMS')
+
+    // 3. Extract CMS data and verify live render has CMS text + /media/<key> responsive srcsets + 0 data-tls-* attrs
+    const homeCms = extractHomeCmsData(fetchedHome)
+    const siteSettings = extractSiteSettings(fetchedSettings)
+    expect(homeCms.hero?.image?.src).toBe('/media/sites/chantal-masse/media/hero-sha256.jpg')
+    expect(homeCms.hero?.image?.srcset).toContain('/media/sites/chantal-masse/media/hero-sha256.jpg?w=640 640w')
+    expect(homeCms.philosophy?.image?.src).toBe('/media/sites/chantal-masse/media/portrait-44-sha.jpg')
+    expect(homeCms.philosophy?.image?.srcset).toContain('/media/sites/chantal-masse/media/portrait-44-sha.jpg?w=1280 1280w')
+    expect(siteSettings?.address).toBe('245 rue Colette, Shefford, QC J2M 2B7')
+
+    const [
+      liveHeroHtml,
+      liveServicesHtml,
+      livePhilosophyHtml,
+      liveMethodsHtml,
+      liveTestimonialsHtml,
+      liveNewsletterHtml,
+      liveBookingHtml,
+      liveFooterHtml,
+    ] = await Promise.all([
+      renderToString(vue.createSSRApp({ render: () => vue.h(HeroSection, { cmsHero: homeCms.hero }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(ServicesSection, { cmsServices: homeCms.services }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(PhilosophySection, { cmsPhilosophy: homeCms.philosophy }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(MethodsSection, { cmsMethods: homeCms.methods }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(TestimonialsSection, { cmsTestimonials: homeCms.testimonials }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(NewsletterSection, { posts: SAMPLE_POSTS, cmsNewsletter: homeCms.newsletter }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(BookingSection, { cmsBooking: homeCms.booking, cmsSettings: siteSettings }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(TheFooter, { cmsSettings: siteSettings }) })),
+    ])
+
+    expect(liveHeroHtml).toContain('Cabinet à Shefford')
+    expect(liveHeroHtml).toContain('/media/sites/chantal-masse/media/hero-sha256.jpg?w=640 640w')
+    expect(liveHeroHtml).not.toContain('data-tls-')
+
+    expect(liveServicesHtml).toContain('Nos services CMS')
+    expect(liveServicesHtml).toContain('Coaching de Couple CMS')
+    expect(liveServicesHtml).not.toContain('data-tls-')
+
+    expect(livePhilosophyHtml).toContain('L&#39;amour conscient CMS')
+    expect(livePhilosophyHtml).toContain('Premier paragraphe CMS philosophie.')
+    expect(livePhilosophyHtml).toContain('/media/sites/chantal-masse/media/portrait-44-sha.jpg?w=640 640w')
+    expect(livePhilosophyHtml).not.toContain('data-tls-')
+
+    expect(liveMethodsHtml).toContain('Qui je suis CMS')
+    expect(liveMethodsHtml).toContain('Relations humaines CMS')
+    expect(liveMethodsHtml).not.toContain('data-tls-')
+
+    expect(liveTestimonialsHtml).toContain('Témoignages CMS')
+    expect(liveTestimonialsHtml).toContain('Super accompagnement avec Chantal.')
+    expect(liveTestimonialsHtml).not.toContain('data-tls-')
+
+    expect(liveNewsletterHtml).toContain('Infolettre CMS')
+    expect(liveNewsletterHtml).not.toContain('data-tls-')
+
+    expect(liveBookingHtml).toContain('Prêt à réserver CMS?')
+    expect(liveBookingHtml).toContain('09:30 — 18:30')
+    expect(liveBookingHtml).not.toContain('data-tls-')
+
+    expect(liveFooterHtml).toContain('Chantal Massé CMS')
+    expect(liveFooterHtml).toContain('245 rue Colette, Shefford, QC J2M 2B7')
+    expect(liveFooterHtml).not.toContain('data-tls-')
+
+    // 4. Resilience fallback when getPage() returns null (404 / omitted fields):
+    //    must render French copy & PR #57 static images (/images/chantal-hero.jpg, /images/chantal-portrait-44.jpg)
+    const emptyHome = extractHomeCmsData(null)
+    const emptyCouple = extractServiceLandingCmsData(null, 'coaching-de-couple')
+    const emptyIndividuelle = extractServiceLandingCmsData(null, 'therapie-individuelle')
+    const emptyBookingLp = extractBookingLpCmsData(null)
+    const emptyBlog = extractBlogIndexCmsData(null)
+
+    const [
+      fallbackHero,
+      fallbackPhilosophy,
+      fallbackCouple,
+      fallbackIndividuelle,
+      fallbackBookingLp,
+      fallbackBlogIndex,
+    ] = await Promise.all([
+      renderToString(vue.createSSRApp({ render: () => vue.h(HeroSection, { cmsHero: emptyHome.hero, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(PhilosophySection, { cmsPhilosophy: emptyHome.philosophy, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(CoachingDeCouplePage, { cmsPage: emptyCouple, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(TherapieIndividuellePage, { cmsPage: emptyIndividuelle, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(PrendreRendezVousPage, { cmsPage: emptyBookingLp, previewMode: true }) })),
+      renderToString(vue.createSSRApp({ render: () => vue.h(BlogIndexPage, { posts: SAMPLE_POSTS, cmsHero: emptyBlog.hero, previewMode: true }) })),
+    ])
+
+    expect(fallbackHero).toContain('/images/chantal-hero.jpg')
+    expect(fallbackHero).toContain('/images/hero/chantal-hero-690.webp 690w')
+    expect(fallbackHero).toContain('data-tls-image="doc:chantal-masse:page:home/blocks/hero/data/image"')
+
+    expect(fallbackPhilosophy).toContain('/images/chantal-portrait-44.jpg')
+    expect(fallbackPhilosophy).toContain('L&#39;amour conscient')
+    expect(fallbackPhilosophy).toContain('data-tls-image="doc:chantal-masse:page:home/blocks/approche/data/media/0"')
+    expect(fallbackPhilosophy).toContain('data-tls-field="doc:chantal-masse:page:home/blocks/approche/data/title"')
+
+    expect(fallbackCouple).toContain('Coaching de couple — Shefford, en présentiel')
+    expect(fallbackCouple).toContain('160$ / séance')
+    expect(fallbackCouple).toContain('data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/hero/data/heading/0"')
+    expect(fallbackCouple).toContain('data-tls-field="doc:chantal-masse:item:service:coaching-de-couple/ext/priceCents"')
+
+    expect(fallbackIndividuelle).toContain('Thérapie individuelle — Shefford &amp; vidéoconférence')
+    expect(fallbackIndividuelle).toContain('105$ / séance')
+    expect(fallbackIndividuelle).toContain('data-tls-field="doc:chantal-masse:page:therapie-individuelle/blocks/hero/data/heading/0"')
+    expect(fallbackIndividuelle).toContain('data-tls-field="doc:chantal-masse:item:service:therapie-individuelle/ext/priceCents"')
+
+    expect(fallbackBookingLp).toContain('/images/chantal-hero.jpg')
+    expect(fallbackBookingLp).toContain('/images/hero/chantal-hero-615.webp 615w')
+    expect(fallbackBookingLp).toContain('Réserve ta séance avec Chantal, en moins de 2 minutes.')
+    expect(fallbackBookingLp).toContain('data-tls-field="doc:chantal-masse:page:prendre-rendez-vous/blocks/hero/data/heading/0"')
+    expect(fallbackBookingLp).toContain('data-tls-image="doc:chantal-masse:page:prendre-rendez-vous/blocks/hero/data/image"')
+    expect(fallbackBookingLp).toContain('data-tls-field="doc:chantal-masse:page:prendre-rendez-vous/blocks/etapes/data/items/0/title"')
+    expect(fallbackBookingLp).toContain('data-tls-field="doc:chantal-masse:page:prendre-rendez-vous/blocks/faq/data/items/0/title"')
+
+    expect(fallbackBlogIndex).toContain('Ressources &amp; Réflexions')
+    expect(fallbackBlogIndex).toContain('data-tls-field="doc:chantal-masse:page:blog/blocks/hero/data/title"')
+
+    // 5. resolveCmsImage resolves raw key strings into /media/<key> + responsive srcset
+    expect(resolveCmsImage({ key: 'sites/chantal-masse/media/abc.jpg', alt: 'Alt' })).toEqual({
+      src: '/media/sites/chantal-masse/media/abc.jpg',
+      alt: 'Alt',
+      srcset:
+        '/media/sites/chantal-masse/media/abc.jpg?w=640 640w, /media/sites/chantal-masse/media/abc.jpg?w=960 960w, /media/sites/chantal-masse/media/abc.jpg?w=1280 1280w, /media/sites/chantal-masse/media/abc.jpg?w=1920 1920w',
+    })
+
+    // 6. Middleware skips storing in PAGE_CACHE when page sets SKIP_CACHE on CMS hiccup
+    const kvPut = vi.fn(async () => {})
+    mockWorkerEnv.PAGE_CACHE = {
+      get: vi.fn(async () => null),
+      put: kvPut,
+      delete: vi.fn(async () => {}),
+    }
+    mockWorkerEnv.CF_VERSION = { id: 'v2' }
+    const hiccupRes = (await onRequest(
+      {
+        isPrerendered: false,
+        url: new URL('https://chantalmasse.com/coaching-de-couple'),
+        request: new Request('https://chantalmasse.com/coaching-de-couple'),
+        locals: {},
+      } as never,
+      async () =>
+        new Response('<!doctype html><html><body>fallback</body></html>', {
+          status: 200,
+          headers: { 'content-type': 'text/html', [SKIP_CACHE]: '1' },
+        }),
+    )) as Response
+    expect(hiccupRes.status).toBe(200)
+    expect(hiccupRes.headers.has(SKIP_CACHE)).toBe(false)
+    expect(kvPut).not.toHaveBeenCalled()
+  })
+
+  it('supports dynamic CMS list lengths, preserves testimonial origIndex across filtering, binds blog hero vs heading blockType, and memoizes getRequestSettings on locals', async () => {
+    // 1. Dynamic list lengths: 2 items (< default 6) and 7 items (> default 6, cycling icons) on CoachingDeCouplePage & PrendreRendezVousPage
+    const couple7ItemsHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(CoachingDeCouplePage, {
+            previewMode: true,
+            cmsPage: {
+              docId: 'chantal-masse:page:coaching-de-couple',
+              services: {
+                title: '7 Situations CMS',
+                items: Array.from({ length: 7 }, (_, i) => ({
+                  title: `Douleur CMS #${i + 1}`,
+                  body: `Description douleur #${i + 1}`,
+                })),
+              },
+              apropos: {
+                // Item 2 (index 2, past DEFAULT_COUPLE_TESTIMONIALS length 2) has empty body/title; item 3 (index 3) is complete
+                items: [
+                  { title: 'Couple 1', subtitle: 'Couple', body: 'Citation 1' },
+                  { title: 'Couple 2', subtitle: 'Couple', body: 'Citation 2' },
+                  { title: '', subtitle: '', body: '' },
+                  { title: 'Couple 4', subtitle: 'Couple', body: 'Citation 4' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(couple7ItemsHtml).toContain('Douleur CMS #7')
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/services/data/items/6/title"',
+    )
+    // In previewMode, incomplete item at index 2 is NOT filtered out, and item at index 3 keeps items/3/*
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/apropos/data/items/2/body"',
+    )
+    expect(couple7ItemsHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:coaching-de-couple/blocks/apropos/data/items/3/title"',
+    )
+
+    // In live mode (previewMode: false), incomplete item at index 2 IS filtered out while Couple 4 still renders
+    const coupleLiveFilteredHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(CoachingDeCouplePage, {
+            previewMode: false,
+            cmsPage: {
+              docId: 'chantal-masse:page:coaching-de-couple',
+              services: {
+                items: [
+                  { title: 'Seule situation 1', body: 'Desc 1' },
+                  { title: 'Seule situation 2', body: 'Desc 2' },
+                ],
+              },
+              apropos: {
+                items: [
+                  { title: 'Couple 1', subtitle: 'Couple', body: 'Citation 1' },
+                  { title: 'Couple 2', subtitle: 'Couple', body: 'Citation 2' },
+                  { title: '', subtitle: '', body: '' },
+                  { title: 'Couple 4', subtitle: 'Couple', body: 'Citation 4' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(coupleLiveFilteredHtml).toContain('Seule situation 1')
+    expect(coupleLiveFilteredHtml).toContain('Seule situation 2')
+    expect(coupleLiveFilteredHtml).not.toContain('La distance s&#39;est installée')
+    expect(coupleLiveFilteredHtml).toContain('Couple 4')
+
+    // 2. Dynamic steps (4 items) and FAQ (2 items) on PrendreRendezVousPage
+    const bookingLpDynamicHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(PrendreRendezVousPage, {
+            previewMode: true,
+            cmsPage: {
+              docId: 'chantal-masse:page:prendre-rendez-vous',
+              etapes: {
+                items: [
+                  { title: 'Étape 1', body: 'B1' },
+                  { title: 'Étape 2', body: 'B2' },
+                  { title: 'Étape 3', body: 'B3' },
+                  { title: 'Étape 4 Bonus', body: 'B4' },
+                ],
+              },
+              faq: {
+                items: [
+                  { title: 'Q1 CMS?', body: 'R1 CMS' },
+                  { title: 'Q2 CMS?', body: 'R2 CMS' },
+                ],
+              },
+            },
+          }),
+      }),
+    )
+    expect(bookingLpDynamicHtml).toContain('Étape 4 Bonus')
+    expect(bookingLpDynamicHtml).toContain(
+      'data-tls-field="doc:chantal-masse:page:prendre-rendez-vous/blocks/etapes/data/items/3/title"',
+    )
+    expect(bookingLpDynamicHtml).toContain('Q2 CMS?')
+    expect(bookingLpDynamicHtml).not.toContain('Quelle est ta formation?')
+
+    // 3. BlogIndexPage: blockType "hero" binds heading/0; blockType "heading" binds title; pagePreviewMode=false suppresses page block attrs while keeping post attrs
+    const blogWithHeroBlock = extractBlogIndexCmsData({
+      id: 'chantal-masse:page:blog',
+      type: 'page',
+      locale: 'fr',
+      fallbackFrom: null,
+      path: '/blog',
+      title: 'Blogue',
+      template: 'default',
+      seo: { title: 'Blogue', description: null, image: null, noindex: false, canonical: null },
+      updatedAt: '2026-11-24T00:00:00.000Z',
+      blocks: [
+        {
+          type: 'hero',
+          key: 'hero',
+          data: { eyebrow: 'Lectures', heading: ['Titre Hero Blogue'], lede: 'Lede Hero Blogue' },
+        },
+      ],
+    })
+    expect(blogWithHeroBlock.hero?.blockType).toBe('hero')
+    const blogHeroHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(BlogIndexPage, {
+            posts: SAMPLE_POSTS,
+            docId: blogWithHeroBlock.docId,
+            cmsHero: blogWithHeroBlock.hero,
+            previewMode: true,
+          }),
+      }),
+    )
+    expect(blogHeroHtml).toContain('data-tls-block="hero"')
+    expect(blogHeroHtml).toContain('data-tls-block-type="hero"')
+    expect(blogHeroHtml).toContain('data-tls-field="doc:chantal-masse:page:blog/blocks/hero/data/heading/0"')
+
+    const blogNoPageDocHtml = await renderToString(
+      vue.createSSRApp({
+        render: () =>
+          vue.h(BlogIndexPage, {
+            posts: SAMPLE_POSTS,
+            previewMode: true,
+            pagePreviewMode: false,
+          }),
+      }),
+    )
+    expect(blogNoPageDocHtml).not.toContain('data-tls-block="hero"')
+    expect(blogNoPageDocHtml).toContain('data-tls-collection="post"')
+    expect(blogNoPageDocHtml).toContain('data-tls-item="chantal-masse:post:l-amour-conscient"')
+
+    // 4. resolveBaseLayoutTls with pageDocId: null omits data-tls-page when getPage() returned 404
+    const missingPageLayout = resolveBaseLayoutTls({
+      isPrerendered: false,
+      locals: { previewMode: true, previewToken: 'valid_tok' },
+      pageDocId: null,
+      path: '/coaching-de-couple',
+    })
+    expect(missingPageLayout.previewMode).toBe(true)
+    expect(missingPageLayout.mainAttrs).toEqual({})
+
+    // 5. getRequestSettings memoizes per SSR request on Astro.locals
+    let settingsCalls = 0
+    mockWorkerEnv.CMS = {
+      fetch: vi.fn(async () => {
+        settingsCalls++
+        return new Response(
+          JSON.stringify({
+            data: {
+              locale: 'fr',
+              siteName: 'Chantal Massé Memo',
+              tagline: null,
+              phone: null,
+              email: null,
+              address: null,
+              hours: [],
+              socials: [],
+              logo: null,
+              defaultOgImage: null,
+              locales: [],
+            },
+            meta: { version: 1, tags: [] },
+          }),
+          { status: 200 },
+        )
+      }),
+    }
+    const reqLocals: { cmsSettingsPromise?: Promise<Settings | null> } = {}
+    const [s1, s2] = await Promise.all([
+      getRequestSettings(reqLocals, { previewToken: 'tok_1' }),
+      getRequestSettings(reqLocals, { previewToken: 'tok_1' }),
+    ])
+    expect(settingsCalls).toBe(1)
+    expect(s1?.siteName).toBe('Chantal Massé Memo')
+    expect(s2?.siteName).toBe('Chantal Massé Memo')
   })
 })

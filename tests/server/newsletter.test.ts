@@ -153,7 +153,7 @@ describe('newsletter consent and Brevo removal', () => {
   })
 
   it('no longer depends on Brevo', () => {
-    for (const file of ['package.json', 'nuxt.config.ts', 'server/api/newsletter/subscribe.post.ts']) {
+    for (const file of ['package.json', 'astro/astro.config.mjs', 'server/api/newsletter/subscribe.post.ts']) {
       expect(readFileSync(file, 'utf8').toLowerCase()).not.toContain('brevo')
     }
   })

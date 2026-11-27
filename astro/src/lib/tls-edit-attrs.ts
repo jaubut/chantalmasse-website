@@ -386,6 +386,76 @@ export function tlsItemAttrs(
   }
 }
 
+// ---------- Shared CMS text & media URL / srcset helpers ----------
+
+/**
+ * Normalizes a plain-text field from `tls-cms` by stripping inline `<em>`/`<i>` tags and decoding HTML character
+ * entities (`&#39;`, `&quot;`, `&nbsp;`, `&amp;`) that were present in initial HTML-derived seed rows.
+ */
+export function cleanCmsText(raw?: string | null): string | undefined {
+  if (typeof raw !== 'string') return undefined
+  const cleaned = raw
+    .replace(/<\/?(?:em|i)\b[^>]*>/gi, '')
+    .replace(/&#39;|&#x27;|&apos;/gi, "'")
+    .replace(/&quot;/gi, '"')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .trim()
+  return cleaned || undefined
+}
+
+export const CMS_MEDIA_WIDTHS = [640, 960, 1280, 1920] as const
+
+export interface ResolvedCmsImage {
+  src: string
+  alt?: string
+  srcset?: string
+}
+
+export function buildCmsMediaSrcset(
+  src?: string | null,
+  widths: readonly number[] = CMS_MEDIA_WIDTHS,
+): string | undefined {
+  if (!src || !src.startsWith('/media/')) return undefined
+  const base = src.split('?')[0]!
+  if (!base || base === '/media/') return undefined
+  return widths.map(w => `${base}?w=${w} ${w}w`).join(', ')
+}
+
+/**
+ * Resolves a CMS `Image` or `MediaRef` (`{ src }`, `{ key }`, `{ mediaId }`, or string key) to a `/media/<key>` URL
+ * (or preserves an existing `/images/...` or `https://...` path) and builds a responsive `/media/<key>?w=<w>` srcset.
+ */
+export function resolveCmsImage(
+  img?: { src?: string | null, key?: string | null, mediaId?: string | null, alt?: string | null, srcset?: string | null } | string | null,
+  widths: readonly number[] = CMS_MEDIA_WIDTHS,
+): ResolvedCmsImage | undefined {
+  if (!img) return undefined
+  if (typeof img === 'string') {
+    const trimmed = img.trim()
+    if (!trimmed) return undefined
+    const src = (trimmed.startsWith('/') || /^https?:\/\//.test(trimmed))
+      ? trimmed
+      : `/media/${trimmed.replace(/^\/+/, '')}`
+    const srcset = buildCmsMediaSrcset(src, widths)
+    return { src, ...(srcset ? { srcset } : {}) }
+  }
+  const raw = (img.src ?? img.key ?? '').trim()
+  if (!raw) return undefined
+  const src = (raw.startsWith('/') || /^https?:\/\//.test(raw))
+    ? raw
+    : `/media/${raw.replace(/^\/+/, '')}`
+  const alt = typeof img.alt === 'string' && img.alt.trim() ? img.alt.trim() : undefined
+  const srcset = (typeof img.srcset === 'string' && img.srcset.trim())
+    ? img.srcset.trim()
+    : buildCmsMediaSrcset(src, widths)
+  return {
+    src,
+    ...(alt ? { alt } : {}),
+    ...(srcset ? { srcset } : {}),
+  }
+}
+
 // ---------- Layout preview state resolution (shared by `Base.astro` and unit tests) ----------
 
 export interface ResolveBaseLayoutTlsInput {
@@ -413,7 +483,7 @@ export function resolveBaseLayoutTls(input: ResolveBaseLayoutTlsInput): Resolved
     ? null
     : (input.locals?.previewToken ?? null)
   const previewMode = input.previewModeProp ?? (isPrerendered ? false : (input.locals?.previewMode ?? Boolean(previewToken)))
-  const resolvedPageDocId = input.pageDocId ?? pageDocIdForPath(input.path)
+  const resolvedPageDocId = input.pageDocId === null ? '' : (input.pageDocId ?? pageDocIdForPath(input.path))
   const mainAttrs = tlsPageAttrs(previewMode, resolvedPageDocId, input.locale ?? DEFAULT_LOCALE)
   const loaderScript = buildDormantLoaderScript(input.editOrigin)
   return { previewToken, previewMode, resolvedPageDocId, mainAttrs, loaderScript }

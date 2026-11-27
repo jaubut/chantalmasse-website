@@ -1,5 +1,5 @@
 // URL-shape check (status codes, Location headers, sitemap, canonicals).
-// Local:  bun run build && bunx wrangler dev --config .output/server/wrangler.json --port 8787
+// Local:  bun run build && bunx wrangler dev --config astro/dist/server/wrangler.json --port 8787
 //         bun scripts/check-urls.ts http://127.0.0.1:8787
 // Prod:   bun scripts/check-urls.ts https://chantalmasse.com https://www.chantalmasse.com
 // The www checks need the second argument: the www → apex 301 is a Cloudflare zone rule
@@ -36,12 +36,32 @@ const rawLocation = (origin: string, path: string) => new Promise<{ status: numb
   req.on('error', reject)
 })
 
-// Pages from pages/*.vue (+ /blog), posts from content/blog/*.md (file name = slug).
-const pages = readdirSync('pages').filter(f => f.endsWith('.vue'))
-  .map(f => (f === 'index.vue' ? '/' : `/${f.slice(0, -4)}`))
-  .concat('/blog')
-const posts = readdirSync('content/blog').filter(f => f.endsWith('.md'))
-  .map(f => `/blog/${f.slice(0, -3)}`)
+// Discover static + SSR page routes from astro/src/pages (excluding 404.astro and dynamic [slug].astro).
+function discoverAstroPages(dir = 'astro/src/pages', prefix = ''): string[] {
+  return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
+    const relPath = prefix ? `${prefix}/${entry.name}` : entry.name
+    if (entry.isDirectory()) return discoverAstroPages(`${dir}/${entry.name}`, relPath)
+    if (!entry.name.endsWith('.astro') || entry.name === '404.astro' || /\[.+\]/.test(entry.name)) return []
+    const route = `/${relPath.slice(0, -'.astro'.length).replace(/(^|\/)index$/, '')}`.replace(/\/$/, '')
+    return [route || '/']
+  }).sort()
+}
+
+const pages = discoverAstroPages()
+
+// Fetch live sitemap.xml first so expected blog post routes come from the authoritative CMS-backed sitemap.
+const sitemapRes = await get(`${base}/sitemap.xml`)
+check('sitemap', sitemapRes.status === 200, `/sitemap.xml → ${sitemapRes.status} (want 200)`)
+const sitemap = sitemapRes.status === 200 ? await sitemapRes.text() : ''
+const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1] ?? '')
+check('sitemap', locs.length > 0, `sitemap has ${locs.length} <loc>`)
+
+const posts = locs
+  .map((loc) => {
+    try { return new URL(loc).pathname } catch { return '' }
+  })
+  .filter(p => /^\/blog\/[a-z0-9-]+$/.test(p))
+check('sitemap', posts.length > 0, `sitemap lists ${posts.length} blog posts`)
 
 // Legacy redirects: static lines of public/_redirects; the final URL is the no-slash canonical.
 const legacy = readFileSync('public/_redirects', 'utf8').split('\n')
@@ -83,7 +103,7 @@ for (const path of [...pages, ...posts]) {
   check('canonical', want.includes(canonical ?? ''), `${path} canonical=${canonical}`)
   const ogUrl = attr(html, /<meta[^>]+property="og:url"[^>]+content="([^"]+)"/)
   check('og:url', !ogUrl || want.includes(ogUrl), `${path} og:url=${ogUrl}`)
-  const slashLinks = [...html.matchAll(/href="(\/[^"?#]+\/)(?:[?#][^"]*)?"/g)].map(m => m[1] ?? '').filter(h => !h.startsWith('/_nuxt/'))
+  const slashLinks = [...html.matchAll(/href="(\/[^"?#]+\/)(?:[?#][^"]*)?"/g)].map(m => m[1] ?? '').filter(h => !h.startsWith('/_astro/'))
   check('links', slashLinks.length === 0, `${path} internal links with trailing slash: ${slashLinks.join(' ')}`)
 }
 
@@ -105,10 +125,7 @@ for (const path of ['//evil.com/', '//evil.com/x/', '///evil.com/', '//evil.com'
   check('open-redirect', ok, `${path}${Q} → ${status} ${location || '(none)'} (want 301 on ${[...ownOrigins].join(' or ')}, or 404 with no Location)`)
 }
 
-// 4. Sitemap: every page/post, no trailing slash, no noindex page, every <loc> answers 200.
-const sitemap = await (await get(`${base}/sitemap.xml`)).text()
-const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1] ?? '')
-check('sitemap', locs.length > 0, `sitemap has ${locs.length} <loc>`)
+// 4. Sitemap: every indexed page/post, no trailing slash, no noindex page, every <loc> answers 200.
 for (const loc of locs) {
   const path = new URL(loc).pathname
   check('sitemap', loc.startsWith(APEX) && (path === '/' || !path.endsWith('/')), `sitemap <loc> ${loc}`)

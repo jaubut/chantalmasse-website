@@ -1,15 +1,13 @@
 import { defineConfig, devices } from '@playwright/test'
 
-// Smoke suite: runs against the real production build (node-server preset,
-// `bun run build:smoke`) served by Nitro. Server and build run in UTC like
-// Cloudflare Workers; the browser runs in Shefford's timezone like real visitors.
-// No secrets are configured, so even an un-mocked call can't reach
-// Google/Resend/the dashboard — the API answers 400/503.
-const PORT = Number(process.env.SMOKE_PORT ?? 3100)
+// Smoke suite: runs against the locally built Astro Worker (`scripts/serve-astro-smoke.ts`) by default,
+// or against an explicit remote deployment when `SMOKE_BASE_URL` is set, covering both tests/smoke and tests/smoke-astro.
 const isCI = !!process.env.CI
+const smokeBaseUrl = process.env.SMOKE_BASE_URL
 
 export default defineConfig({
-  testDir: 'tests/smoke',
+  testDir: 'tests',
+  testMatch: ['smoke/**/*.spec.ts', 'smoke-astro/**/*.spec.ts'],
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
@@ -18,18 +16,19 @@ export default defineConfig({
   expect: { timeout: 7_000 },
   reporter: isCI ? [['list'], ['github'], ['html', { open: 'never' }]] : [['list']],
   use: {
-    baseURL: `http://127.0.0.1:${PORT}`,
+    baseURL: smokeBaseUrl ?? 'http://127.0.0.1:8788',
     locale: 'fr-CA',
     timezoneId: 'America/Toronto',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
-  webServer: {
-    command: 'node .output/server/index.mjs',
-    url: `http://127.0.0.1:${PORT}/`,
-    reuseExistingServer: false,
-    timeout: 60_000,
-    env: { PORT: String(PORT), HOST: '127.0.0.1', NODE_ENV: 'production', TZ: 'UTC' },
-  },
+  webServer: smokeBaseUrl
+    ? undefined
+    : {
+        command: 'bun scripts/serve-astro-smoke.ts',
+        url: 'http://127.0.0.1:8788',
+        reuseExistingServer: !isCI,
+        timeout: 120_000,
+      },
 })

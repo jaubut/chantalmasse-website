@@ -1,13 +1,23 @@
 <template>
-  <section id="apropos" class="py-32 px-8 bg-surface-container">
+  <section
+    id="apropos"
+    class="py-32 px-8 bg-surface-container"
+    v-bind="tlsBlockAttrs(on, blockKey, 'list')"
+  >
     <div class="max-w-screen-xl mx-auto space-y-24">
 
       <!-- Personal intro -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
         <div data-animate>
-          <h2 class="font-headline text-5xl text-primary italic mb-8">Qui je suis</h2>
-          <p class="text-on-surface-variant font-light leading-relaxed mb-5">
-            J'ai un grand intérêt pour l'être humain et les relations. Ayant déjà été confrontée moi-même à un bouleversement dans ma vie personnelle, cela m'a amené à vouloir tendre la main à d'autres qui ont besoin d'être accompagnés afin de retrouver un équilibre et atteindre leurs objectifs de mieux-être.
+          <h2
+            class="font-headline text-5xl text-primary italic mb-8"
+            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'title')"
+          >{{ cmsMethods?.title || 'Qui je suis' }}</h2>
+          <p
+            class="text-on-surface-variant font-light leading-relaxed mb-5"
+            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'intro')"
+          >
+            {{ cmsMethods?.intro || "J'ai un grand intérêt pour l'être humain et les relations. Ayant déjà été confrontée moi-même à un bouleversement dans ma vie personnelle, cela m'a amené à vouloir tendre la main à d'autres qui ont besoin d'être accompagnés afin de retrouver un équilibre et atteindre leurs objectifs de mieux-être." }}
           </p>
           <p class="text-on-surface-variant font-light leading-relaxed mb-5">
             La souffrance est différente quand on peut partager ce que l'on vit dans la compréhension, l'empathie et sans jugement. Je suis reconnue pour mon professionnalisme, mon écoute et ma fiabilité.
@@ -39,25 +49,43 @@
 
           <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:psychology" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
-            <h4 class="font-headline text-2xl text-primary mb-4">Relations humaines</h4>
-            <p class="text-on-surface-variant font-light leading-relaxed">
-              Accompagnement individualisé vers une meilleure compréhension de soi et de ses relations, pour des choix conscients et épanouissants.
+            <h4
+              class="font-headline text-2xl text-primary mb-4"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/0/title')"
+            >{{ cmsMethods?.items?.[0]?.title || 'Relations humaines' }}</h4>
+            <p
+              class="text-on-surface-variant font-light leading-relaxed"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/0/body')"
+            >
+              {{ cmsMethods?.items?.[0]?.body || 'Accompagnement individualisé vers une meilleure compréhension de soi et de ses relations, pour des choix conscients et épanouissants.' }}
             </p>
           </div>
 
           <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:diversity-2" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
-            <h4 class="font-headline text-2xl text-primary mb-4">Imago & Couple</h4>
-            <p class="text-on-surface-variant font-light leading-relaxed">
-              Thérapie relationnelle internationale transformant les dynamiques de couple par le dialogue intentionnel et la reconnexion profonde.
+            <h4
+              class="font-headline text-2xl text-primary mb-4"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/1/title')"
+            >{{ cmsMethods?.items?.[1]?.title || 'Imago & Couple' }}</h4>
+            <p
+              class="text-on-surface-variant font-light leading-relaxed"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/1/body')"
+            >
+              {{ cmsMethods?.items?.[1]?.body || 'Thérapie relationnelle internationale transformant les dynamiques de couple par le dialogue intentionnel et la reconnexion profonde.' }}
             </p>
           </div>
 
           <div class="bg-surface-container-high p-10 rounded-[2rem] text-center soft-lift" data-animate>
             <Icon icon="material-symbols:neurology" class="text-4xl text-secondary flex justify-center items-center mx-auto mb-6" />
-            <h4 class="font-headline text-2xl text-primary mb-4">Neurosciences</h4>
-            <p class="text-on-surface-variant font-light leading-relaxed">
-              Compréhension des mécanismes du cerveau pour mieux réguler le stress, les émotions et renforcer le lien dans la relation de couple.
+            <h4
+              class="font-headline text-2xl text-primary mb-4"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/2/title')"
+            >{{ cmsMethods?.items?.[2]?.title || 'Neurosciences' }}</h4>
+            <p
+              class="text-on-surface-variant font-light leading-relaxed"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'items/2/body')"
+            >
+              {{ cmsMethods?.items?.[2]?.body || 'Compréhension des mécanismes du cerveau pour mieux réguler le stress, les émotions et renforcer le lien dans la relation de couple.' }}
             </p>
           </div>
 
@@ -101,7 +129,26 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Icon from '../Icon.vue'
+import { pageDocId, tlsBlockAttrs, tlsBlockFieldAttrs } from '../../lib/tls-edit-attrs'
+
+export interface CmsMethodsBlockData {
+  docId?: string
+  blockKey?: string
+  title?: string
+  intro?: string
+  items?: Array<{ title?: string; subtitle?: string; body?: string }>
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsMethods?: CmsMethodsBlockData
+}>()
+
+const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsMethods?.docId || pageDocId('home'))
+const blockKey = computed(() => props.cmsMethods?.blockKey || 'apropos')
 
 const formations = [
   {

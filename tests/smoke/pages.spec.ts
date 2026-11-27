@@ -20,14 +20,14 @@ const PAGES: Record<string, { heading: RegExp; level?: 'h1' | 'h2' }> = {
 }
 
 function routesFromPagesDir(): string[] {
-  const root = join(process.cwd(), 'pages')
+  const root = join(process.cwd(), 'astro/src/pages')
   const walk = (dir: string): string[] => readdirSync(dir).flatMap((f) => {
     const p = join(dir, f)
     return statSync(p).isDirectory() ? walk(p) : [p]
   })
   return walk(root)
-    .filter((f) => f.endsWith('.vue') && !/\[.+\]/.test(f))
-    .map((f) => `/${relative(root, f).replace(/\.vue$/, '').replace(/(^|\/)index$/, '')}`.replace(/\/$/, '') || '/')
+    .filter((f) => f.endsWith('.astro') && !/\[.+\]/.test(f) && !f.endsWith('/404.astro'))
+    .map((f) => `/${relative(root, f).replace(/\.astro$/, '').replace(/(^|\/)index$/, '')}`.replace(/\/$/, '') || '/')
 }
 
 test('no JS download is declared in the HTML, so it cannot compete with the stylesheet', async ({ request }) => {

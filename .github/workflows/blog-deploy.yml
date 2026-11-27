@@ -1,17 +1,11 @@
 name: Blog deploy
 
-# Approved articles reach main through the dashboard blog-publish flow
-# (content/blog/<slug>.md). This ships them without waiting for the next manual
-# release, and ONLY when the tree on main differs from the live deploy by blog
-# content alone. Anything else (code, config, deps) fails the guard: code
-# releases stay manual. The live tree is the `site-deployed` tag, moved by this
-# workflow and by every manual deploy (docs/url-fixes-deploy-notes.md).
+# Production deploy workflow for chantalmasse.com (Astro Cloudflare Worker).
+# Blog posts and page blocks are served at request time from tls-cms D1 over the
+# CMS (SiteReads) service binding, so content edits go live within the 60s SWR
+# PAGE_CACHE window without rebuilding the Worker. Code releases run on demand
+# via workflow_dispatch from main and advance the `site-deployed` tag forward-only.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'content/blog/**'
-      - 'public/images/blog/**'
   workflow_dispatch:
 
 # One site deploy at a time; never cancel one mid-flight.
@@ -24,7 +18,7 @@ permissions:
 
 jobs:
   guard:
-    name: guard (blog content only)
+    name: guard (main forward-only)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -36,12 +30,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Only content/blog/** and public/images/blog/** differ from the live deploy
+      - name: Verify main branch ancestry against site-deployed tag
         id: diff
         run: |
           # Manual runs from another branch would ship unmerged content and move the tag off main.
           if [ "$GITHUB_REF" != "refs/heads/main" ]; then
-            echo "::error::Blog deploy runs on main only (got $GITHUB_REF)."
+            echo "::error::Deploy runs on main only (got $GITHUB_REF)."
             exit 1
           fi
           if ! live="$(git rev-parse -q --verify 'refs/tags/site-deployed^{commit}')"; then
@@ -49,24 +43,8 @@ jobs:
             exit 1
           fi
           printf 'live=%s\ntag=%s\n' "$live" "$(git rev-parse refs/tags/site-deployed)" >> "$GITHUB_OUTPUT"
-          # Already live, or a newer commit is (queued/re-run older push): nothing to do, never deploy backwards.
-          if git merge-base --is-ancestor "$GITHUB_SHA" "$live"; then
-            echo "$GITHUB_SHA is already contained in the live deploy ${live::7}; skipping."
-            echo "deploy=false" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           if ! git merge-base --is-ancestor "$live" "$GITHUB_SHA"; then
             echo "::error::Live deploy ${live::7} is not an ancestor of $GITHUB_SHA (deployed from another branch?). Deploy manually."
-            exit 1
-          fi
-          # --no-renames: a rename lists both paths, so moving a file into content/blog/ can't hide its source.
-          # quotePath=false: accented names print as-is; names git still quotes (control chars) fail the guard.
-          changed="$(git -c core.quotePath=false diff --no-renames --name-only "$live" "$GITHUB_SHA")"
-          printf 'Changed since site-deployed (%s):\n%s\n' "${live::7}" "$changed"
-          other="$(printf '%s\n' "$changed" | grep -Ev '^(content/blog/|public/images/blog/|$)' || true)"
-          if [ -n "$other" ]; then
-            echo "::error::Non-blog changes are not live yet; code releases are manual. Deploy by hand (that ships the article too):"
-            printf '%s\n' "$other"
             exit 1
           fi
           echo "deploy=true" >> "$GITHUB_OUTPUT"
@@ -82,9 +60,8 @@ jobs:
       issues: write # opens the smoke-failure issue
     env:
       CI: 'true'
-      NUXT_TELEMETRY_DISABLED: '1'
       # Build-time values only. Server secrets are NOT needed here: the build
-      # bakes them as "" and the Worker's NUXT_* secrets override them at runtime.
+      # bakes them as "" and the Worker's secrets override them at runtime.
       SITE_BASE_URL: https://chantalmasse.com
       BOOKING_TIMEZONE: America/Toronto
       BOOKING_ADVANCE_DAYS: '60'
@@ -115,7 +92,9 @@ jobs:
       - name: Install (frozen lockfile)
         run: bun install --frozen-lockfile
 
-      - name: Build (Cloudflare preset, as deployed)
+      - name: Build (Astro Cloudflare Worker, production env)
+        env:
+          CLOUDFLARE_ENV: production
         run: bun run build
 
       # The checkout is shallow and has no tags. Fetch the tag object the final lease names, and
@@ -134,9 +113,9 @@ jobs:
       - name: Deploy Worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: npx --yes wrangler@4.165.0 deploy --config .output/server/wrangler.json --message "blog auto-deploy ${GITHUB_SHA::7}"
+        run: npx --yes wrangler@4.165.0 deploy --config astro/dist/server/wrangler.json --message "astro deploy ${GITHUB_SHA::7}"
 
-      - name: Smoke (URL shape + new posts live + booking API)
+      - name: Smoke (URL shape + CMS posts live + booking API)
         id: smoke
         run: |
           sleep 20 # let the new version reach every edge
@@ -154,13 +133,13 @@ jobs:
         run: |
           echo "::error::Smoke failed after deploying ${GITHUB_SHA::7}. It is LIVE and was NOT rolled back; decide by hand (see the issue)."
           gh issue create --assignee jaubut \
-            --title "Blog auto-deploy ${GITHUB_SHA::7} failed smoke: live, not rolled back" \
+            --title "Astro deploy ${GITHUB_SHA::7} failed smoke: live, not rolled back" \
             --body "$(printf '%s\n' \
-              "Blog auto-deploy of $GITHUB_SHA went live, then the smoke check failed: $RUN_URL" \
+              "Astro deploy of $GITHUB_SHA went live, then the smoke check failed: $RUN_URL" \
               "" \
               "Nothing was rolled back. site-deployed still points to the previous release ${LIVE::7}. Decide:" \
               "" \
-              "- Roll back: \`bunx wrangler rollback --name chantalmasse-website -m \"blog ${GITHUB_SHA::7} failed smoke\"\`" \
+              "- Roll back: \`bunx wrangler rollback --name chantalmasse-website -m \"deploy ${GITHUB_SHA::7} failed smoke\"\`" \
               "- Keep it (false alarm, e.g. Google Calendar down): re-run \`bun scripts/check-urls.ts https://chantalmasse.com\`, then \`git tag -f site-deployed $GITHUB_SHA && git push -f origin refs/tags/site-deployed\`")"
 
       - name: Move site-deployed tag to the live commit

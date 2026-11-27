@@ -2,7 +2,7 @@
   <section
     id="hero"
     class="min-h-0 md:min-h-[921px] flex items-center overflow-hidden px-8 lg:px-20 pt-24 pb-16 bg-background"
-    v-bind="tlsBlockAttrs(hasCms, blockKey, 'hero')"
+    v-bind="tlsBlockAttrs(on, blockKey, 'hero')"
   >
     <div class="max-w-screen-xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
@@ -11,7 +11,7 @@
         <span
           class="inline-flex w-fit items-center bg-secondary-fixed text-primary text-xs font-medium uppercase tracking-widest rounded-full px-4 py-2"
           data-animate
-          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.eyebrow), docId, blockKey, 'eyebrow')"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'eyebrow')"
         >
           <template v-if="cmsHero?.eyebrow">{{ cmsHero.eyebrow }}</template>
           <span
@@ -44,9 +44,9 @@
         <h1
           class="font-headline text-5xl lg:text-7xl text-primary leading-[1.05] lg:leading-none tracking-tight"
           data-animate
-          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.heading?.[0]), docId, blockKey, 'heading/0')"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'heading/0')"
         >
-          <template v-if="cmsHero?.heading?.[0]">{{ cmsHero.heading[0] }}</template>
+          <template v-if="customHeading0">{{ customHeading0 }}</template>
           <template v-else>
             Thérapeute en relation d'aide à
             <span
@@ -95,9 +95,9 @@
         <h2
           class="font-headline text-3xl lg:text-5xl text-primary/80 leading-[1.1] lg:leading-none tracking-tight"
           data-animate
-          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.heading?.[1]), docId, blockKey, 'heading/1')"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'heading/1')"
         >
-          <template v-if="cmsHero?.heading?.[1]">{{ cmsHero.heading[1] }}</template>
+          <template v-if="customHeading1">{{ customHeading1 }}</template>
           <template v-else>
             Tu as de la <span class="italic">valeur</span> — ne laisse pas ta souffrance te définir et te voler ton présent.
           </template>
@@ -106,18 +106,18 @@
         <p
           class="text-on-surface-variant text-xl max-w-lg font-light"
           data-animate
-          v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.lede), docId, blockKey, 'lede')"
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'lede')"
         >
-          {{ cmsHero?.lede ?? 'Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.' }}
+          {{ cmsHero?.lede || 'Une approche douce et consciente pour naviguer les transitions de vie, apaiser les conflits relationnels et cultiver un amour durable.' }}
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center" data-animate>
           <button
             class="liquid-fill bg-secondary text-on-secondary px-10 py-5 rounded-xl font-semibold text-center hover:text-on-secondary-container focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-secondary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             data-booking-open
-            v-bind="tlsBlockFieldAttrs(Boolean(hasCms && cmsHero?.ctaLabel), docId, blockKey, 'cta/label')"
+            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'cta/label')"
           >
-            {{ cmsHero?.ctaLabel ?? 'Prendre rendez-vous' }}
+            {{ cmsHero?.ctaLabel || 'Prendre rendez-vous' }}
           </button>
           <a
             href="#services"
@@ -135,12 +135,12 @@
         <div class="aspect-[4/5] rounded-[2rem] overflow-hidden lg:translate-x-12 translate-y-4">
           <div class="blur-up w-full h-full">
           <img
-            :src="cmsHero?.image?.src ?? '/images/chantal-hero.jpg'"
+            :src="heroImageSrc"
             sizes="(max-width: 1023px) 137vw, 690px"
-            :srcset="cmsHero?.image ? undefined : '/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w'"
-            :alt="cmsHero?.image?.alt ?? `Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford`"
+            :srcset="heroImageSrcset"
+            :alt="heroImageAlt"
             class="w-full h-full object-cover hover:scale-105 transition-transform duration-[2000ms]"
-            v-bind="tlsBlockImageAttrs(Boolean(hasCms && cmsHero?.image), docId, blockKey, 'image')"
+            v-bind="tlsBlockImageAttrs(on, docId, blockKey, 'image')"
           />
           </div>
         </div>
@@ -153,7 +153,9 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
+  cleanCmsText,
   pageDocId,
+  resolveCmsImage,
   tlsBlockAttrs,
   tlsBlockFieldAttrs,
   tlsBlockImageAttrs,
@@ -166,7 +168,7 @@ export interface CmsHeroBlockData {
   heading?: [string, string?]
   lede?: string
   ctaLabel?: string
-  image?: { src: string; alt?: string }
+  image?: { src?: string; key?: string; alt?: string; srcset?: string }
 }
 
 const props = defineProps<{
@@ -174,9 +176,33 @@ const props = defineProps<{
   cmsHero?: CmsHeroBlockData
 }>()
 
-const hasCms = computed(() => Boolean(props.previewMode && props.cmsHero))
-const docId = computed(() => props.cmsHero?.docId ?? pageDocId('home'))
-const blockKey = computed(() => props.cmsHero?.blockKey ?? 'hero')
+const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsHero?.docId || pageDocId('home'))
+const blockKey = computed(() => props.cmsHero?.blockKey || 'hero')
+
+const DEFAULT_H0 = "Thérapeute en relation d'aide à Shefford"
+const DEFAULT_H1 = 'Tu as de la valeur — ne laisse pas ta souffrance te définir et te voler ton présent.'
+const customHeading0 = computed(() => {
+  const h = cleanCmsText(props.cmsHero?.heading?.[0])
+  return h && h !== DEFAULT_H0 ? h : undefined
+})
+const customHeading1 = computed(() => {
+  const h = cleanCmsText(props.cmsHero?.heading?.[1])
+  return h && h !== DEFAULT_H1 ? h : undefined
+})
+
+const resolvedHeroImg = computed(() => resolveCmsImage(props.cmsHero?.image))
+const heroImageSrc = computed(() => resolvedHeroImg.value?.src ?? '/images/chantal-hero.jpg')
+const heroImageSrcset = computed(() => {
+  if (resolvedHeroImg.value?.srcset) return resolvedHeroImg.value.srcset
+  if (!resolvedHeroImg.value) {
+    return '/images/hero/chantal-hero-690.webp 690w, /images/hero/chantal-hero-877.webp 877w, /images/hero/chantal-hero-1380.webp 1380w, /images/hero/chantal-hero-1754.webp 1754w'
+  }
+  return undefined
+})
+const heroImageAlt = computed(
+  () => resolvedHeroImg.value?.alt || "Chantal Massé, thérapeute en relation d'aide, dans son cabinet à Shefford",
+)
 
 const showMap = ref(false)
 const mapLoaded = ref(false)

@@ -20,7 +20,6 @@ jobs:
     timeout-minutes: 20
     env:
       CI: 'true'
-      NUXT_TELEMETRY_DISABLED: '1'
       # Non-secret configuration only. No Google / Resend / dashboard / Twilio /
       # Anthropic / Turso / Meta credentials exist in CI on purpose: the build
       # doesn't need them, and without them the API routes answer 400/503
@@ -54,22 +53,17 @@ jobs:
       - name: Install (frozen lockfile)
         run: bun install --frozen-lockfile
 
-      - name: Typecheck
+      - name: Typecheck (Astro)
         run: bun run typecheck
 
       - name: Unit & server tests
         run: bun run test
 
-      - name: Build (Cloudflare preset, as deployed)
+      - name: Reminder & session rule tests
+        run: bun run test:reminder && bun run test:rules
+
+      - name: Build (Astro Cloudflare Worker)
         run: bun run build
-
-      # astro/ is excluded from `nuxt typecheck`: its .astro/.ts files are checked here (Astro's own TS project).
-      - name: Typecheck (Astro)
-        run: bun run astro:check
-
-      # Astro build next to Nuxt (docs/astro-migration-parity.md): prerenders the static pages, bundles the Worker.
-      - name: Build (Astro, preview of the migration)
-        run: bun run astro:build
 
       - name: Playwright version
         id: pw
@@ -90,8 +84,8 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: bunx playwright install-deps chromium
 
-      - name: Smoke tests (node-server build + Playwright)
-        run: bun run test:smoke
+      - name: Smoke tests (Astro Playwright)
+        run: bun run test:smoke:astro
 
       - name: Upload Playwright report
         if: failure()

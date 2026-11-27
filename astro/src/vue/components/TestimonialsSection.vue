@@ -1,27 +1,43 @@
 <template>
-  <section class="py-32 px-8 overflow-hidden bg-background">
+  <section
+    class="py-32 px-8 overflow-hidden bg-background"
+    v-bind="tlsBlockAttrs(on, blockKey, 'list')"
+  >
     <div class="max-w-screen-xl mx-auto">
 
       <div class="text-center mb-16">
-        <h2 class="font-headline text-5xl text-primary italic" data-animate>Témoignages</h2>
+        <h2
+          class="font-headline text-5xl text-primary italic"
+          data-animate
+          v-bind="tlsBlockFieldAttrs(on, docId, blockKey, 'title')"
+        >{{ cmsTestimonials?.title || 'Témoignages' }}</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
 
         <div
-          v-for="(t, i) in testimonials"
-          :key="t.name"
+          v-for="(t, i) in resolvedTestimonials"
+          :key="`${t.name}-${t.origIndex}`"
           class="bg-surface-container-low p-12 rounded-[2rem] editorial-shadow soft-lift"
           :class="i === 1 || i === 2 ? 'lg:translate-y-8' : ''"
           data-animate
         >
           <p class="font-headline text-4xl text-primary-fixed-dim leading-none mb-6">"</p>
-          <p class="text-on-surface text-lg leading-relaxed mb-8">
+          <p
+            class="text-on-surface text-lg leading-relaxed mb-8"
+            v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/body`)"
+          >
             {{ t.quote }}
           </p>
           <div>
-            <p class="font-semibold text-primary">{{ t.name }}</p>
-            <p class="text-sm text-on-surface-variant font-light">{{ t.context }}</p>
+            <p
+              class="font-semibold text-primary"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/title`)"
+            >{{ t.name }}</p>
+            <p
+              class="text-sm text-on-surface-variant font-light"
+              v-bind="tlsBlockFieldAttrs(on, docId, blockKey, `items/${t.origIndex}/subtitle`)"
+            >{{ t.context }}</p>
           </div>
         </div>
 
@@ -43,8 +59,26 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { pageDocId, tlsBlockAttrs, tlsBlockFieldAttrs } from '../../lib/tls-edit-attrs'
 
-const testimonials = [
+export interface CmsTestimonialsBlockData {
+  docId?: string
+  blockKey?: string
+  title?: string
+  items?: Array<{ title?: string; subtitle?: string; body?: string }>
+}
+
+const props = defineProps<{
+  previewMode?: boolean
+  cmsTestimonials?: CmsTestimonialsBlockData
+}>()
+
+const on = computed(() => Boolean(props.previewMode))
+const docId = computed(() => props.cmsTestimonials?.docId || pageDocId('home'))
+const blockKey = computed(() => props.cmsTestimonials?.blockKey || 'temoignages')
+
+const DEFAULT_TESTIMONIALS = [
   {
     quote: "Les moments partagés avec Chantal ont été simplement bénissant. Elle m'a doucement guider dans mes réflexions et m'a aidé à travailler sur moi-même. J'ai pu, grâce à nos rencontres, apprendre enfin, à mieux me connaître, à m'aimer et enfin mettre mes limites. Douce, empathique, à l'écoute Chantal sait nous accompagné dans un respect des plus complet.",
     name: 'Alexandra',
@@ -66,4 +100,21 @@ const testimonials = [
     context: 'En coaching de couple',
   },
 ]
+
+const resolvedTestimonials = computed(() => {
+  const items = props.cmsTestimonials?.items
+  if (!items || items.length === 0) {
+    return DEFAULT_TESTIMONIALS.map((t, i) => ({ ...t, origIndex: i }))
+  }
+  const mapped = items.map((it, i) => {
+    const fb = DEFAULT_TESTIMONIALS[i]
+    return {
+      origIndex: i,
+      quote: it.body?.trim() || fb?.quote || '',
+      name: it.title?.trim() || fb?.name || '',
+      context: it.subtitle?.trim() || fb?.context || '',
+    }
+  })
+  return on.value ? mapped : mapped.filter(t => t.quote && t.name)
+})
 </script>

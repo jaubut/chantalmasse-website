@@ -1,10 +1,19 @@
 ---
-// pages/index.vue. Not prerendered: the newsletter section lists the 2 latest posts, read from the CMS per request.
+// pages/index.vue. Not prerendered: page blocks, settings, and the 2 latest posts are read from tls-cms per request
+// (cached in PAGE_CACHE with 60s SWR on live requests; skipped in preview mode or on CMS hiccups).
 import Base from '../layouts/Base.astro'
+import {
+  extractHomeCmsData,
+  extractSiteSettings,
+  getPage,
+  getRequestSettings,
+  type CmsSiteSettingsData,
+  type PageDoc,
+} from '../lib/cms-client'
 import { HERO_IMAGE, SITE_DESCRIPTION } from '../lib/seo'
 import { latestPosts, type BlogPost } from '../lib/blog'
 import { SKIP_CACHE } from '../lib/page-cache'
-import { buildPreviewSetCookie, pageDocId } from '../lib/tls-edit-attrs'
+import { buildPreviewSetCookie } from '../lib/tls-edit-attrs'
 import HeroSection from '../vue/components/HeroSection.vue'
 import ServicesSection from '../vue/components/ServicesSection.vue'
 import PhilosophySection from '../vue/components/PhilosophySection.vue'
@@ -17,43 +26,72 @@ export const prerender = false
 
 const previewToken = Astro.locals.previewToken ?? null
 let previewMode = Astro.locals.previewMode ?? Boolean(previewToken)
-const homeDocId = pageDocId('home')
 const isHttps = Astro.url.protocol === 'https:' || Astro.request.headers.get('x-forwarded-proto')?.split(',')[0]?.trim() === 'https'
+let cookieCleared = false
 
 const onPreviewRejected = (): void => {
   previewMode = false
   Astro.locals.previewMode = false
   Astro.locals.previewToken = null
-  Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+  if (!cookieCleared) {
+    cookieCleared = true
+    Astro.response.headers.append('set-cookie', buildPreviewSetCookie(null, isHttps))
+  }
 }
 
-// A CMS hiccup must not take the home page down: render it without the two cards, and keep it out of the page cache
-// so the next request tries again.
-let posts: BlogPost[] = []
-try {
-  posts = await latestPosts(2, { previewToken, onPreviewRejected })
-} catch (err) {
-  console.error('[home] latest posts unavailable', err)
+// A CMS hiccup must not take the home page down: fall back to static French copy & PR #57 images, and keep it out of
+// PAGE_CACHE so the next request tries again.
+const [pageResult, settingsResult, postsResult] = await Promise.allSettled([
+  getPage('/', { previewToken, onPreviewRejected }),
+  getRequestSettings(Astro.locals, { previewToken, onPreviewRejected }),
+  latestPosts(2, { previewToken, onPreviewRejected }),
+])
+
+let page: PageDoc | null = null
+if (pageResult.status === 'fulfilled') {
+  page = pageResult.value
+} else {
+  console.error('[home] page blocks unavailable', pageResult.reason)
   Astro.response.headers.set(SKIP_CACHE, '1')
 }
+
+let siteSettings: CmsSiteSettingsData | undefined
+if (settingsResult.status === 'fulfilled') {
+  siteSettings = extractSiteSettings(settingsResult.value)
+} else {
+  console.error('[home] settings unavailable', settingsResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+let posts: BlogPost[] = []
+if (postsResult.status === 'fulfilled') {
+  posts = postsResult.value
+} else {
+  console.error('[home] latest posts unavailable', postsResult.reason)
+  Astro.response.headers.set(SKIP_CACHE, '1')
+}
+
+const homeCms = extractHomeCmsData(page)
+const pagePreviewMode = Boolean(previewMode && page)
 ---
 <Base
   title="Chantal Massé — Thérapeute en relation d'aide à Shefford"
   path="/"
   description={SITE_DESCRIPTION}
   ogImage={HERO_IMAGE}
-  pageDocId={homeDocId}
+  pageDocId={page ? homeCms.docId : null}
   previewMode={previewMode}
+  cmsSettings={siteSettings ?? null}
 >
   <div>
     {/* idle: the island only rotates the label and shows the map on hover; its CTA works before hydration
         (data-booking-open, src/lib/client.ts), so hydration stays off the first-paint path. */}
-    <HeroSection client:idle />
-    <ServicesSection />
-    <PhilosophySection />
-    <MethodsSection />
-    <TestimonialsSection />
-    <NewsletterSection client:visible posts={posts} {...(previewMode ? { previewMode: true } : {})} />
-    <BookingSection />
+    <HeroSection client:idle {...(homeCms.hero ? { cmsHero: homeCms.hero } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <ServicesSection {...(homeCms.services ? { cmsServices: homeCms.services } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <PhilosophySection {...(homeCms.philosophy ? { cmsPhilosophy: homeCms.philosophy } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <MethodsSection {...(homeCms.methods ? { cmsMethods: homeCms.methods } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <TestimonialsSection {...(homeCms.testimonials ? { cmsTestimonials: homeCms.testimonials } : {})} {...(pagePreviewMode ? { previewMode: true } : {})} />
+    <NewsletterSection client:visible posts={posts} {...(homeCms.newsletter ? { cmsNewsletter: homeCms.newsletter } : {})} {...(previewMode ? { previewMode: true, pagePreviewMode } : {})} />
+    <BookingSection {...(homeCms.booking ? { cmsBooking: homeCms.booking } : {})} {...(siteSettings ? { cmsSettings: siteSettings } : {})} {...(previewMode ? { previewMode: true, pagePreviewMode } : {})} />
   </div>
 </Base>

@@ -5,59 +5,19 @@
 // verifies `Authorization: Preview <token>` against `PREVIEW_SECRET` (`aud: "tls-preview"`, `site: "chantal-masse"`) on
 // every `stage=draft` call over the service binding and answers 401 on an invalid or expired token. When a 401/403 occurs,
 // `withLiveFallback` transparently falls back to `stage=live` and invokes `onPreviewRejected` so the caller clears the cookie.
-import { env } from 'cloudflare:workers'
-import { CmsError, createCmsClient, type BlogPost, type CmsClient, type PostDoc, type PostSummary } from './cms-client'
+import {
+  DEFAULT_LOCALE,
+  SITE_ID,
+  withLiveFallback,
+  type BlogPost,
+  type CmsReadOpts,
+  type PostDoc,
+  type PostSummary,
+} from './cms-client'
 
+export { SITE_ID }
 export type { BlogPost }
-export const SITE_ID = 'chantal-masse'
-const LOCALE = 'fr'
-
-interface CmsEnv { CMS?: { fetch: (req: Request) => Promise<Response> }, CMS_BASE_URL?: string }
-
-export interface BlogReadOpts {
-  previewToken?: string | null
-  /** Called when `tls-cms` rejects `previewToken` with 401/403 and the read falls back to `stage=live`. */
-  onPreviewRejected?: () => void
-}
-
-let liveClient: CmsClient | undefined
-let lastCmsBinding: unknown
-let lastCmsBaseUrl: string | undefined
-
-function cms(previewToken?: string | null): CmsClient {
-  const e = env as unknown as CmsEnv
-  const token = previewToken || undefined
-  if (!token && liveClient && lastCmsBinding === e.CMS && lastCmsBaseUrl === e.CMS_BASE_URL) {
-    return liveClient
-  }
-  let c: CmsClient
-  if (e.CMS) c = createCmsClient({ siteId: SITE_ID, fetch: req => e.CMS!.fetch(req), previewToken: token })
-  else if (e.CMS_BASE_URL) c = createCmsClient({ siteId: SITE_ID, fetch: req => fetch(req), baseUrl: e.CMS_BASE_URL, previewToken: token })
-  else throw new Error('No CMS: bind CMS (service binding to tls-cms SiteReads) or set CMS_BASE_URL')
-  if (!token) {
-    liveClient = c
-    lastCmsBinding = e.CMS
-    lastCmsBaseUrl = e.CMS_BASE_URL
-  }
-  return c
-}
-
-async function withLiveFallback<T>(
-  opts: BlogReadOpts | undefined,
-  run: (client: CmsClient) => Promise<T>,
-): Promise<T> {
-  const token = opts?.previewToken
-  if (!token) return run(cms(null))
-  try {
-    return await run(cms(token))
-  } catch (err) {
-    if (err instanceof CmsError && (err.status === 401 || err.status === 403)) {
-      opts?.onPreviewRejected?.()
-      return run(cms(null))
-    }
-    throw err
-  }
-}
+export type BlogReadOpts = CmsReadOpts
 
 export function toPost(p: PostSummary): BlogPost {
   return {
@@ -81,7 +41,7 @@ export async function allPosts(opts?: BlogReadOpts): Promise<BlogPost[]> {
   return withLiveFallback(opts, async (client) => {
     const out: PostSummary[] = []
     for (let page = 1; ; page++) {
-      const { data } = await client.listPosts({ locale: LOCALE, page, limit: 50, sort: 'date_desc' })
+      const { data } = await client.listPosts({ locale: opts?.locale ?? DEFAULT_LOCALE, page, limit: 50, sort: 'date_desc' })
       out.push(...data.items)
       if (page >= data.pages) break
     }
@@ -91,7 +51,7 @@ export async function allPosts(opts?: BlogReadOpts): Promise<BlogPost[]> {
 
 export async function latestPosts(n: number, opts?: BlogReadOpts): Promise<BlogPost[]> {
   return withLiveFallback(opts, async (client) => {
-    const { data } = await client.listPosts({ locale: LOCALE, limit: n, sort: 'date_desc' })
+    const { data } = await client.listPosts({ locale: opts?.locale ?? DEFAULT_LOCALE, limit: n, sort: 'date_desc' })
     return data.items.map(toPost)
   })
 }
@@ -99,7 +59,7 @@ export async function latestPosts(n: number, opts?: BlogReadOpts): Promise<BlogP
 export async function getPost(slug: string, opts?: BlogReadOpts): Promise<{ post: BlogPost, doc: PostDoc } | null> {
   if (!/^[a-z0-9-]+$/.test(slug)) return null
   return withLiveFallback(opts, async (client) => {
-    const { data } = await client.getPage({ path: `/blog/${slug}`, locale: LOCALE })
+    const { data } = await client.getPage({ path: `/blog/${slug}`, locale: opts?.locale ?? DEFAULT_LOCALE })
     if (!data || data.type !== 'post') return null
     return { post: toPost(data), doc: data }
   })
